@@ -1,8 +1,0 @@
-pyproject.toml
-setup.py
-LidarAug/transformations.cpp
-LidarAug.egg-info/PKG-INFO
-LidarAug.egg-info/SOURCES.txt
-LidarAug.egg-info/dependency_links.txt
-LidarAug.egg-info/not-zip-safe
-LidarAug.egg-info/top_level.txt
