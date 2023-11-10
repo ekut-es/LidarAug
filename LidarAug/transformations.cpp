@@ -15,8 +15,10 @@ typedef struct {
 } transformations;
 
 void translate(at::Tensor points, at::Tensor translation) {
-  dimensions dims = {points.size(0), points.size(1), points.size(2)};
-  float *t = translation.data<float>();
+  dimensions dims = {static_cast<int>(points.size(0)),
+                     static_cast<int>(points.size(1)),
+                     static_cast<int>(points.size(2))};
+  float *t = translation.data_ptr<float>();
   vec translate = {t[0], t[1], t[2]};
 
   // translate all point clouds in a batch by the same amount
