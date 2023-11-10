@@ -13,4 +13,4 @@ dependencies = [
     "torch",
 ]
 
-target-version = "py37"
+# target-version = "py37"
