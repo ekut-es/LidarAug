@@ -1,18 +1,4 @@
-#include <iostream>
-#include <pybind11/pybind11.h>
-#include <torch/extension.h>
-#include <torch/serialize/tensor.h>
-
-typedef struct {
-  float x, y, z;
-} vec;
-typedef struct {
-  int batch_size, num_points, num_point_features;
-} dimensions;
-typedef struct {
-  float scale;
-  vec translate, rotate;
-} transformations;
+#include "../include/transformations.hpp"
 
 void translate(at::Tensor points, at::Tensor translation) {
   dimensions dims = {static_cast<int>(points.size(0)),
@@ -31,7 +17,10 @@ void translate(at::Tensor points, at::Tensor translation) {
   }
 }
 
-PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
-  m.def("translate", &translate,
-        "translation function for point clouds in C++");
-}
+// uncomment this to include the bindings to build the python library
+// #define BUILD
+#ifdef BUILD
+#include "../include/bindings.hpp"
+#else
+int main(int argc, char *argv[]) { return 0; }
+#endif
