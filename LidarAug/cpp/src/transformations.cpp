@@ -22,5 +22,10 @@ void translate(at::Tensor points, at::Tensor translation) {
 #ifdef BUILD
 #include "../include/bindings.hpp"
 #else
-int main(int argc, char *argv[]) { return 0; }
+#include "gtest/gtest.h"
+
+int main(int argc, char *argv[]) {
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
 #endif
