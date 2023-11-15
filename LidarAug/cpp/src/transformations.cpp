@@ -17,6 +17,20 @@ void translate(at::Tensor points, at::Tensor translation) {
   }
 }
 
+void translate_random(at::Tensor points, at::Tensor labels, double sigma) {
+
+  double x_translation = get_normal(sigma, 0);
+  double y_translation = get_normal(sigma, 0);
+  double z_translation = get_normal(sigma, 0);
+
+  auto translation = at::tensor({x_translation, y_translation, z_translation});
+
+  translate(points, translation);
+  translate(labels, translation);
+
+  // NOTE(tom): coop boxes not implemented
+}
+
 // uncomment this to include the bindings to build the python library
 // #define BUILD
 #ifdef BUILD

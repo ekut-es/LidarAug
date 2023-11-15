@@ -2,6 +2,7 @@
 #ifndef TRANSFORMATIONS_HPP
 #define TRANSFORMATIONS_HPP
 
+#include <random>
 #include <torch/serialize/tensor.h>
 
 typedef struct {
@@ -16,5 +17,18 @@ typedef struct {
 } transformations;
 
 void translate(at::Tensor points, at::Tensor translation);
+void translate_random(at::Tensor points, at::Tensor labels, double scale);
+
+inline double get_normal(double scale, double mean) {
+  // seed
+  std::random_device d;
+
+  // random number generator
+  std::mt19937 gen(d());
+
+  std::normal_distribution<double> dist(mean, scale);
+
+  return dist(gen);
+}
 
 #endif // !TRANSFORMATIONS_HPP
