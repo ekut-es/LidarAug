@@ -7,6 +7,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_compile_definitions(_GLIBCXX_USE_CXX11_ABI=0)
 
+if (MSVC)
+    # additional warning levels for msvc (commonly used on windows)
+    add_compile_options(/W4)
+else()
+    # additional warnings for other compilers
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# Add sign conversion warnings
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-Wconversion)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-Wsign-conversion)
+endif()
+
 include(FetchContent)
 FetchContent_Declare(
   googletest
