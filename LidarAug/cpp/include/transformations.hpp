@@ -19,7 +19,13 @@ typedef struct {
 } transformations;
 
 void translate(at::Tensor points, at::Tensor translation);
+void scale_points(at::Tensor points, double factor);
+void scale_labels(at::Tensor labels, double factor);
+
 void translate_random(at::Tensor points, at::Tensor labels, double scale);
+void scale_random(at::Tensor points, at::Tensor labels, double sigma,
+                  double max_scale);
+
 
 inline double get_normal(double scale, double mean) {
   // seed
