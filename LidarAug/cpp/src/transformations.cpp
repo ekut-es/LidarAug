@@ -1,6 +1,5 @@
 #include "../include/transformations.hpp"
 #include <math.h>
-#include <stdlib.h>
 
 void translate(at::Tensor points, at::Tensor translation) {
   dimensions dims = {static_cast<int>(points.size(0)),
@@ -75,9 +74,13 @@ void scale_random(at::Tensor points, at::Tensor labels, double sigma,
 bool flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
 
   if (prob < 101) [[likely]] {
-    std::size_t r = rand() % 100 + 1;
 
-    if (prob > r) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<std::size_t> distrib(0, 100);
+    auto rand = distrib(gen);
+
+    if (prob > rand) {
       dimensions dims = {static_cast<int>(points.size(0)),
                          static_cast<int>(points.size(1)),
                          static_cast<int>(points.size(2))};
