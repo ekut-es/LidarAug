@@ -31,6 +31,8 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+find_package(Boost REQUIRED)
+
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
@@ -46,6 +48,7 @@ add_executable(
 target_link_libraries(
   transformations_test
   "${TORCH_LIBRARIES}"
+  "${Boost_LIBRARIES}"
   GTest::gtest_main
   # GTest::gtest
 )
