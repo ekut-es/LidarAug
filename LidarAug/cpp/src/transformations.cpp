@@ -1,4 +1,6 @@
 #include "../include/transformations.hpp"
+#include <math.h>
+#include <stdlib.h>
 
 void translate(at::Tensor points, at::Tensor translation) {
   dimensions dims = {static_cast<int>(points.size(0)),
@@ -68,6 +70,33 @@ void scale_random(at::Tensor points, at::Tensor labels, double sigma,
   scale_labels(labels, scale_factor);
 
   // NOTE(tom): coop boxes not implemented
+}
+
+bool flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
+
+  if (prob < 101) [[likely]] {
+    std::size_t r = rand() % 100 + 1;
+
+    if (prob > r) {
+      dimensions dims = {static_cast<int>(points.size(0)),
+                         static_cast<int>(points.size(1)),
+                         static_cast<int>(points.size(2))};
+
+      for (int i = 0; i < dims.batch_size; i++) {
+        for (int j = 0; j < dims.num_points; j++) {
+          points.index({i, j, 1}) *= -1;
+        }
+      }
+      for (int i = 0; i < static_cast<int>(labels.size(0)); i++) {
+        labels.index({i, 1}) *= -1;
+        labels.index({i, 6}) = (labels.index({i, 6}) + M_PI) % (2 * M_PI);
+      }
+    }
+
+    return true;
+  } else {
+    return false;
+  }
 }
 
 // uncomment this to include the bindings to build the python library
