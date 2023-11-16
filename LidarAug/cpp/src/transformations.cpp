@@ -71,34 +71,27 @@ void scale_random(at::Tensor points, at::Tensor labels, double sigma,
   // NOTE(tom): coop boxes not implemented
 }
 
-bool flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
+void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
 
-  if (prob < 101) [[likely]] {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<std::size_t> distrib(0, 100);
+  auto rand = distrib(gen);
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<std::size_t> distrib(0, 100);
-    auto rand = distrib(gen);
+  if (prob > rand) {
+    dimensions dims = {static_cast<int>(points.size(0)),
+                       static_cast<int>(points.size(1)),
+                       static_cast<int>(points.size(2))};
 
-    if (prob > rand) {
-      dimensions dims = {static_cast<int>(points.size(0)),
-                         static_cast<int>(points.size(1)),
-                         static_cast<int>(points.size(2))};
-
-      for (int i = 0; i < dims.batch_size; i++) {
-        for (int j = 0; j < dims.num_points; j++) {
-          points.index({i, j, 1}) *= -1;
-        }
-      }
-      for (int i = 0; i < static_cast<int>(labels.size(0)); i++) {
-        labels.index({i, 1}) *= -1;
-        labels.index({i, 6}) = (labels.index({i, 6}) + M_PI) % (2 * M_PI);
+    for (int i = 0; i < dims.batch_size; i++) {
+      for (int j = 0; j < dims.num_points; j++) {
+        points.index({i, j, 1}) *= -1;
       }
     }
-
-    return true;
-  } else {
-    return false;
+    for (int i = 0; i < static_cast<int>(labels.size(0)); i++) {
+      labels.index({i, 1}) *= -1;
+      labels.index({i, 6}) = (labels.index({i, 6}) + M_PI) % (2 * M_PI);
+    }
   }
 }
 

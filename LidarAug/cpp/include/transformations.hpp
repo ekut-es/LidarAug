@@ -26,7 +26,7 @@ void scale_labels(at::Tensor labels, double factor);
 void translate_random(at::Tensor points, at::Tensor labels, double scale);
 void scale_random(at::Tensor points, at::Tensor labels, double sigma,
                   double max_scale);
-bool flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
+void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
 
 
 inline double get_normal(double scale, double mean) {
