@@ -1,5 +1,4 @@
 #include "../include/transformations.hpp"
-#include "../include/linalg.h"
 #include <math.h>
 
 void translate(at::Tensor points, at::Tensor translation) {
@@ -7,7 +6,7 @@ void translate(at::Tensor points, at::Tensor translation) {
                      static_cast<int>(points.size(1)),
                      static_cast<int>(points.size(2))};
   float *t = translation.data_ptr<float>();
-  vec translate = {t[0], t[1], t[2]};
+  linalg::aliases::float3 translate{t[0], t[1], t[2]};
 
   // translate all point clouds in a batch by the same amount
   for (int i = 0; i < dims.batch_size; i++) {

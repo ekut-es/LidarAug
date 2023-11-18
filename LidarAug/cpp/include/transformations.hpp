@@ -2,6 +2,7 @@
 #ifndef TRANSFORMATIONS_HPP
 #define TRANSFORMATIONS_HPP
 
+#include "../include/linalg.h"
 #include <boost/math/distributions/normal.hpp>
 #include <cstdint>
 #include <optional>
@@ -9,14 +10,11 @@
 #include <torch/serialize/tensor.h>
 
 typedef struct {
-  float x, y, z;
-} vec;
-typedef struct {
   int batch_size, num_points, num_point_features;
 } dimensions;
 typedef struct {
   float scale;
-  vec translate, rotate;
+  linalg::aliases::float3 translate, rotate;
 } transformations;
 
 typedef enum { UNIFORM, SALT_PEPPER, MIN, MAX } noise;
