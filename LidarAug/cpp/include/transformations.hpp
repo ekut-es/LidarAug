@@ -19,6 +19,8 @@ typedef struct {
   vec translate, rotate;
 } transformations;
 
+typedef enum { UNIFORM, SALT_PEPPER, MIN, MAX } noise;
+
 void translate(at::Tensor points, at::Tensor translation);
 void scale_points(at::Tensor points, double factor);
 void scale_labels(at::Tensor labels, double factor);
@@ -27,6 +29,9 @@ void translate_random(at::Tensor points, at::Tensor labels, double scale);
 void scale_random(at::Tensor points, at::Tensor labels, double sigma,
                   double max_scale);
 void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
+
+void random_noise(at::Tensor points, double sigma,
+                  const std::array<double, 8> &ranges, noise type);
 
 inline std::mt19937 get_rng() {
   // seed
@@ -38,6 +43,21 @@ inline std::mt19937 get_rng() {
   return gen;
 }
 
+template <typename T>
+static inline std::vector<T>
+draw_uniform_values(const std::uniform_real_distribution<T> &dist,
+                    std::size_t number_of_values) {
+  auto rng = get_rng();
+
+  std::vector<T> numbers;
+  numbers.reserve(number_of_values);
+
+  for (std::size_t i = 0; i < number_of_values; i++) {
+    numbers.emplace_back(dist(rng));
+  }
+
+  numbers;
+}
 
 inline double get_normal(double scale, double mean) {
   // seed
