@@ -74,10 +74,9 @@ void scale_random(at::Tensor points, at::Tensor labels, double sigma,
 
 void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
 
-  std::random_device rd;
-  std::mt19937 gen(rd());
+  auto rng = get_rng();
   std::uniform_int_distribution<std::size_t> distrib(0, 100);
-  auto rand = distrib(gen);
+  auto rand = distrib(rng);
 
   if (prob > rand) {
     dimensions dims = {static_cast<int>(points.size(0)),

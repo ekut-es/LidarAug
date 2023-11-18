@@ -60,15 +60,11 @@ draw_uniform_values(const std::uniform_real_distribution<T> &dist,
 }
 
 inline double get_normal(double scale, double mean) {
-  // seed
-  std::random_device d;
-
-  // random number generator
-  std::mt19937 gen(d());
+  auto rng = get_rng();
 
   std::normal_distribution<double> dist(mean, scale);
 
-  return dist(gen);
+  return dist(rng);
 }
 
 inline double get_truncated_normal_value(std::optional<double> mean = 0,
@@ -76,11 +72,7 @@ inline double get_truncated_normal_value(std::optional<double> mean = 0,
                                          std::optional<double> low = 0,
                                          std::optional<double> up = 10) {
 
-  // seed
-  std::random_device d;
-
-  // random number generator
-  std::mt19937 gen(d());
+  auto rng = get_rng();
 
   // create normal distribution
   boost::math::normal_distribution<double> nd(mean.value(), sd.value());
@@ -96,7 +88,7 @@ inline double get_truncated_normal_value(std::optional<double> mean = 0,
 
   // sample uniform distribution, returning a uniformly distributed value
   // between upper and lower
-  double ud_sample = ud(gen);
+  double ud_sample = ud(rng);
 
   // use the quantile function (inverse of cdf, so equal to ppf) to 'convert'
   // the sampled probability into its corresponding value
