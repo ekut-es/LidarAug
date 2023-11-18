@@ -28,6 +28,16 @@ void scale_random(at::Tensor points, at::Tensor labels, double sigma,
                   double max_scale);
 void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
 
+inline std::mt19937 get_rng() {
+  // seed
+  std::random_device d;
+
+  // random number generator
+  std::mt19937 gen(d());
+
+  return gen;
+}
+
 
 inline double get_normal(double scale, double mean) {
   // seed
