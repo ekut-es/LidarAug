@@ -21,4 +21,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("thin_out", &thin_out,
         "function to remove a random percentage of points from a point cloud "
         "in C++");
+  m.def("random_noise", &random_noise,
+        "function to introduce random noise to a point clouds in C++");
 }

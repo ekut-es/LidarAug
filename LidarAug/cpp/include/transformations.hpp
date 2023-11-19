@@ -30,6 +30,14 @@ void scale_random(at::Tensor points, at::Tensor labels, double sigma,
                   double max_scale);
 void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
 
+/**
+ * Introduces random noise to a point cloud.
+ *
+ * @param points is a (n, 4) tensor representing the point cloud
+ * @param sigma  TODO
+ * @param ranges TODO
+ * @param type   The type of noise that is to be introduced
+ */
 void random_noise(at::Tensor points, double sigma,
                   const std::array<double, 8> &ranges, noise type);
 void thin_out(at::Tensor points, double sigma);
