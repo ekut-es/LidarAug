@@ -10,7 +10,7 @@ void translate(at::Tensor points, at::Tensor translation) {
 
   // translate all point clouds in a batch by the same amount
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    for (tensor_size_t j = 0; j < dims.num_points; j++) {
+    for (tensor_size_t j = 0; j < dims.num_items; j++) {
       points.index({i, j, POINT_CLOUD_X_IDX}) += translate.x;
       points.index({i, j, POINT_CLOUD_Y_IDX}) += translate.y;
       points.index({i, j, POINT_CLOUD_Z_IDX}) += translate.z;
@@ -21,9 +21,9 @@ void translate(at::Tensor points, at::Tensor translation) {
 void scale_points(at::Tensor points, double factor) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
-  // scale all point clouds in a batch by the same amount
+  // scale all point clouds by the same amount
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    for (tensor_size_t j = 0; j < dims.num_points; j++) {
+    for (tensor_size_t j = 0; j < dims.num_items; j++) {
       points.index({i, j, POINT_CLOUD_X_IDX}) *= factor;
       points.index({i, j, POINT_CLOUD_Y_IDX}) *= factor;
       points.index({i, j, POINT_CLOUD_Z_IDX}) *= factor;

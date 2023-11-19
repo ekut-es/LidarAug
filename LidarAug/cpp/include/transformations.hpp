@@ -12,7 +12,7 @@
 #include <variant>
 
 typedef struct {
-  tensor_size_t batch_size, num_points, num_point_features;
+  tensor_size_t batch_size, num_items, num_features;
 } dimensions;
 typedef struct {
   float scale;
