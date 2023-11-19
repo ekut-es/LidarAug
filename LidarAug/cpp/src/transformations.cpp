@@ -76,7 +76,7 @@ void scale_random(at::Tensor points, at::Tensor labels, double sigma,
 void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
 
   auto rng = get_rng();
-  std::uniform_int_distribution<std::size_t> distrib(0, 100);
+  std::uniform_int_distribution<std::size_t> distrib(0, 99);
   auto rand = distrib(rng);
 
   if (prob > rand) {
