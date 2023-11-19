@@ -15,4 +15,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "function to randomly scale point clouds and bounding boxes in C++");
   m.def("flip_random", &flip_random,
         "function to randomly flip point clouds and bounding boxes in C++");
+  m.def("rotate_random", &rotate_random,
+        "function to randomly rotate point clouds and bounding boxes around "
+        "the 'y' axis in C++");
 }

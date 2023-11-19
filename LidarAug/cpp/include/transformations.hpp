@@ -32,6 +32,7 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
 
 void random_noise(at::Tensor points, double sigma,
                   const std::array<double, 8> &ranges, noise type);
+void rotate_random(at::Tensor points, at::Tensor labels, double sigma);
 
 inline std::mt19937 get_rng() {
   // seed

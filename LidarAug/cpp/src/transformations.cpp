@@ -158,6 +158,34 @@ void random_noise(at::Tensor points, double sigma,
   */
 }
 
+void rotate_random(at::Tensor points, at::Tensor labels, double sigma) {
+  auto rot_angle = get_truncated_normal_value(0, sigma, -180, 180);
+  auto angle_rad = to_rad(rot_angle);
+
+  auto rotation = rotate_yaw(angle_rad);
+
+  for (std::int64_t i = 0; i < points.size(0); i++) {
+    for (std::int64_t j = 0; j < points.size(1); j++) {
+
+      auto points_vec = points[i][j];
+
+      points[i][j] = torch::matmul(points_vec, rotation);
+    }
+  }
+
+  for (std::int64_t i = 0; i < labels.size(0); i++) {
+    auto label = labels[i];
+    auto label_vec = torch::tensor({labels[i][LABEL_X_IDX].item<double>(),
+                                    labels[i][LABEL_Y_IDX].item<double>(),
+                                    labels[i][LABEL_X_IDX].item<double>()});
+    labels[i] = torch::matmul(label_vec, rotation);
+
+    label[LABEL_ANGLE_IDX] = (label[LABEL_ANGLE_IDX] + angle_rad) % (2 * M_PI);
+  }
+
+  // NOTE(tom): coop boxes not implemented
+}
+
 // uncomment this to include the bindings to build the python library
 // #define BUILD
 #ifdef BUILD
