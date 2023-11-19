@@ -24,7 +24,7 @@ void translate(at::Tensor points, at::Tensor translation);
 void scale_points(at::Tensor points, double factor);
 void scale_labels(at::Tensor labels, double factor);
 
-void translate_random(at::Tensor points, at::Tensor labels, double scale);
+void translate_random(at::Tensor points, at::Tensor labels, double sigma);
 void scale_random(at::Tensor points, at::Tensor labels, double sigma,
                   double max_scale);
 void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
