@@ -32,14 +32,18 @@ void scale_points(at::Tensor points, double factor) {
 }
 
 void scale_labels(at::Tensor labels, double factor) {
-  // scale all the labels in a batch by the same amount
-  for (tensor_size_t i = 0; i < labels.size(0); i++) {
-    labels.index({i, LABEL_X_IDX}) *= factor;
-    labels.index({i, LABEL_Y_IDX}) *= factor;
-    labels.index({i, LABEL_Z_IDX}) *= factor;
-    labels.index({i, LABEL_W_IDX}) *= factor;
-    labels.index({i, LABEL_H_IDX}) *= factor;
-    labels.index({i, LABEL_L_IDX}) *= factor;
+  dimensions dims = {labels.size(0), labels.size(1), labels.size(2)};
+
+  // scale all the labels by the same amount
+  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
+    for (tensor_size_t j = 0; j < dims.num_items; j++) {
+      labels.index({i, j, LABEL_X_IDX}) *= factor;
+      labels.index({i, j, LABEL_Y_IDX}) *= factor;
+      labels.index({i, j, LABEL_Z_IDX}) *= factor;
+      labels.index({i, j, LABEL_W_IDX}) *= factor;
+      labels.index({i, j, LABEL_H_IDX}) *= factor;
+      labels.index({i, j, LABEL_L_IDX}) *= factor;
+    }
   }
 }
 
@@ -76,17 +80,21 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
   auto rand = distrib(rng);
 
   if (prob > rand) {
-    dimensions dims = {points.size(0), points.size(1), points.size(2)};
+    dimensions point_dims = {points.size(0), points.size(1), points.size(2)};
 
-    for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-      for (tensor_size_t j = 0; j < dims.num_points; j++) {
+    for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
+      for (tensor_size_t j = 0; j < point_dims.num_items; j++) {
         points.index({i, j, POINT_CLOUD_Y_IDX}) *= -1;
       }
     }
-    for (tensor_size_t i = 0; i < labels.size(0); i++) {
-      labels.index({i, LABEL_Y_IDX}) *= -1;
-      labels.index({i, LABEL_ANGLE_IDX}) =
-          (labels.index({i, 6}) + M_PI) % (2 * M_PI);
+
+    dimensions label_dims = {labels.size(0), labels.size(1), labels.size(2)};
+    for (tensor_size_t i = 0; i < label_dims.batch_size; i++) {
+      for (tensor_size_t j = 0; j < label_dims.num_items; j++) {
+        labels.index({i, j, LABEL_Y_IDX}) *= -1;
+        labels.index({i, j, LABEL_ANGLE_IDX}) =
+            (labels.index({i, 6}) + M_PI) % (2 * M_PI);
+      }
     }
   }
 }
@@ -155,13 +163,14 @@ void random_noise(at::Tensor points, double sigma,
 }
 
 void rotate_random(at::Tensor points, at::Tensor labels, double sigma) {
+  dimensions point_dims = {points.size(0), points.size(1), points.size(2)};
   auto rot_angle = get_truncated_normal_value(0, sigma, -180, 180);
   auto angle_rad = to_rad(rot_angle);
 
   auto rotation = rotate_yaw(angle_rad);
 
-  for (tensor_size_t i = 0; i < points.size(0); i++) {
-    for (tensor_size_t j = 0; j < points.size(1); j++) {
+  for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
+    for (tensor_size_t j = 0; j < point_dims.num_items; j++) {
 
       auto points_vec = points[i][j];
 
@@ -169,29 +178,36 @@ void rotate_random(at::Tensor points, at::Tensor labels, double sigma) {
     }
   }
 
-  for (tensor_size_t i = 0; i < labels.size(0); i++) {
-    auto label = labels[i];
-    auto label_vec = torch::tensor({labels[i][LABEL_X_IDX].item<double>(),
-                                    labels[i][LABEL_Y_IDX].item<double>(),
-                                    labels[i][LABEL_X_IDX].item<double>()});
-    labels[i] = torch::matmul(label_vec, rotation);
+  dimensions label_dims = {labels.size(0), labels.size(1), labels.size(2)};
+  for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
+    for (tensor_size_t j = 0; j < point_dims.num_items; j++) {
+      auto label = labels[i][j];
+      auto label_vec = torch::tensor({label[LABEL_X_IDX].item<double>(),
+                                      label[LABEL_Y_IDX].item<double>(),
+                                      label[LABEL_X_IDX].item<double>()});
+      torch::matmul(label_vec, rotation);
 
-    label[LABEL_ANGLE_IDX] = (label[LABEL_ANGLE_IDX] + angle_rad) % (2 * M_PI);
+      label[LABEL_ANGLE_IDX] =
+          (label[LABEL_ANGLE_IDX] + angle_rad) % (2 * M_PI);
+    }
   }
 
   // NOTE(tom): coop boxes not implemented
 }
 
 void thin_out(at::Tensor points, double sigma) {
-  double percent = get_truncated_normal_value(0, sigma, 0, 1);
-  auto pc_size = points.size(0);
-  std::uniform_int_distribution<tensor_size_t> ud(pc_size,
-                                                  pc_size * (1 - percent));
+  dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
-  auto idx = std::get<1>(draw_values<tensor_size_t>(ud));
+  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
+    double percent = get_truncated_normal_value(0, sigma, 0, 1);
+    std::uniform_int_distribution<tensor_size_t> ud(
+        dims.num_items, dims.num_items * (1 - percent));
 
-  // remove first n-1 elements
-  points.slice(0, idx - 1);
+    auto idx = std::get<1>(draw_values<tensor_size_t>(ud));
+
+    // remove first n-1 elements
+    points[i].slice(0, idx - 1);
+  }
 }
 
 // uncomment this to include the bindings to build the python library
