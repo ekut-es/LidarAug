@@ -108,58 +108,63 @@ void random_noise(at::Tensor points, double sigma,
   std::uniform_real_distribution<float> y_distrib(ranges[2], ranges[3]);
   std::uniform_real_distribution<float> z_distrib(ranges[4], ranges[5]);
 
-  const std::size_t num_points = std::abs(normal(rng));
+  // iterate over batches
+  for (tensor_size_t i = 0; i < points.size(0); i++) {
 
-  const auto x = std::get<0>(draw_values<float>(x_distrib, num_points, true));
-  const auto y = std::get<0>(draw_values<float>(y_distrib, num_points, true));
-  const auto z = std::get<0>(draw_values<float>(z_distrib, num_points, true));
+    const std::size_t num_points = std::abs(normal(rng));
 
-  std::vector<float> noise_intensity;
-  noise_intensity.reserve(num_points);
+    const auto x = std::get<0>(draw_values<float>(x_distrib, num_points, true));
+    const auto y = std::get<0>(draw_values<float>(y_distrib, num_points, true));
+    const auto z = std::get<0>(draw_values<float>(z_distrib, num_points, true));
 
-  switch (type) {
-  case UNIFORM: {
-    std::uniform_real_distribution<float> ud(ranges[6], ranges[7]);
-    noise_intensity = std::get<0>(draw_values<float>(ud, num_points, true));
-    break;
+    std::vector<float> noise_intensity;
+    noise_intensity.reserve(num_points);
+
+    switch (type) {
+    case UNIFORM: {
+      std::uniform_real_distribution<float> ud(ranges[6], ranges[7]);
+      noise_intensity = std::get<0>(draw_values<float>(ud, num_points, true));
+      break;
+    }
+    case SALT_PEPPER: {
+      const auto salt_len = num_points / 2;
+      const std::vector<float> salt(salt_len, 0);
+      const std::vector<float> pepper(num_points - salt_len, 255);
+
+      noise_intensity.insert(noise_intensity.begin(), salt.begin(), salt.end());
+      noise_intensity.insert(noise_intensity.end(), pepper.begin(),
+                             pepper.end());
+      break;
+    }
+    case MIN: {
+      std::fill(noise_intensity.begin(), noise_intensity.end(), 0);
+      break;
+    }
+    case MAX: {
+      std::fill(noise_intensity.begin(), noise_intensity.end(), 255);
+      break;
+    }
+    }
+
+    std::vector<linalg::aliases::float4> stacked_values;
+    stacked_values.reserve(num_points);
+
+    // 'stack' x, y, z and noise (same as np.stack((x, y, z, noise_intensity),
+    // axis=-1))
+    for (std::size_t i = 0; i < num_points; i++) {
+      const linalg::aliases::float4 vals{x[i], y[i], z[i], noise_intensity[i]};
+      stacked_values.emplace_back(vals);
+    }
+
+    // NOTE(tom): this involves copying all the data over. Maybe more efficent
+    // to work with tensors from the beginning?
+    auto noise_tensor = torch::from_blob(
+        stacked_values.data(),
+        {static_cast<tensor_size_t>(stacked_values.size())}, torch::kFloat32);
+
+    // concatenate points
+    torch::stack({points[i], noise_tensor});
   }
-  case SALT_PEPPER: {
-    const auto salt_len = num_points / 2;
-    const std::vector<float> salt(salt_len, 0);
-    const std::vector<float> pepper(num_points - salt_len, 255);
-
-    noise_intensity.insert(noise_intensity.begin(), salt.begin(), salt.end());
-    noise_intensity.insert(noise_intensity.end(), pepper.begin(), pepper.end());
-    break;
-  }
-  case MIN: {
-    std::fill(noise_intensity.begin(), noise_intensity.end(), 0);
-    break;
-  }
-  case MAX: {
-    std::fill(noise_intensity.begin(), noise_intensity.end(), 255);
-    break;
-  }
-  }
-
-  std::vector<linalg::aliases::float4> stacked_values;
-  stacked_values.reserve(num_points);
-
-  // 'stack' x, y, z and noise (same as np.stack((x, y, z, noise_intensity),
-  // axis=-1))
-  for (std::size_t i = 0; i < num_points; i++) {
-    const linalg::aliases::float4 vals{x[i], y[i], z[i], noise_intensity[i]};
-    stacked_values.emplace_back(vals);
-  }
-
-  // NOTE(tom): this involves copying all the data over. Maybe more efficent to
-  // work with tensors from the beginning?
-  auto noise_tensor = torch::from_blob(
-      stacked_values.data(),
-      {static_cast<tensor_size_t>(stacked_values.size())}, torch::kFloat32);
-
-  // concatenate points
-  torch::stack({points, noise_tensor});
 }
 
 void rotate_random(at::Tensor points, at::Tensor labels, double sigma) {
