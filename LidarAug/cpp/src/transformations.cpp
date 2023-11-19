@@ -184,8 +184,8 @@ void rotate_random(at::Tensor points, at::Tensor labels, double sigma) {
   }
 
   dimensions label_dims = {labels.size(0), labels.size(1), labels.size(2)};
-  for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
-    for (tensor_size_t j = 0; j < point_dims.num_items; j++) {
+  for (tensor_size_t i = 0; i < label_dims.batch_size; i++) {
+    for (tensor_size_t j = 0; j < label_dims.num_items; j++) {
       auto label = labels[i][j];
       auto label_vec = torch::tensor({label[LABEL_X_IDX].item<double>(),
                                       label[LABEL_Y_IDX].item<double>(),
