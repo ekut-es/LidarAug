@@ -4,6 +4,7 @@ project(LidarAug)
 # GoogleTest requires at least C++14, but torch requires C++17
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=-*,readability-*)
 
 add_compile_definitions(_GLIBCXX_USE_CXX11_ABI=0)
 
@@ -12,7 +13,7 @@ if (MSVC)
     add_compile_options(/W4)
 else()
     # additional warnings for other compilers
-    add_compile_options(-Wall -Wextra -Wpedantic)
+    add_compile_options(-Wall -Wextra -Wpedantic -Wshadow)
 endif()
 
 # Add sign conversion warnings
