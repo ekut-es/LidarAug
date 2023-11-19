@@ -47,7 +47,7 @@ inline std::mt19937 get_rng() {
 /**
  * Function to draw a number of values from a provided distribution.
  *
- * @param dist              A const ref to one of the following distributions:
+ * @param dist              A reference to one of the following distributions:
  *                            - uniform_int_distribution
  *                            - uniform_real_distribution
  *                            - normal_distribution
