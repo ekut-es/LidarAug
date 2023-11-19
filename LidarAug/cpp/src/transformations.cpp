@@ -164,8 +164,8 @@ void rotate_random(at::Tensor points, at::Tensor labels, double sigma) {
 
   auto rotation = rotate_yaw(angle_rad);
 
-  for (std::int64_t i = 0; i < points.size(0); i++) {
-    for (std::int64_t j = 0; j < points.size(1); j++) {
+  for (tensor_size_t i = 0; i < points.size(0); i++) {
+    for (tensor_size_t j = 0; j < points.size(1); j++) {
 
       auto points_vec = points[i][j];
 
@@ -173,7 +173,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, double sigma) {
     }
   }
 
-  for (std::int64_t i = 0; i < labels.size(0); i++) {
+  for (tensor_size_t i = 0; i < labels.size(0); i++) {
     auto label = labels[i];
     auto label_vec = torch::tensor({labels[i][LABEL_X_IDX].item<double>(),
                                     labels[i][LABEL_Y_IDX].item<double>(),
