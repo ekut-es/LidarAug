@@ -13,7 +13,7 @@ TEST(TranslationTest, BasicAssertions) {
 
   auto expected = torch::tensor({{{2.0, 4.0, 6.0}, {5.0, 7.0, 9.0}}});
 
-  ASSERT_TRUE(tensor.equal(expected));
+  EXPECT_TRUE(tensor.equal(expected));
 }
 
 TEST(ScalingTest, BasicAssertions) {
@@ -30,8 +30,8 @@ TEST(ScalingTest, BasicAssertions) {
   auto expected_labels = torch::tensor(
       {{{2.0, 2.0, 2.0, 4.0, 6.0, 5.0}, {4.0, 4.0, 4.0, 2.0, 2.0, 1.0, M_PI}}});
 
-  ASSERT_TRUE(tensor.equal(expected_points));
-  ASSERT_TRUE(labels.equal(expected_labels));
+  EXPECT_TRUE(tensor.equal(expected_points));
+  EXPECT_TRUE(labels.equal(expected_labels));
 }
 
 TEST(FlipTest, BasicAssertions) {
