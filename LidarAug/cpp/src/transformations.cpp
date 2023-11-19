@@ -105,9 +105,9 @@ void random_noise(at::Tensor points, double sigma,
 
   const std::size_t num_points = std::abs(normal(rng));
 
-  const auto x = draw_uniform_values(x_distrib, num_points);
-  const auto y = draw_uniform_values(y_distrib, num_points);
-  const auto z = draw_uniform_values(z_distrib, num_points);
+  const auto x = std::get<0>(draw_values<float>(x_distrib, num_points, true));
+  const auto y = std::get<0>(draw_values<float>(y_distrib, num_points, true));
+  const auto z = std::get<0>(draw_values<float>(z_distrib, num_points, true));
 
   std::vector<float> noise_values;
   noise_values.reserve(num_points);
@@ -115,7 +115,7 @@ void random_noise(at::Tensor points, double sigma,
   switch (type) {
   case UNIFORM: {
     std::uniform_real_distribution<float> ud(ranges[6], ranges[7]);
-    noise_values = draw_uniform_values(ud, num_points);
+    noise_values = std::get<0>(draw_values<float>(ud, num_points, true));
     break;
   }
   case SALT_PEPPER: {

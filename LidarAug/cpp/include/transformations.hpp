@@ -8,6 +8,7 @@
 #include <optional>
 #include <random>
 #include <torch/serialize/tensor.h>
+#include <variant>
 
 typedef struct {
   int batch_size, num_points, num_point_features;
@@ -41,20 +42,47 @@ inline std::mt19937 get_rng() {
   return gen;
 }
 
-template <typename T>
-static inline std::vector<T>
-draw_uniform_values(const std::uniform_real_distribution<T> &dist,
-                    std::size_t number_of_values) {
+/**
+ * Function to draw a number of values from a provided distribution.
+ *
+ * @param dist              A const ref to one of the following distributions:
+ *                            - uniform_int_distribution
+ *                            - uniform_real_distribution
+ *                            - normal_distribution
+ * @param number_of_values  Optional argument to draw more than one value.
+ * @param force             Forces the function to use a vector even if there is
+ *                          only one value.
+ *
+ * @returns A value of type T or multiple values of type T wrapped in a vector.
+ */
+template <typename T, typename D>
+static inline std::variant<std::vector<T>, T>
+draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
+            std::optional<bool> force = false) {
+
+  static_assert(std::is_base_of<std::uniform_int_distribution<T>, D>::value ||
+                std::is_base_of<std::uniform_real_distribution<T>, D>::value ||
+                std::is_base_of<std::normal_distribution<T>, D>::value ||
+                "'dist' does not satisfy the type constaints!");
+
   auto rng = get_rng();
 
-  std::vector<T> numbers;
-  numbers.reserve(number_of_values);
+  std::size_t n = number_of_values.value_or(1);
 
-  for (std::size_t i = 0; i < number_of_values; i++) {
-    numbers.emplace_back(dist(rng));
+  if (n > 1 || force.value_or(false)) {
+    std::vector<T> numbers;
+    numbers.reserve(n);
+
+    for (std::size_t i = 0; i < n; i++) {
+      auto v = dist(rng);
+      numbers.emplace_back(v);
+    }
+
+    return numbers;
+
+  } else {
+    return dist(rng);
   }
-
-  numbers;
 }
 
 inline double get_normal(double scale, double mean) {
