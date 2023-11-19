@@ -124,4 +124,25 @@ inline double get_truncated_normal_value(std::optional<double> mean = 0,
   return sample;
 }
 
+/**
+ * Generates a rotation matrix around the 'z' axis (yaw) from the provided
+ * angle.
+ *
+ * @param angle is the angle (in radians)
+ *
+ * @returns a 3x3 rotation matrix (in form of a torch::Tensor)
+ */
+inline torch::Tensor rotate_yaw(double angle) {
+
+  auto cos_angle = cos(angle);
+  auto sin_angle = sin(angle);
+
+  auto rotation = torch::tensor({{cos_angle, 0.0, sin_angle},
+                                 {0.0, 1.0, 0.0},
+                                 {-sin_angle, 0.0, cos_angle}});
+  return rotation;
+}
+
+inline double to_rad(double angle) { return angle * (M_PI / 180.0); }
+
 #endif // !TRANSFORMATIONS_HPP
