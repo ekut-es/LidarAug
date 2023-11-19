@@ -2,6 +2,8 @@
 #include "../include/transformations.hpp"
 #include <gtest/gtest.h>
 
+// NOLINTBEGIN
+
 TEST(TranslationTest, BasicAssertions) {
   auto tensor = torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}});
   auto translation = torch::tensor({1.0, 2.0, 3.0});
@@ -30,3 +32,5 @@ TEST(ScalingTest, BasicAssertions) {
   ASSERT_TRUE(tensor.equal(expected_points));
   ASSERT_TRUE(labels.equal(expected_labels));
 }
+
+// NOLINTEND
