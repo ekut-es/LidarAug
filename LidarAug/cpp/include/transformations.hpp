@@ -3,6 +3,7 @@
 #define TRANSFORMATIONS_HPP
 
 #include "../include/linalg.h"
+#include <array>
 #include <boost/math/distributions/normal.hpp>
 #include <cstdint>
 #include <optional>
