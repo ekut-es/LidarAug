@@ -109,7 +109,7 @@ void random_noise(at::Tensor points, double sigma,
   std::uniform_real_distribution<float> z_distrib(ranges[4], ranges[5]);
 
   // iterate over batches
-  for (tensor_size_t i = 0; i < points.size(0); i++) {
+  for (tensor_size_t batch_num = 0; batch_num < points.size(0); batch_num++) {
 
     const std::size_t num_points = std::abs(normal(rng));
 
@@ -163,7 +163,7 @@ void random_noise(at::Tensor points, double sigma,
         {static_cast<tensor_size_t>(stacked_values.size())}, torch::kFloat32);
 
     // concatenate points
-    torch::stack({points[i], noise_tensor});
+    torch::stack({points[batch_num], noise_tensor});
   }
 }
 
