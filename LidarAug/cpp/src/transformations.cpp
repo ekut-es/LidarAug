@@ -1,4 +1,6 @@
 #include "../include/transformations.hpp"
+#include "../include/label.hpp"
+#include "../include/point_cloud.hpp"
 #include <math.h>
 
 void translate(at::Tensor points, at::Tensor translation) {
@@ -11,9 +13,9 @@ void translate(at::Tensor points, at::Tensor translation) {
   // translate all point clouds in a batch by the same amount
   for (int i = 0; i < dims.batch_size; i++) {
     for (int j = 0; j < dims.num_points; j++) {
-      points.index({i, j, 0}) += translate.x;
-      points.index({i, j, 1}) += translate.y;
-      points.index({i, j, 2}) += translate.z;
+      points.index({i, j, POINT_CLOUD_X_IDX}) += translate.x;
+      points.index({i, j, POINT_CLOUD_Y_IDX}) += translate.y;
+      points.index({i, j, POINT_CLOUD_Z_IDX}) += translate.z;
     }
   }
 }
@@ -26,9 +28,9 @@ void scale_points(at::Tensor points, double factor) {
   // scale all point clouds in a batch by the same amount
   for (int i = 0; i < dims.batch_size; i++) {
     for (int j = 0; j < dims.num_points; j++) {
-      points.index({i, j, 0}) *= factor;
-      points.index({i, j, 1}) *= factor;
-      points.index({i, j, 2}) *= factor;
+      points.index({i, j, POINT_CLOUD_X_IDX}) *= factor;
+      points.index({i, j, POINT_CLOUD_Y_IDX}) *= factor;
+      points.index({i, j, POINT_CLOUD_Z_IDX}) *= factor;
     }
   }
 }
@@ -36,12 +38,12 @@ void scale_points(at::Tensor points, double factor) {
 void scale_labels(at::Tensor labels, double factor) {
   // scale all the labels in a batch by the same amount
   for (int i = 0; i < static_cast<int>(labels.size(0)); i++) {
-    labels.index({i, 0}) *= factor;
-    labels.index({i, 1}) *= factor;
-    labels.index({i, 2}) *= factor;
-    labels.index({i, 3}) *= factor;
-    labels.index({i, 4}) *= factor;
-    labels.index({i, 5}) *= factor;
+    labels.index({i, LABEL_X_IDX}) *= factor;
+    labels.index({i, LABEL_Y_IDX}) *= factor;
+    labels.index({i, LABEL_Z_IDX}) *= factor;
+    labels.index({i, LABEL_W_IDX}) *= factor;
+    labels.index({i, LABEL_H_IDX}) *= factor;
+    labels.index({i, LABEL_L_IDX}) *= factor;
   }
 }
 
@@ -84,12 +86,13 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
 
     for (int i = 0; i < dims.batch_size; i++) {
       for (int j = 0; j < dims.num_points; j++) {
-        points.index({i, j, 1}) *= -1;
+        points.index({i, j, POINT_CLOUD_Y_IDX}) *= -1;
       }
     }
     for (int i = 0; i < static_cast<int>(labels.size(0)); i++) {
-      labels.index({i, 1}) *= -1;
-      labels.index({i, 6}) = (labels.index({i, 6}) + M_PI) % (2 * M_PI);
+      labels.index({i, LABEL_Y_IDX}) *= -1;
+      labels.index({i, LABEL_ANGLE_IDX}) =
+          (labels.index({i, 6}) + M_PI) % (2 * M_PI);
     }
   }
 }
