@@ -180,6 +180,18 @@ void rotate_random(at::Tensor points, at::Tensor labels, double sigma) {
   // NOTE(tom): coop boxes not implemented
 }
 
+void thin_out(at::Tensor points, double sigma) {
+  double percent = get_truncated_normal_value(0, sigma, 0, 1);
+  auto pc_size = points.size(0);
+  std::uniform_int_distribution<std::int64_t> ud(pc_size,
+                                                 pc_size * (1 - percent));
+
+  auto idx = std::get<1>(draw_values<std::int64_t>(ud));
+
+  // remove first n-1 elements
+  points.slice(0, idx - 1);
+}
+
 // uncomment this to include the bindings to build the python library
 // #define BUILD
 #ifdef BUILD

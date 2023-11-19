@@ -18,4 +18,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("rotate_random", &rotate_random,
         "function to randomly rotate point clouds and bounding boxes around "
         "the 'y' axis in C++");
+  m.def("thin_out", &thin_out,
+        "function to remove a random percentage of points from a point cloud "
+        "in C++");
 }
