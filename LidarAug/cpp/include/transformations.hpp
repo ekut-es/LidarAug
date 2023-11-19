@@ -3,16 +3,16 @@
 #define TRANSFORMATIONS_HPP
 
 #include "../include/linalg.h"
+#include "../include/tensor.hpp"
 #include <array>
 #include <boost/math/distributions/normal.hpp>
-#include <cstdint>
 #include <optional>
 #include <random>
 #include <torch/serialize/tensor.h>
 #include <variant>
 
 typedef struct {
-  int batch_size, num_points, num_point_features;
+  tensor_size_t batch_size, num_points, num_point_features;
 } dimensions;
 typedef struct {
   float scale;
