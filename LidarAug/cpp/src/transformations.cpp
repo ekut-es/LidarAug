@@ -93,7 +93,7 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
       for (tensor_size_t j = 0; j < label_dims.num_items; j++) {
         labels.index({i, j, LABEL_Y_IDX}) *= -1;
         labels.index({i, j, LABEL_ANGLE_IDX}) =
-            (labels.index({i, 6}) + M_PI) % (2 * M_PI);
+            (labels.index({i, j, LABEL_ANGLE_IDX}) + M_PI) % (2 * M_PI);
       }
     }
   }
