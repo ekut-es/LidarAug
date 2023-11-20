@@ -43,7 +43,7 @@ void random_noise(at::Tensor points, double sigma,
 void thin_out(at::Tensor points, double sigma);
 void rotate_random(at::Tensor points, at::Tensor labels, double sigma);
 
-inline std::mt19937 get_rng() {
+[[nodiscard]] inline std::mt19937 get_rng() {
   // seed
   std::random_device d;
 
@@ -67,7 +67,7 @@ inline std::mt19937 get_rng() {
  * @returns A value of type T or multiple values of type T wrapped in a vector.
  */
 template <typename T, typename D>
-static inline std::variant<std::vector<T>, T>
+[[nodiscard]] static inline std::variant<std::vector<T>, T>
 draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
             std::optional<bool> force = false) {
 
@@ -96,7 +96,7 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
   }
 }
 
-inline double get_normal(double scale, double mean) {
+[[nodiscard]] inline double get_normal(double scale, double mean) {
   auto rng = get_rng();
 
   std::normal_distribution<double> dist(mean, scale);
@@ -104,10 +104,9 @@ inline double get_normal(double scale, double mean) {
   return dist(rng);
 }
 
-inline double get_truncated_normal_value(std::optional<double> mean = 0,
-                                         std::optional<double> sd = 1,
-                                         std::optional<double> low = 0,
-                                         std::optional<double> up = 10) {
+[[nodiscard]] inline double get_truncated_normal_value(
+    std::optional<double> mean = 0, std::optional<double> sd = 1,
+    std::optional<double> low = 0, std::optional<double> up = 10) {
 
   auto rng = get_rng();
 
@@ -142,7 +141,7 @@ inline double get_truncated_normal_value(std::optional<double> mean = 0,
  *
  * @returns a 3x3 rotation matrix (in form of a torch::Tensor)
  */
-inline torch::Tensor rotate_yaw(double angle) {
+[[nodiscard]] inline torch::Tensor rotate_yaw(double angle) {
 
   auto cos_angle = cos(angle);
   auto sin_angle = sin(angle);
@@ -153,6 +152,8 @@ inline torch::Tensor rotate_yaw(double angle) {
   return rotation;
 }
 
-inline double to_rad(double angle) { return angle * (M_PI / 180.0); }
+[[nodiscard]] inline double to_rad(double angle) {
+  return angle * (M_PI / 180.0);
+}
 
 #endif // !TRANSFORMATIONS_HPP
