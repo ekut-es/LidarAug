@@ -5,7 +5,7 @@
 
 void translate(at::Tensor points, at::Tensor translation) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
-  float *t = translation.data_ptr<float>();
+  auto *t = translation.data_ptr<float>();
   linalg::aliases::float3 translate{t[0], t[1], t[2]};
 
   // translate all point clouds in a batch by the same amount
@@ -18,7 +18,7 @@ void translate(at::Tensor points, at::Tensor translation) {
   }
 }
 
-void scale_points(at::Tensor points, double factor) {
+void scale_points(at::Tensor points, float factor) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   // scale all point clouds by the same amount
@@ -31,7 +31,7 @@ void scale_points(at::Tensor points, double factor) {
   }
 }
 
-void scale_labels(at::Tensor labels, double factor) {
+void scale_labels(at::Tensor labels, float factor) {
   dimensions dims = {labels.size(0), labels.size(1), labels.size(2)};
 
   // scale all the labels by the same amount
@@ -47,13 +47,13 @@ void scale_labels(at::Tensor labels, double factor) {
   }
 }
 
-void translate_random(at::Tensor points, at::Tensor labels, double sigma) {
+void translate_random(at::Tensor points, at::Tensor labels, float sigma) {
 
   std::normal_distribution<double> dist(sigma, 0);
 
-  double x_translation = std::get<1>(draw_values<double>(dist));
-  double y_translation = std::get<1>(draw_values<double>(dist));
-  double z_translation = std::get<1>(draw_values<double>(dist));
+  auto x_translation = std::get<1>(draw_values<float>(dist));
+  auto y_translation = std::get<1>(draw_values<float>(dist));
+  auto z_translation = std::get<1>(draw_values<float>(dist));
 
   auto translation = at::tensor({x_translation, y_translation, z_translation});
 
@@ -63,10 +63,10 @@ void translate_random(at::Tensor points, at::Tensor labels, double sigma) {
   // NOTE(tom): coop boxes not implemented
 }
 
-void scale_random(at::Tensor points, at::Tensor labels, double sigma,
-                  double max_scale) {
+void scale_random(at::Tensor points, at::Tensor labels, float sigma,
+                  float max_scale) {
 
-  double scale_factor =
+  auto scale_factor =
       get_truncated_normal_value(1, sigma, (1 / max_scale), max_scale);
 
   scale_points(points, scale_factor);
@@ -101,11 +101,11 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
   }
 }
 
-void random_noise(at::Tensor points, double sigma,
-                  const std::array<double, 8> &ranges, noise type) {
+void random_noise(at::Tensor points, float sigma,
+                  const std::array<float, 8> &ranges, noise type) {
 
   auto rng = get_rng();
-  std::normal_distribution<double> normal(0.0, sigma);
+  std::normal_distribution<float> normal(0.0, sigma);
   std::uniform_real_distribution<float> x_distrib(ranges[0], ranges[1]);
   std::uniform_real_distribution<float> y_distrib(ranges[2], ranges[3]);
   std::uniform_real_distribution<float> z_distrib(ranges[4], ranges[5]);
@@ -169,7 +169,8 @@ void random_noise(at::Tensor points, double sigma,
   }
 }
 
-void rotate_random(at::Tensor points, at::Tensor labels, double sigma) {
+void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
+
   dimensions point_dims = {points.size(0), points.size(1), points.size(2)};
   auto rot_angle = get_truncated_normal_value(0, sigma, -180, 180);
   auto angle_rad = to_rad(rot_angle);
@@ -202,11 +203,11 @@ void rotate_random(at::Tensor points, at::Tensor labels, double sigma) {
   // NOTE(tom): coop boxes not implemented
 }
 
-void thin_out(at::Tensor points, double sigma) {
+void thin_out(at::Tensor points, float sigma) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    double percent = get_truncated_normal_value(0, sigma, 0, 1);
+    auto percent = get_truncated_normal_value(0, sigma, 0, 1);
     std::uniform_int_distribution<tensor_size_t> ud(
         dims.num_items, dims.num_items * (1 - percent));
 
