@@ -43,14 +43,17 @@ void random_noise(at::Tensor points, double sigma,
 void thin_out(at::Tensor points, double sigma);
 void rotate_random(at::Tensor points, at::Tensor labels, double sigma);
 
+/**
+ * Returns a random number generator using `std::random_device` as a seed and
+ * `std::mt18837` as a generator.
+ *
+ * @returns an instance of a `std::mt19937` instance
+ */
 [[nodiscard]] inline std::mt19937 get_rng() {
-  // seed
-  std::random_device d;
+  std::random_device seed;
+  std::mt19937 rng(seed());
 
-  // random number generator
-  std::mt19937 gen(d());
-
-  return gen;
+  return rng;
 }
 
 /**
