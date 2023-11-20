@@ -49,9 +49,11 @@ void scale_labels(at::Tensor labels, double factor) {
 
 void translate_random(at::Tensor points, at::Tensor labels, double sigma) {
 
-  double x_translation = get_normal(sigma, 0);
-  double y_translation = get_normal(sigma, 0);
-  double z_translation = get_normal(sigma, 0);
+  std::normal_distribution<double> dist(sigma, 0);
+
+  double x_translation = std::get<1>(draw_values<double>(dist));
+  double y_translation = std::get<1>(draw_values<double>(dist));
+  double z_translation = std::get<1>(draw_values<double>(dist));
 
   auto translation = at::tensor({x_translation, y_translation, z_translation});
 

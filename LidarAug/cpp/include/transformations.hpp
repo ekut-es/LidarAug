@@ -99,14 +99,6 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
   }
 }
 
-[[nodiscard]] inline double get_normal(double scale, double mean) {
-  auto rng = get_rng();
-
-  std::normal_distribution<double> dist(mean, scale);
-
-  return dist(rng);
-}
-
 [[nodiscard]] inline double get_truncated_normal_value(
     std::optional<double> mean = 0, std::optional<double> sd = 1,
     std::optional<double> low = 0, std::optional<double> up = 10) {
