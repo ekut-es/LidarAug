@@ -176,7 +176,7 @@ void random_noise(at::Tensor points, float sigma,
 void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
 
   dimensions point_dims = {points.size(0), points.size(1), points.size(2)};
-  auto rot_angle = get_truncated_normal_value(0, sigma, -180, 180);
+  auto rot_angle = get_truncated_normal_value(0, sigma, -PI_DEG, PI_DEG);
   auto angle_rad = to_rad(rot_angle);
 
   auto rotation = rotate_yaw(angle_rad);

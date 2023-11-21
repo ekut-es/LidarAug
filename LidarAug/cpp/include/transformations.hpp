@@ -11,6 +11,8 @@
 #include <torch/serialize/tensor.h>
 #include <variant>
 
+#define PI_DEG 180.0
+
 typedef struct {
   tensor_size_t batch_size, num_items, num_features;
 } dimensions;
@@ -156,7 +158,7 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
 }
 
 [[nodiscard]] inline float to_rad(float angle) noexcept {
-  return angle * (M_PI / 180.0);
+  return angle * (M_PI / PI_DEG);
 }
 
 #endif // !TRANSFORMATIONS_HPP
