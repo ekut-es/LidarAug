@@ -49,7 +49,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, double sigma);
  *
  * @returns an instance of a `std::mt19937` instance
  */
-[[nodiscard]] inline std::mt19937 get_rng() {
+[[nodiscard]] inline std::mt19937 get_rng() noexcept {
   std::random_device seed;
   std::mt19937 rng(seed());
 
@@ -72,7 +72,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, double sigma);
 template <typename T, typename D>
 [[nodiscard]] static inline std::variant<std::vector<T>, T>
 draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
-            std::optional<bool> force = false) {
+            std::optional<bool> force = false) noexcept {
 
   static_assert(std::is_base_of<std::uniform_int_distribution<T>, D>::value ||
                 std::is_base_of<std::uniform_real_distribution<T>, D>::value ||
@@ -147,7 +147,7 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
   return rotation;
 }
 
-[[nodiscard]] inline float to_rad(double angle) {
+[[nodiscard]] inline float to_rad(double angle) noexcept {
   return angle * (M_PI / 180.0);
 }
 
