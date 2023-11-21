@@ -18,8 +18,8 @@ TEST(TranslationTest, BasicAssertions) {
 
 TEST(ScalingTest, BasicAssertions) {
   auto tensor = torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}});
-  auto labels = torch::tensor(
-      {{{1.0, 1.0, 1.0, 2.0, 3.0, 2.5}, {2.0, 2.0, 2.0, 1.0, 1.0, 0.5, M_PI}}});
+  auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 2.5, M_PI},
+                                {2.0, 2.0, 2.0, 1.0, 1.0, 0.5, M_PI}}});
 
   auto scaling_factor = 2.0;
 
@@ -27,8 +27,9 @@ TEST(ScalingTest, BasicAssertions) {
   scale_labels(labels, scaling_factor);
 
   auto expected_points = torch::tensor({{{2.0, 4.0, 6.0}, {8.0, 10.0, 12.0}}});
-  auto expected_labels = torch::tensor(
-      {{{2.0, 2.0, 2.0, 4.0, 6.0, 5.0}, {4.0, 4.0, 4.0, 2.0, 2.0, 1.0, M_PI}}});
+  auto expected_labels =
+      torch::tensor({{{2.0, 2.0, 2.0, 4.0, 6.0, 5.0, M_PI},
+                      {4.0, 4.0, 4.0, 2.0, 2.0, 1.0, M_PI}}});
 
   EXPECT_TRUE(tensor.equal(expected_points));
   EXPECT_TRUE(labels.equal(expected_labels));
