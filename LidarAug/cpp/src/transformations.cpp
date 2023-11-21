@@ -218,9 +218,7 @@ void thin_out(at::Tensor points, float sigma) {
   }
 }
 
-// uncomment this to include the bindings to build the python library
-// #define BUILD
-#ifdef BUILD
+#ifdef BUILD_MODULE
 #include "../include/bindings.hpp"
 #else
 #include "gtest/gtest.h"
