@@ -82,4 +82,17 @@ TEST(FlipTest, BasicAssertions) {
   }
 }
 
+TEST(AngleConversionTest, BasicAssertions) {
+  constexpr static float three_sixty_deg = 360;
+  constexpr static float zero_deg = 0;
+  constexpr static float one_eighty_deg = 180;
+  constexpr static float ninety_deg = 90;
+
+  EXPECT_EQ(to_rad(three_sixty_deg), 2 * static_cast<float>(M_PI));
+  EXPECT_EQ(to_rad(zero_deg), 0);
+  EXPECT_EQ(to_rad(one_eighty_deg), static_cast<float>(M_PI));
+  EXPECT_EQ(to_rad(-one_eighty_deg), static_cast<float>(-M_PI));
+  EXPECT_EQ(to_rad(ninety_deg), static_cast<float>(M_PI / 2));
+  EXPECT_EQ(to_rad(-ninety_deg), static_cast<float>((-M_PI) / 2));
+}
 // NOLINTEND
