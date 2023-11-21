@@ -19,6 +19,14 @@ typedef struct {
   linalg::aliases::float3 translate, rotate;
 } transformations;
 
+template <typename T> struct range {
+  T min, max;
+};
+
+template <typename T> struct distribution_ranges {
+  range<T> x_range, y_range, z_range, uniform_range;
+};
+
 typedef enum { UNIFORM, SALT_PEPPER, MIN, MAX } noise;
 
 void translate(at::Tensor points, at::Tensor translation);
@@ -39,7 +47,7 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
  * @param type   The type of noise that is to be introduced
  */
 void random_noise(at::Tensor points, double sigma,
-                  const std::array<double, 8> &ranges, noise type);
+                  const distribution_ranges<float> &ranges, noise type);
 void thin_out(at::Tensor points, double sigma);
 void rotate_random(at::Tensor points, at::Tensor labels, double sigma);
 

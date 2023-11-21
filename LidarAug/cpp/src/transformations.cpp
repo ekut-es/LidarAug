@@ -102,13 +102,16 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
 }
 
 void random_noise(at::Tensor points, float sigma,
-                  const std::array<float, 8> &ranges, noise type) {
+                  const distribution_ranges<float> &ranges, noise type) {
 
   auto rng = get_rng();
   std::normal_distribution<float> normal(0.0, sigma);
-  std::uniform_real_distribution<float> x_distrib(ranges[0], ranges[1]);
-  std::uniform_real_distribution<float> y_distrib(ranges[2], ranges[3]);
-  std::uniform_real_distribution<float> z_distrib(ranges[4], ranges[5]);
+  std::uniform_real_distribution<float> x_distrib(ranges.x_range.min,
+                                                  ranges.x_range.max);
+  std::uniform_real_distribution<float> y_distrib(ranges.y_range.min,
+                                                  ranges.y_range.max);
+  std::uniform_real_distribution<float> z_distrib(ranges.z_range.min,
+                                                  ranges.z_range.max);
 
   // iterate over batches
   for (tensor_size_t batch_num = 0; batch_num < points.size(0); batch_num++) {
@@ -124,7 +127,8 @@ void random_noise(at::Tensor points, float sigma,
 
     switch (type) {
     case UNIFORM: {
-      std::uniform_real_distribution<float> ud(ranges[6], ranges[7]);
+      std::uniform_real_distribution<float> ud(ranges.uniform_range.min,
+                                               ranges.uniform_range.max);
       noise_intensity = std::get<0>(draw_values<float>(ud, num_points, true));
       break;
     }
