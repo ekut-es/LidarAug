@@ -70,10 +70,15 @@ TEST(FlipTest, BasicAssertions) {
 
     static constexpr auto probability = 0;
 
+    auto expected_points = torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}});
+    auto expected_labels =
+        torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 4.0, 2.5},
+                        {2.0, 2.0, 2.0, 1.0, 1.0, 1.5, 0.5}}});
+
     flip_random(points, labels, probability);
 
-    EXPECT_TRUE(points.equal(points)) << "Points unexpectidly changed";
-    EXPECT_TRUE(labels.equal(labels)) << "Labels unexpectidly changed";
+    EXPECT_TRUE(points.equal(expected_points)) << "Points unexpectidly changed";
+    EXPECT_TRUE(labels.equal(expected_labels)) << "Labels unexpectidly changed";
   }
 }
 
