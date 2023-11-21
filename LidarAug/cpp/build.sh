@@ -8,6 +8,9 @@ if [[ $1 == "clean" ]]; then
         rm -rf build
     fi
 
+elif [[ $1 == "install" ]]; then
+    cd ../..
+    pip install .
 else
     cmake -DCMAKE_PREFIX_PATH="$TORCH_PATH" -S . -B build
     cmake --build build
