@@ -30,12 +30,12 @@ template <typename T> struct distribution_ranges {
 typedef enum { UNIFORM, SALT_PEPPER, MIN, MAX } noise;
 
 void translate(at::Tensor points, at::Tensor translation);
-void scale_points(at::Tensor points, double factor);
-void scale_labels(at::Tensor labels, double factor);
+void scale_points(at::Tensor points, float factor);
+void scale_labels(at::Tensor labels, float factor);
 
-void translate_random(at::Tensor points, at::Tensor labels, double sigma);
-void scale_random(at::Tensor points, at::Tensor labels, double sigma,
-                  double max_scale);
+void translate_random(at::Tensor points, at::Tensor labels, float sigma);
+void scale_random(at::Tensor points, at::Tensor labels, float sigma,
+                  float max_scale);
 void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
 
 /**
@@ -46,10 +46,10 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
  * @param ranges TODO
  * @param type   The type of noise that is to be introduced
  */
-void random_noise(at::Tensor points, double sigma,
+void random_noise(at::Tensor points, float sigma,
                   const distribution_ranges<float> &ranges, noise type);
-void thin_out(at::Tensor points, double sigma);
-void rotate_random(at::Tensor points, at::Tensor labels, double sigma);
+void thin_out(at::Tensor points, float sigma);
+void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
 
 /**
  * Returns a random number generator using `std::random_device` as a seed and
@@ -144,7 +144,7 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
  *
  * @returns a 3x3 rotation matrix (in form of a torch::Tensor)
  */
-[[nodiscard]] inline torch::Tensor rotate_yaw(double angle) {
+[[nodiscard]] inline torch::Tensor rotate_yaw(float angle) {
 
   auto cos_angle = cos(angle);
   auto sin_angle = sin(angle);
@@ -155,7 +155,7 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
   return rotation;
 }
 
-[[nodiscard]] inline float to_rad(double angle) noexcept {
+[[nodiscard]] inline float to_rad(float angle) noexcept {
   return angle * (M_PI / 180.0);
 }
 
