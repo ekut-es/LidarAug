@@ -1,6 +1,7 @@
 
 LidarAug.egg-info
 build
+build_files
 **/__pycache__
 .cache
 **/compile_commands.json
