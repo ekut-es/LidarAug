@@ -148,12 +148,12 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
  */
 [[nodiscard]] inline torch::Tensor rotate_yaw(float angle) {
 
-  auto cos_angle = cos(angle);
-  auto sin_angle = sin(angle);
+  float cos_angle = cos(angle);
+  float sin_angle = sin(angle);
 
-  auto rotation = torch::tensor({{cos_angle, 0.0, sin_angle},
-                                 {0.0, 1.0, 0.0},
-                                 {-sin_angle, 0.0, cos_angle}});
+  auto rotation = torch::tensor({{cos_angle, 0.0f, sin_angle},
+                                 {0.0f, 1.0f, 0.0f},
+                                 {-sin_angle, 0.0f, cos_angle}});
   return rotation;
 }
 
