@@ -1,6 +1,7 @@
 #include "../include/transformations.hpp"
 #include "../include/label.hpp"
 #include "../include/point_cloud.hpp"
+#include "../include/utils.hpp"
 #include <math.h>
 
 void translate(at::Tensor points, at::Tensor translation) {
