@@ -1,6 +1,7 @@
 #include "../include/transformations.hpp"
 #include "../include/label.hpp"
 #include "../include/point_cloud.hpp"
+#include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <math.h>
 
