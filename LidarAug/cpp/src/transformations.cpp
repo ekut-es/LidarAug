@@ -48,6 +48,27 @@ void scale_labels(at::Tensor labels, float factor) {
   }
 }
 
+/**
+ * Only scale the dimensions of the bounding box (L, H, W) by a constant factor.
+ * The labels have the shape (N, M, K), where N is the batch size, M, is the
+ * number of labels and K are the features.
+ *
+ * @param labels are the labels with their bounding boxes.
+ * @param factor is the constant factor to scale the box dimensions by.
+ */
+inline void scale_box_dimensions(at::Tensor labels, float factor) {
+  dimensions dims = {labels.size(0), labels.size(1), labels.size(2)};
+
+  // scale all the boxes by the same amount
+  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
+    for (tensor_size_t j = 0; j < dims.num_items; j++) {
+      labels.index({i, j, LABEL_W_IDX}) *= factor;
+      labels.index({i, j, LABEL_H_IDX}) *= factor;
+      labels.index({i, j, LABEL_L_IDX}) *= factor;
+    }
+  }
+}
+
 void translate_random(at::Tensor points, at::Tensor labels, float sigma) {
 
   std::normal_distribution<float> dist(sigma, 0);
