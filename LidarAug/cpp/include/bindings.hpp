@@ -23,4 +23,17 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "in C++");
   m.def("random_noise", &random_noise,
         "function to introduce random noise to a point clouds in C++");
+  pybind11::enum_<noise>(m, "noise")
+      .value("UNIFORM", UNIFORM)
+      .value("SALT_PEPPER", SALT_PEPPER)
+      .value("MIN", MIN)
+      .value("MAX", MAX)
+      .export_values();
+
+  // NOTE(tom): Unfortunately it is necessary to export this with defined types,
+  //            as PyBind does not appear to support generics/templates.
+  pybind11::class_<range<float>>(m, "distribution_range")
+      .def(pybind11::init<>());
+  pybind11::class_<distribution_ranges<float>>(m, "distribution_ranges")
+      .def(pybind11::init<>());
 }
