@@ -1,4 +1,5 @@
 
+#include "../include/stats.hpp"
 #include "../include/transformations.hpp"
 #include "../include/utils.hpp"
 #include <gtest/gtest.h>
@@ -95,5 +96,19 @@ TEST(AngleConversionTest, BasicAssertions) {
   EXPECT_EQ(to_rad(-one_eighty_deg), static_cast<float>(-M_PI));
   EXPECT_EQ(to_rad(ninety_deg), static_cast<float>(M_PI / 2));
   EXPECT_EQ(to_rad(-ninety_deg), static_cast<float>((-M_PI) / 2));
+}
+
+TEST(DrawUniformValuesTest, BasicAssertions) {
+  constexpr static auto size = 10;
+  constexpr static auto num_values = 3;
+
+  auto values = draw_unique_uniform_values<int>(size, num_values);
+
+  EXPECT_EQ(values.size(), num_values);
+
+  for (auto val : values) {
+    EXPECT_LT(val, size);
+    EXPECT_GE(val, 0);
+  }
 }
 // NOLINTEND

@@ -95,4 +95,30 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
   return sample;
 }
 
+/**
+ * Draws a fixed amount of values from a pool of potential values.
+ *
+ * NOTE: this can generate a lot of values and might be inefficient for big
+ * `size`s but small `num_values`!
+ *
+ * @param size       defines the end of the range of total values: [0; size)
+ * @param num_values is the number of values to be drawn
+ *
+ * @returns a vector containing `num_values` random unique values in [0; size)
+ */
+template <typename T>
+[[nodiscard]] inline std::vector<T>
+draw_unique_uniform_values(std::size_t size, std::size_t num_values) {
+  auto rng = get_rng();
+
+  std::vector<T> values(size);
+  std::generate(values.begin(), values.end(),
+                [value = 0]() mutable { return value++; });
+  std::shuffle(values.begin(), values.end(), rng);
+
+  values.resize(num_values);
+
+  return values;
+}
+
 #endif // !STATS_HPP
