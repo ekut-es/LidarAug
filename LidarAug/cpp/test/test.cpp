@@ -111,4 +111,20 @@ TEST(DrawUniformValuesTest, BasicAssertions) {
     EXPECT_GE(val, 0);
   }
 }
+
+TEST(ThinOutTest, BasicAssertions) {
+  auto points = torch::rand({2, 10, 4});
+  dimensions dims_original = {points.size(0), points.size(1), points.size(2)};
+  auto new_points = thin_out(points, 1);
+  dimensions dims_edited = {new_points.size(0), new_points.size(1),
+                            new_points.size(2)};
+
+  EXPECT_EQ(dims_edited.batch_size, dims_original.batch_size);
+  EXPECT_LT(dims_edited.num_items, dims_original.num_items)
+      << "Expected the amounts to have reduced...\noriginal:\n"
+      << points << "\nnew:\n"
+      << new_points;
+  EXPECT_EQ(dims_edited.num_features, dims_original.num_features);
+}
+
 // NOLINTEND
