@@ -31,7 +31,7 @@ void scale_labels(at::Tensor labels, float factor);
 void translate_random(at::Tensor points, at::Tensor labels, float sigma);
 void scale_random(at::Tensor points, at::Tensor labels, float sigma,
                   float max_scale);
-void scale_local(at::Tensor points, at::Tensor labels, float sigma,
+void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
                  float max_scale);
 void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
 
