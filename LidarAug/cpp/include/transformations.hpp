@@ -24,7 +24,7 @@ template <typename T> struct distribution_ranges {
 
 typedef enum { UNIFORM, SALT_PEPPER, MIN, MAX } noise;
 
-void translate(at::Tensor points, at::Tensor translation);
+void translate(at::Tensor points, const at::Tensor &translation);
 void scale_points(at::Tensor points, float factor);
 void scale_labels(at::Tensor labels, float factor);
 

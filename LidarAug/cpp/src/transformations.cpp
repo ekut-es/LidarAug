@@ -6,7 +6,7 @@
 #include "../include/utils.hpp"
 #include <math.h>
 
-void translate(at::Tensor points, at::Tensor translation) {
+void translate(at::Tensor points, const at::Tensor &translation) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
   auto *t = translation.data_ptr<float>();
   linalg::aliases::float3 translate{t[0], t[1], t[2]};
