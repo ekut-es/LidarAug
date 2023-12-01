@@ -1,6 +1,7 @@
 #include "../include/transformations.hpp"
 #include "../include/label.hpp"
 #include "../include/point_cloud.hpp"
+#include "../include/roiware_utils.h"
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <math.h>
@@ -96,6 +97,47 @@ void scale_random(at::Tensor points, at::Tensor labels, float sigma,
   scale_labels(labels, scale_factor);
 
   // NOTE(tom): coop boxes not implemented
+}
+
+void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
+                 float max_scale) {
+
+  auto scale_factor =
+      get_truncated_normal_value(1, sigma, (1 / max_scale), max_scale);
+
+  dimensions label_dims = {labels.size(0), labels.size(1), labels.size(2)};
+  dimensions point_dims = {point_cloud.size(0), point_cloud.size(1),
+                           point_cloud.size(2)};
+
+  for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
+    auto point_indeces =
+        torch::zeros({label_dims.num_items, point_dims.num_items}, torch::kI32);
+
+    points_in_boxes_cpu(
+        labels[i].contiguous(),
+        point_cloud[i]
+            .index({torch::indexing::None, torch::indexing::Slice(0, 3)})
+            .contiguous(),
+        point_indeces);
+
+    for (int j = 0; j < point_indeces.size(0); j++) {
+      auto box = labels[i][j];
+      auto points = point_indeces[j];
+
+      if (!at::any(points).item<bool>())
+        continue;
+
+      point_cloud.index(
+          {points, torch::indexing::Slice(torch::indexing::None, 3)}) -=
+          box.slice(0, torch::indexing::None, 3);
+      point_cloud.index({points, torch::indexing::Slice(torch::indexing::None,
+                                                        3)}) *= scale_factor;
+      point_cloud.index(
+          {points, torch::indexing::Slice(torch::indexing::None, 3)}) +=
+          box.slice(0, torch::indexing::None, 3);
+    }
+  }
+  scale_box_dimensions(labels, scale_factor);
 }
 
 void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
