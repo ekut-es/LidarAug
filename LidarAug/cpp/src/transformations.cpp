@@ -272,15 +272,31 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
   // NOTE(tom): coop boxes not implemented
 }
 
-void thin_out(at::Tensor points, float sigma) {
+[[nodiscard]] torch::Tensor thin_out(at::Tensor points, float sigma) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
-  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    auto percent = get_truncated_normal_value(0, sigma, 0, 1);
-    std::uniform_int_distribution<tensor_size_t> ud(
-        dims.num_items, dims.num_items * (1 - percent));
+  const auto percent = get_truncated_normal_value(0, sigma, 0, 1);
 
-    auto idx = std::get<1>(draw_values<tensor_size_t>(ud));
+  const auto num_values =
+      static_cast<tensor_size_t>(std::ceil(dims.num_items * (1 - percent)));
+
+  auto new_tensor =
+      torch::empty({dims.batch_size, num_values, dims.num_features});
+
+  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
+
+    auto indeces = draw_unique_uniform_values<tensor_size_t>(
+        static_cast<std::size_t>(dims.num_items),
+        static_cast<std::size_t>(num_values));
+
+    for (tensor_size_t j = 0; j < num_values; j++) {
+      new_tensor[i][j] = points[i][indeces[static_cast<std::size_t>(j)]];
+    }
+  }
+
+  return new_tensor;
+}
+
 
     // remove first n-1 elements
     points[i].slice(0, idx - 1);

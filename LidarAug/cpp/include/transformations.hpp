@@ -45,7 +45,23 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
  */
 void random_noise(at::Tensor points, float sigma,
                   const distribution_ranges<float> &ranges, noise type);
-void thin_out(at::Tensor points, float sigma);
+
+/**
+ * Randomly genereates a percentage from a norma distribution, which determines
+ * how many items should be 'thinned out'. From that percentage random indeces
+ * are uniformly drawn (in a random order, where each index is unique).
+ *
+ * Finally a new tensor is created containing the items present at those
+ * indeces.
+ *
+ * @param points is the point cloud.
+ * @param sigma  is the standard diviation of the distribution that genereates
+ *               the percentage.
+ *
+ * @returns a new tensor containing the new data
+ */
+[[nodiscard]] torch::Tensor thin_out(at::Tensor points, float sigma);
+
 void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
 
 #endif // !TRANSFORMATIONS_HPP
