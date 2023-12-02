@@ -17,8 +17,14 @@
  * @returns an instance of a `std::mt19937` instance
  */
 [[nodiscard]] inline std::mt19937 get_rng() noexcept {
+
+#ifdef TEST_RNG
+  auto seed = 123u;
+  std::mt19937 rng(seed);
+#else
   std::random_device seed;
   std::mt19937 rng(seed());
+#endif
 
   return rng;
 }

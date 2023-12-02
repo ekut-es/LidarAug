@@ -304,6 +304,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
 }
 
 #ifdef BUILD_MODULE
+#undef TEST_RNG
 #include "../include/bindings.hpp"
 #else
 #include "gtest/gtest.h"
