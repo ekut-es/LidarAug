@@ -261,7 +261,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
       auto label = labels[i][j];
       auto label_vec = torch::tensor({label[LABEL_X_IDX].item<double>(),
                                       label[LABEL_Y_IDX].item<double>(),
-                                      label[LABEL_X_IDX].item<double>()});
+                                      label[LABEL_Z_IDX].item<double>()});
       torch::matmul(label_vec, rotation);
 
       label[LABEL_ANGLE_IDX] =
