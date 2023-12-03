@@ -4,7 +4,9 @@
 #include "../include/roiware_utils.h"
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
+#include <algorithm>
 #include <math.h>
+#include <torch/types.h>
 
 void translate(at::Tensor points, const at::Tensor &translation) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
@@ -169,6 +171,8 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
 void random_noise(at::Tensor points, float sigma,
                   const distribution_ranges<float> &ranges, noise type) {
 
+  dimensions dims = {points.size(0), points.size(1), points.size(3)};
+
   auto rng = get_rng();
   std::normal_distribution<float> normal(0.0, sigma);
   std::uniform_real_distribution<float> x_distrib(ranges.x_range.min,
@@ -178,60 +182,71 @@ void random_noise(at::Tensor points, float sigma,
   std::uniform_real_distribution<float> z_distrib(ranges.z_range.min,
                                                   ranges.z_range.max);
 
-  // iterate over batches
-  for (tensor_size_t batch_num = 0; batch_num < points.size(0); batch_num++) {
+  const std::size_t num_points = std::abs(normal(rng));
 
-    const std::size_t num_points = std::abs(normal(rng));
+  // iterate over batches
+  for (tensor_size_t batch_num = 0; batch_num < dims.batch_size; batch_num++) {
 
     const auto x = std::get<0>(draw_values<float>(x_distrib, num_points, true));
     const auto y = std::get<0>(draw_values<float>(y_distrib, num_points, true));
     const auto z = std::get<0>(draw_values<float>(z_distrib, num_points, true));
 
-    std::vector<float> noise_intensity;
-    noise_intensity.reserve(num_points);
+    std::vector<float> noise_intensity = [type, num_points,
+                                          min = ranges.uniform_range.min,
+                                          max = ranges.uniform_range.max]() {
+      switch (type) {
+      case UNIFORM: {
+        std::uniform_real_distribution<float> ud(min, max);
+        auto noise_intensity =
+            std::get<0>(draw_values<float>(ud, num_points, true));
+        return noise_intensity;
+      }
+      case SALT_PEPPER: {
+        const auto salt_len = num_points / 2;
+        const std::vector<float> salt(salt_len, 0);
+        const std::vector<float> pepper(num_points - salt_len, 255);
 
-    switch (type) {
-    case UNIFORM: {
-      std::uniform_real_distribution<float> ud(ranges.uniform_range.min,
-                                               ranges.uniform_range.max);
-      noise_intensity = std::get<0>(draw_values<float>(ud, num_points, true));
-      break;
-    }
-    case SALT_PEPPER: {
-      const auto salt_len = num_points / 2;
-      const std::vector<float> salt(salt_len, 0);
-      const std::vector<float> pepper(num_points - salt_len, 255);
+        std::vector<float> noise_intensity;
+        noise_intensity.reserve(num_points);
+        noise_intensity.insert(noise_intensity.begin(), salt.begin(),
+                               salt.end());
+        noise_intensity.insert(noise_intensity.end(), pepper.begin(),
+                               pepper.end());
+        return noise_intensity;
+      }
+      case MIN: {
+        std::vector<float> noise_intensity;
+        noise_intensity.reserve(num_points);
+        std::fill(noise_intensity.begin(), noise_intensity.end(), 0);
+        return noise_intensity;
+      }
+      case MAX: {
+        std::vector<float> noise_intensity;
+        noise_intensity.reserve(num_points);
+        std::fill(noise_intensity.begin(), noise_intensity.end(), 255);
+        return noise_intensity;
+      }
+      }
+    }();
 
-      noise_intensity.insert(noise_intensity.begin(), salt.begin(), salt.end());
-      noise_intensity.insert(noise_intensity.end(), pepper.begin(),
-                             pepper.end());
-      break;
-    }
-    case MIN: {
-      std::fill(noise_intensity.begin(), noise_intensity.end(), 0);
-      break;
-    }
-    case MAX: {
-      std::fill(noise_intensity.begin(), noise_intensity.end(), 255);
-      break;
-    }
-    }
+    auto noise_tensor = torch::empty(
+        {static_cast<tensor_size_t>(num_points), dims.num_features},
+        torch::kF32);
 
-    std::vector<linalg::aliases::float4> stacked_values;
-    stacked_values.reserve(num_points);
+    // NOTE(tom): maybe this can be done more efficiently using masks or by
+    // having x, y, z and noise_intensity as tensors from the beginning, but I'd
+    // need benchmarks to figure that out
 
     // 'stack' x, y, z and noise (same as np.stack((x, y, z, noise_intensity),
     // axis=-1))
     for (std::size_t i = 0; i < num_points; i++) {
-      const linalg::aliases::float4 vals{x[i], y[i], z[i], noise_intensity[i]};
-      stacked_values.emplace_back(vals);
-    }
 
-    // NOTE(tom): this involves copying all the data over. Maybe more efficent
-    // to work with tensors from the beginning?
-    auto noise_tensor = torch::from_blob(
-        stacked_values.data(),
-        {static_cast<tensor_size_t>(stacked_values.size())}, torch::kFloat32);
+      noise_tensor[static_cast<tensor_size_t>(i)][POINT_CLOUD_X_IDX] = x[i];
+      noise_tensor[static_cast<tensor_size_t>(i)][POINT_CLOUD_Y_IDX] = y[i];
+      noise_tensor[static_cast<tensor_size_t>(i)][POINT_CLOUD_Z_IDX] = z[i];
+      noise_tensor[static_cast<tensor_size_t>(i)][POINT_CLOUD_I_IDX] =
+          noise_intensity[i];
+    }
 
     // concatenate points
     torch::stack({points[batch_num], noise_tensor});
