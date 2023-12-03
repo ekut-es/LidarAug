@@ -127,4 +127,71 @@ TEST(ThinOutTest, BasicAssertions) {
   EXPECT_EQ(dims_edited.num_features, dims_original.num_features);
 }
 
+// doing tests with controlled random number generation (no random seed)
+#ifdef TEST_RNG
+
+TEST(DrawValuesTest, BasicAssertions) {
+  std::uniform_int_distribution<int> ud(0, 100);
+  std::normal_distribution<float> nd(0, 5);
+  {
+    auto ud_result = std::get<0>(draw_values<int>(ud, 10));
+    std::vector<int> ud_expected_values{70, 72, 28, 43, 22, 69, 55, 72, 72, 49};
+
+    auto nd_result = std::get<0>(draw_values<float>(nd, 10));
+    std::vector<float> nd_expected_values{
+        5.42903471,  5.00874138, -2.83043623, -8.46256065,  3.64878798,
+        -5.22126913, 8.69870472, 2.03683066,  -0.366712242, 9.06219864};
+
+    EXPECT_EQ(ud_result, ud_expected_values)
+        << "Vectors are not equal: expected\n"
+        << ud_expected_values << "\nactual:\n"
+        << ud_result;
+
+    EXPECT_EQ(nd_result, nd_expected_values)
+        << "Vectors are not equal: expected\n"
+        << nd_expected_values << "\nactual:\n"
+        << nd_result;
+  }
+
+  {
+    auto ud_result = std::get<1>(draw_values<int>(ud));
+    int expected_value = 70;
+
+    auto nd_result = std::get<1>(draw_values<float>(nd));
+    float nd_expected_value = 5.42903471;
+
+    EXPECT_EQ(ud_result, expected_value) << "Values are not equal: expected\n"
+                                         << expected_value << "\nactual:\n"
+                                         << ud_result;
+
+    EXPECT_EQ(nd_result, nd_expected_value)
+        << "Values are not equal: expected\n"
+        << nd_expected_value << "\nactual:\n"
+        << nd_result;
+  }
+  {
+
+    auto ud_result = std::get<0>(draw_values<int>(ud, {}, true));
+    std::vector<int> ud_expected_value = {70};
+
+    // NOTE(tom): for some reason this results in the second value from the
+    // sequence, not the first
+    auto nd_result = std::get<0>(draw_values<float>(nd, {}, true));
+    std::vector<float> nd_expected_value{5.42903471};
+
+    EXPECT_EQ(ud_result, ud_expected_value)
+        << "Vectors are not equal: expected\n"
+        << ud_expected_value << "\nactual:\n"
+        << ud_result;
+
+    // NOTE(tom): as a result of the note above; this will fail
+    EXPECT_EQ(nd_result, nd_expected_value)
+        << "Vectors are not equal: expected\n"
+        << nd_expected_value << "\nactual:\n"
+        << nd_result;
+  }
+}
+
+#endif
+
 // NOLINTEND
