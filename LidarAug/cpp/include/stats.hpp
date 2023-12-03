@@ -56,17 +56,15 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
 
   std::size_t n = number_of_values.value_or(1);
 
-  if (n > 1 || force.value_or(false)) {
-    std::vector<T> numbers;
-    numbers.reserve(n);
+  if (n > 1) {
+    std::vector<T> numbers(n);
 
-    for (std::size_t i = 0; i < n; i++) {
-      auto v = dist(rng);
-      numbers.emplace_back(v);
-    }
+    auto draw_values = [&dist, &rng]() { return dist(rng); };
+    std::generate(numbers.begin(), numbers.end(), draw_values);
 
     return numbers;
-
+  } else if (force.value_or(false)) {
+    return std::vector<T>{dist(rng)};
   } else {
     return dist(rng);
   }
