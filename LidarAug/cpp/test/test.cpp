@@ -192,6 +192,27 @@ TEST(DrawValuesTest, BasicAssertions) {
   }
 }
 
+TEST(TranslateRandomTest, BasicAssertions) {
+
+  auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
+                              torch::kF32);
+  auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 2.5, M_PI},
+                                {2.0, 2.0, 2.0, 1.0, 1.0, 0.5, M_PI}}},
+                              torch::kF32);
+  const float sigma = 1;
+
+  // NOTE(tom): the generated translation vector should be {1, 1, 1}
+  translate_random(points, labels, sigma);
+
+  auto expected_points = torch::tensor(
+      {{{2.0, 3.0, 4.0, 10.0}, {5.0, 6.0, 7.0, -10.0}}}, torch::kF32);
+  auto expected_labels = torch::tensor({{{2.0, 2.0, 2.0, 2.0, 3.0, 2.5, M_PI},
+                                         {3.0, 3.0, 3.0, 1.0, 1.0, 0.5, M_PI}}},
+                                       torch::kF32);
+
+  EXPECT_TRUE(points.equal(expected_points));
+  EXPECT_TRUE(labels.equal(expected_labels));
+}
 #endif
 
 // NOLINTEND
