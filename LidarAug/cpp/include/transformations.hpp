@@ -43,7 +43,7 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
  * @param ranges TODO
  * @param type   The type of noise that is to be introduced
  */
-void random_noise(at::Tensor points, float sigma,
+void random_noise(at::Tensor &points, float sigma,
                   const distribution_ranges<float> &ranges, noise type);
 
 /**

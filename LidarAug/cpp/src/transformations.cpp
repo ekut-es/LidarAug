@@ -168,10 +168,10 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
   }
 }
 
-void random_noise(at::Tensor points, float sigma,
+void random_noise(at::Tensor &points, float sigma,
                   const distribution_ranges<float> &ranges, noise type) {
 
-  dimensions dims = {points.size(0), points.size(1), points.size(3)};
+  dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   auto rng = get_rng();
   std::normal_distribution<float> normal(0.0, sigma);
@@ -191,9 +191,9 @@ void random_noise(at::Tensor points, float sigma,
     const auto y = std::get<0>(draw_values<float>(y_distrib, num_points, true));
     const auto z = std::get<0>(draw_values<float>(z_distrib, num_points, true));
 
-    std::vector<float> noise_intensity = [type, num_points,
-                                          min = ranges.uniform_range.min,
-                                          max = ranges.uniform_range.max]() {
+    auto noise_intensity =
+        [type, num_points, min = ranges.uniform_range.min,
+         max = ranges.uniform_range.max]() -> std::vector<float> {
       switch (type) {
       case UNIFORM: {
         std::uniform_real_distribution<float> ud(min, max);
@@ -249,7 +249,7 @@ void random_noise(at::Tensor points, float sigma,
     }
 
     // concatenate points
-    torch::stack({points[batch_num], noise_tensor});
+    points = torch::cat({points, noise_tensor.unsqueeze(0)}, 1);
   }
 }
 
