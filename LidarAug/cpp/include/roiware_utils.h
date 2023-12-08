@@ -7,6 +7,9 @@
 
 #include <ATen/core/TensorBody.h>
 #include <math.h>
+
+// NOLINTBEGIN
+
 inline void lidar_to_local_coords_cpu(float shift_x, float shift_y,
                                       float rot_angle, float &local_x,
                                       float &local_y) {
@@ -60,3 +63,5 @@ inline int points_in_boxes_cpu(at::Tensor boxes_tensor, at::Tensor pts_tensor,
 
   return 1;
 }
+
+// NOLINTEND
