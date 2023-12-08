@@ -213,6 +213,34 @@ TEST(TranslateRandomTest, BasicAssertions) {
   EXPECT_TRUE(points.equal(expected_points));
   EXPECT_TRUE(labels.equal(expected_labels));
 }
+
+TEST(ScaleRandomTest, BasicAssertions) {
+
+  auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
+                              torch::kF32);
+  auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 2.5, M_PI},
+                                {2.0, 2.0, 2.0, 1.0, 1.0, 0.5, M_PI}}},
+                              torch::kF32);
+  const float sigma = 10;
+  const float max_scale = 11;
+
+  // NOTE(tom): scale_factor = 7.21812582
+  scale_random(points, labels, sigma, max_scale);
+
+  auto expected_points =
+      torch::tensor({{{7.21812582, 14.43625164, 21.65437746, 10.0},
+                      {28.87250328, 36.0906291, 43.30875492, -10.0}}},
+                    torch::kF32);
+  auto expected_labels =
+      torch::tensor({{{7.21812582, 7.21812582, 7.21812582, 14.43625164,
+                       21.65437746, 18.04531455, M_PI},
+                      {14.43625164, 14.43625164, 14.43625164, 7.21812582,
+                       7.21812582, 3.60906291, M_PI}}},
+                    torch::kF32);
+
+  EXPECT_TRUE(points.equal(expected_points));
+  EXPECT_TRUE(labels.equal(expected_labels));
+}
 #endif
 
 // NOLINTEND
