@@ -127,6 +127,25 @@ TEST(ThinOutTest, BasicAssertions) {
   EXPECT_EQ(dims_edited.num_features, dims_original.num_features);
 }
 
+TEST(RandomNoiseTest, BasicAssertions) {
+  auto points =
+      torch::tensor({{{1.0, 2.0, 3.0, 10.9}, {4.0, 5.0, 6.0, -10.0}}});
+  const auto points_original =
+      torch::tensor({{{1.0, 2.0, 3.0, 10.9}, {4.0, 5.0, 6.0, -10.0}}});
+
+  constexpr static float sigma = 2;
+
+  constexpr static distribution_ranges<float> ranges{
+      {1, 2}, {1, 2}, {1, 2}, {1, 2}};
+
+  random_noise(points, sigma, ranges, UNIFORM);
+
+  for (tensor_size_t i = 0; i < points.size(0); i++) {
+    EXPECT_GT(points[i].size(0), points_original[i].size(0))
+        << "No noise has been added...";
+  }
+}
+
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
