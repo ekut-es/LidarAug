@@ -5,7 +5,7 @@
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 #include <torch/types.h>
 
 void translate(at::Tensor points, const at::Tensor &translation) {
@@ -182,7 +182,7 @@ void random_noise(at::Tensor &points, float sigma,
   std::uniform_real_distribution<float> z_distrib(ranges.z_range.min,
                                                   ranges.z_range.max);
 
-  const std::size_t num_points = std::abs(normal(rng));
+  const auto num_points = static_cast<std::size_t>(std::abs(normal(rng)));
 
   // iterate over batches
   for (tensor_size_t batch_num = 0; batch_num < dims.batch_size; batch_num++) {
@@ -190,10 +190,8 @@ void random_noise(at::Tensor &points, float sigma,
     const auto x = std::get<0>(draw_values<float>(x_distrib, num_points, true));
     const auto y = std::get<0>(draw_values<float>(y_distrib, num_points, true));
     const auto z = std::get<0>(draw_values<float>(z_distrib, num_points, true));
-
-    auto noise_intensity =
-        [type, num_points, min = ranges.uniform_range.min,
-         max = ranges.uniform_range.max]() -> std::vector<float> {
+    const auto i = [type, num_points, min = ranges.uniform_range.min,
+                    max = ranges.uniform_range.max]() -> std::vector<float> {
       switch (type) {
       case UNIFORM: {
         std::uniform_real_distribution<float> ud(min, max);
@@ -226,6 +224,10 @@ void random_noise(at::Tensor &points, float sigma,
         std::fill(noise_intensity.begin(), noise_intensity.end(), 255);
         return noise_intensity;
       }
+
+      default:
+        // NOTE(tom): This should be unreachable
+        assert(false);
       }
     }();
 
@@ -239,13 +241,12 @@ void random_noise(at::Tensor &points, float sigma,
 
     // 'stack' x, y, z and noise (same as np.stack((x, y, z, noise_intensity),
     // axis=-1))
-    for (std::size_t i = 0; i < num_points; i++) {
+    for (std::size_t j = 0; j < num_points; j++) {
 
-      noise_tensor[static_cast<tensor_size_t>(i)][POINT_CLOUD_X_IDX] = x[i];
-      noise_tensor[static_cast<tensor_size_t>(i)][POINT_CLOUD_Y_IDX] = y[i];
-      noise_tensor[static_cast<tensor_size_t>(i)][POINT_CLOUD_Z_IDX] = z[i];
-      noise_tensor[static_cast<tensor_size_t>(i)][POINT_CLOUD_I_IDX] =
-          noise_intensity[i];
+      noise_tensor[static_cast<tensor_size_t>(j)][POINT_CLOUD_X_IDX] = x[j];
+      noise_tensor[static_cast<tensor_size_t>(j)][POINT_CLOUD_Y_IDX] = y[j];
+      noise_tensor[static_cast<tensor_size_t>(j)][POINT_CLOUD_Z_IDX] = z[j];
+      noise_tensor[static_cast<tensor_size_t>(j)][POINT_CLOUD_I_IDX] = i[j];
     }
 
     // concatenate points

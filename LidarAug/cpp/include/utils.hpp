@@ -1,7 +1,7 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
-#include <math.h>
+#include <cmath>
 #include <torch/serialize/tensor.h>
 
 #define PI_DEG 180.0
