@@ -264,23 +264,27 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
   for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < point_dims.num_items; j++) {
 
-      auto points_vec = points[i][j];
+      auto points_vec = points.index(
+          {i, j, torch::indexing::Slice(torch::indexing::None, 3)});
 
-      points[i][j] = torch::matmul(points_vec, rotation);
+      points.index_put_(
+          {i, j, torch::indexing::Slice(torch::indexing::None, 3)},
+          torch::matmul(points_vec, rotation));
     }
   }
 
   dimensions label_dims = {labels.size(0), labels.size(1), labels.size(2)};
   for (tensor_size_t i = 0; i < label_dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < label_dims.num_items; j++) {
-      auto label = labels[i][j];
-      auto label_vec = torch::tensor({label[LABEL_X_IDX].item<double>(),
-                                      label[LABEL_Y_IDX].item<double>(),
-                                      label[LABEL_Z_IDX].item<double>()});
-      torch::matmul(label_vec, rotation);
+      auto label_vec = labels.index(
+          {i, j, torch::indexing::Slice(torch::indexing::None, 3)});
 
-      label[LABEL_ANGLE_IDX] =
-          (label[LABEL_ANGLE_IDX] + angle_rad) % (2 * M_PI);
+      labels.index_put_(
+          {i, j, torch::indexing::Slice(torch::indexing::None, 3)},
+          torch::matmul(label_vec, rotation));
+
+      labels[i][j][LABEL_ANGLE_IDX] =
+          (labels[i][j][LABEL_ANGLE_IDX] + angle_rad) % (2.0f * M_PI);
     }
   }
 
