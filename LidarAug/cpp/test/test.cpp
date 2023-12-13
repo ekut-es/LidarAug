@@ -3,6 +3,7 @@
 #include "../include/transformations.hpp"
 #include "../include/utils.hpp"
 #include <gtest/gtest.h>
+#include <math.h>
 #include <torch/types.h>
 
 // NOLINTBEGIN
@@ -259,6 +260,77 @@ TEST(ScaleRandomTest, BasicAssertions) {
 
   EXPECT_TRUE(points.equal(expected_points));
   EXPECT_TRUE(labels.equal(expected_labels));
+}
+
+TEST(RotateRandomTest, BasicAssertions) {
+
+  auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
+                              torch::kF32);
+
+  auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 2.5, M_PI},
+                                {2.0, 2.0, 2.0, 1.0, 1.0, 0.5, M_PI}}},
+                              torch::kF32);
+
+  constexpr float ROT_ANGLE = 28.0920143;
+  rotate_random(points, labels, 50);
+
+  auto points_coordinates =
+      torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}}, torch::kF32);
+  constexpr float angle = ROT_ANGLE * (M_PI / PI_DEG);
+  const auto rotation_vector = rotate_yaw(angle);
+
+  const auto v1 = torch::matmul(points_coordinates[0][0], rotation_vector);
+  const auto v2 = torch::matmul(points_coordinates[0][1], rotation_vector);
+
+  // The vectors need to contiguous for pointer pointer access
+  ASSERT_TRUE(v1.is_contiguous());
+  ASSERT_TRUE(v2.is_contiguous());
+
+  const float *const vec1 = v1.const_data_ptr<float>();
+  const float *const vec2 = v2.const_data_ptr<float>();
+
+  const auto expected_points = torch::tensor(
+      {{vec1[0], vec1[1], vec1[2], 10.0f}, {vec2[0], vec2[1], vec2[2], -10.0f}},
+      torch::kF32);
+
+  // NOTE(tom): Using allclose here because the equality check ends up failing
+  //            despite there being no visible difference between the tensor
+  //            elements. Even when printing with full 32bit floating point
+  //            precision (%.9g).
+  EXPECT_TRUE(points.allclose(expected_points))
+      << "`points` not equal to `expected_points`:\npoints:" << points
+      << "\nexpected_points:\n"
+      << expected_points;
+
+  auto label_coordinates =
+      torch::tensor({{{1.0, 1.0, 1.0}, {2.0, 2.0, 2.0}}}, torch::kF32);
+
+  const auto l1 = torch::matmul(label_coordinates[0][0], rotation_vector);
+  const auto l2 = torch::matmul(label_coordinates[0][1], rotation_vector);
+
+  // The vectors need to contiguous for pointer pointer access
+  ASSERT_TRUE(l1.is_contiguous());
+  ASSERT_TRUE(l2.is_contiguous());
+
+  const float *const label1 = l1.const_data_ptr<float>();
+  const float *const label2 = l2.const_data_ptr<float>();
+
+  const float angle_label1 = fmodf32((M_PI + angle), (2.0f * M_PI));
+  const float angle_label2 = fmodf32((M_PI + angle), (2.0f * M_PI));
+
+  const auto expected_labels = torch::tensor(
+      {{label1[0], label1[1], label1[2], 2.0f, 3.0f, 2.5f, angle_label1},
+       {label2[0], label2[1], label2[2], 1.0f, 1.0f, 0.5f, angle_label2}},
+      torch::kF32);
+
+  // NOTE(tom): Using allclose here because the equality check ends up failing
+  //            despite there being no visible difference between the tensor
+  //            elements. Even when printing with full 32bit floating point
+  //            precision (%.9g).
+  EXPECT_TRUE(labels.allclose(expected_labels))
+      << "`labels` not equal to `expected_labels`:\nlabels:" << labels
+      << "\nexpected_labels:\n"
+      << expected_labels;
 }
 #endif
 
