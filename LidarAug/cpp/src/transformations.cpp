@@ -317,12 +317,6 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
   return new_tensor;
 }
 
-
-    // remove first n-1 elements
-    points[i].slice(0, idx - 1);
-  }
-}
-
 #ifdef BUILD_MODULE
 #undef TEST_RNG
 #include "../include/bindings.hpp"
