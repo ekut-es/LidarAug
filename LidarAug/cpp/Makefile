@@ -5,7 +5,7 @@ configure:
 	cmake -DCMAKE_PREFIX_PATH="$(TORCH_PATH)" -S . -B build_files
 
 configure_test:
-	cmake -DTEST_RNG -DCMAKE_PREFIX_PATH="$(TORCH_PATH)" -S . -B build_files
+	cmake -DTEST_RNG="" -DCMAKE_PREFIX_PATH="$(TORCH_PATH)" -S . -B build_files
 
 build: configure_test
 	cmake --build build_files
