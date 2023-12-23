@@ -79,4 +79,17 @@ void random_noise(at::Tensor &points, float sigma,
 
 void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
 
+/**
+ * Checks the amount of points for each bounding box.
+ * If the number of points is smaller than a given threshold, the box is removed
+ * along with its label.
+ *
+ * @param points     is the point_cloud.
+ * @param labels     are the bounding boxes of objects.
+ * @param names      are the names/labels of these boxes.
+ * @param min_points is the point threshold.
+ */
+void delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
+                                 at::Tensor names,
+                                 const std::uint64_t min_points);
 #endif // !TRANSFORMATIONS_HPP
