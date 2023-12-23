@@ -23,6 +23,9 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-Wsign-conversion)
 endif()
 
+# NOTE(tom): Add this to run the tests that require controlled RNG
+add_compile_definitions(TEST_RNG)
+
 include(FetchContent)
 FetchContent_Declare(
   googletest
