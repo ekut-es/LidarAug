@@ -111,9 +111,10 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
   dimensions point_dims = {point_cloud.size(0), point_cloud.size(1),
                            point_cloud.size(2)};
 
+  auto point_indeces =
+      torch::zeros({label_dims.num_items, point_dims.num_items}, torch::kI32);
+
   for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
-    auto point_indeces =
-        torch::zeros({label_dims.num_items, point_dims.num_items}, torch::kI32);
 
     points_in_boxes_cpu(
         labels[i].contiguous(),
@@ -138,6 +139,8 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
           {points, torch::indexing::Slice(torch::indexing::None, 3)}) +=
           box.slice(0, torch::indexing::None, 3);
     }
+
+    point_indeces.zero_();
   }
   scale_box_dimensions(labels, scale_factor);
 }
