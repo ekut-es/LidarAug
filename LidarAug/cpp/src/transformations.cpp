@@ -131,12 +131,13 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
         continue;
 
       point_cloud.index(
-          {points, torch::indexing::Slice(torch::indexing::None, 3)}) -=
+          {i, points, torch::indexing::Slice(torch::indexing::None, 3)}) -=
           box.slice(0, torch::indexing::None, 3);
-      point_cloud.index({points, torch::indexing::Slice(torch::indexing::None,
-                                                        3)}) *= scale_factor;
       point_cloud.index(
-          {points, torch::indexing::Slice(torch::indexing::None, 3)}) +=
+          {i, points, torch::indexing::Slice(torch::indexing::None, 3)}) *=
+          scale_factor;
+      point_cloud.index(
+          {i, points, torch::indexing::Slice(torch::indexing::None, 3)}) +=
           box.slice(0, torch::indexing::None, 3);
     }
 
