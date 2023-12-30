@@ -123,22 +123,22 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
             .contiguous(),
         point_indeces);
 
-    for (int j = 0; j < point_indeces.size(0); j++) {
+    assert(point_indeces.size(0) == label_dims.num_items);
+
+    for (int j = 0; j < label_dims.num_items; j++) {
       auto box = labels[i][j];
       auto points = point_indeces[j];
 
       if (!at::any(points).item<bool>())
         continue;
 
-      point_cloud.index(
-          {i, points, torch::indexing::Slice(torch::indexing::None, 3)}) -=
-          box.slice(0, torch::indexing::None, 3);
-      point_cloud.index(
-          {i, points, torch::indexing::Slice(torch::indexing::None, 3)}) *=
-          scale_factor;
-      point_cloud.index(
-          {i, points, torch::indexing::Slice(torch::indexing::None, 3)}) +=
-          box.slice(0, torch::indexing::None, 3);
+      for (int k = 0; k < points.size(0); k++) {
+        if (points[k].item<int>()) {
+          point_cloud.index(
+              {i, k, torch::indexing::Slice(torch::indexing::None, 3)}) *=
+              scale_factor;
+        }
+      }
     }
 
     point_indeces.zero_();
