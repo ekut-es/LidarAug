@@ -5,12 +5,12 @@
 /**
  * A label tensor represents a box and has the following values:
  *
- * x:     The x coordinate
- * y:     The y coordinate
- * z:     The z coordinate
- * w:     The width of the box
- * h:     The height of the box
- * l:     The length of the box
+ * x:     The x coordinate (center of the box)
+ * y:     The y coordinate (center of the box)
+ * z:     The z coordinate (center of the box)
+ * w:     The width  of the box (along the x axis)
+ * h:     The height of the box (along the z axis)
+ * l:     The length of the box (along the y axis)
  * Theta: The rotation angle
  */
 
