@@ -107,5 +107,5 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
  */
 void delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
                                  at::Tensor names,
-                                 const std::uint64_t min_points);
+                                 const tensor_size_t min_points);
 #endif // !TRANSFORMATIONS_HPP
