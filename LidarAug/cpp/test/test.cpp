@@ -262,6 +262,62 @@ TEST(ScaleRandomTest, BasicAssertions) {
   EXPECT_TRUE(labels.equal(expected_labels));
 }
 
+TEST(ScaleLocalTest, BasicAssertions) {
+
+  {
+    auto points = torch::tensor(
+        {{{1.0, 2.0, 3.0, 10.0}, {100.0, 100.0, 100.0, -10.0}}}, torch::kF32);
+    auto labels =
+        torch::tensor({{{1.0, 1.0, 1.0, 9.0, 9.0, 9.0, 0.0}}}, torch::kF32);
+
+    constexpr float sigma = 10;
+    constexpr float max_scale = 11;
+    constexpr float scale_factor = 7.21812582;
+
+    // NOTE(tom): scale_factor = 7.21812582
+    scale_local(points, labels, sigma, max_scale);
+
+    const auto expected_points = torch::tensor(
+        {{{scale_factor * 1.0, scale_factor * 2.0, scale_factor * 3.0, 10.0},
+          {100.0, 100.0, 100.0, -10.0}}},
+        torch::kF32);
+    const auto expected_labels =
+        torch::tensor({{{1.0, 1.0, 1.0, scale_factor * 9.0, scale_factor * 9.0,
+                         scale_factor * 9.0, 0.0}}},
+                      torch::kF32);
+
+    EXPECT_TRUE(points.equal(expected_points))
+        << "points should be scaled: \nexpected" << expected_points
+        << "\nactual:\n"
+        << points;
+    EXPECT_TRUE(labels.equal(expected_labels))
+        << "label dimensions should be scaled: \nexpected" << expected_labels
+        << "\nactual:\n"
+        << labels;
+  }
+  {
+
+    auto points = torch::tensor(
+        {{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}}, torch::kF32);
+    auto labels = torch::zeros({1, 0, 7});
+
+    constexpr float sigma = 10;
+    constexpr float max_scale = 11;
+
+    // NOTE(tom): scale_factor = 7.21812582
+    scale_local(points, labels, sigma, max_scale);
+
+    const auto expected_points = torch::tensor(
+        {{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}}, torch::kF32);
+    const auto expected_labels = torch::zeros({1, 0, 7});
+
+    EXPECT_TRUE(points.equal(expected_points))
+        << "No scaling should happen since there are no labels!";
+    EXPECT_TRUE(labels.equal(expected_labels))
+        << "No scaling should happen since there are no labels!";
+  }
+}
+
 TEST(RotateRandomTest, BasicAssertions) {
 
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
