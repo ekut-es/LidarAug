@@ -321,6 +321,51 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
   return new_tensor;
 }
 
+void delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
+                                 at::Tensor names,
+                                 const tensor_size_t min_points) {
+
+  dimensions label_dims = {labels.size(0), labels.size(1), labels.size(2)};
+  dimensions point_dims = {points.size(0), points.size(1), points.size(2)};
+  dimensions names_dims = {names.size(0), names.size(1), names.size(2)};
+
+  auto point_indeces =
+      torch::zeros({label_dims.num_items, point_dims.num_items}, torch::kI32);
+
+  for (tensor_size_t i = 0; i < label_dims.batch_size; i++) {
+    points_in_boxes_cpu(
+        labels[i].contiguous(),
+        points[i]
+            .index({torch::indexing::None, torch::indexing::Slice(0, 3)})
+            .contiguous(),
+        point_indeces);
+
+    assert(point_indeces.size(0) == label_dims.num_items);
+
+    auto num_points = point_indeces.index({torch::indexing::None}).sum();
+    auto not_deleted = num_points.ge(min_points);
+
+    auto not_deleted_labels = labels[i].masked_select(not_deleted);
+    auto not_deleted_names = names[i].masked_select(not_deleted);
+
+    // NOTE(tom): both sizes should always be the same (?)
+    if (not_deleted_labels.size(0) != 0 && not_deleted_names.size(0) != 0) {
+      // TODO(tom): Does reshaping work to avoid a crash?
+      labels.reshape({label_dims.batch_size, not_deleted_labels.size(0),
+                      label_dims.num_features});
+      names.reshape({names_dims.batch_size, not_deleted_names.size(0),
+                     names_dims.num_features});
+
+      // NOTE(tom): This does not work because of the batching. Overwriting the
+      //            original tensor would work, but I cannot edit part of it.
+      labels.index_put_({i}, not_deleted_labels);
+      names.index_put_({i}, not_deleted_names);
+    }
+
+    point_indeces.zero_();
+  }
+}
+
 #ifdef BUILD_MODULE
 #undef TEST_RNG
 #include "../include/bindings.hpp"
