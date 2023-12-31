@@ -134,7 +134,7 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
       }
 
       for (int k = 0; k < points.size(0); k++) {
-        if (points[k].item<int>()) {
+        if (points[k].item<bool>()) {
           point_cloud.index(
               {i, k, torch::indexing::Slice(torch::indexing::None, 3)}) *=
               scale_factor;
