@@ -310,12 +310,12 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
 
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
 
-    auto indeces = draw_unique_uniform_values<tensor_size_t>(
+    auto indices = draw_unique_uniform_values<tensor_size_t>(
         static_cast<std::size_t>(dims.num_items),
         static_cast<std::size_t>(num_values));
 
     for (tensor_size_t j = 0; j < num_values; j++) {
-      new_tensor[i][j] = points[i][indeces[static_cast<std::size_t>(j)]];
+      new_tensor[i][j] = points[i][indices[static_cast<std::size_t>(j)]];
     }
   }
 
