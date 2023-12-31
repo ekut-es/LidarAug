@@ -161,7 +161,7 @@ TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {
       torch::tensor({{{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0},
                       {100.0, 100.0, 100.0, 1.0, 1.0, 1.0, 0.0}},
                      {{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0},
-                      {10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 7.0}}});
+                      {10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0}}});
   torch::Tensor names = torch::tensor({{{"box0, batch0"}, {"box1, batch0"}},
                                        {{"box0, batch1"}, {"box1, batch1"}}},
                                       torch::kChar);
@@ -181,7 +181,7 @@ TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {
 
   const torch::Tensor expected_labels =
       torch::tensor({{{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0}},
-                     {{10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 7.0}}});
+                     {{10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0}}});
   const torch::Tensor expected_names =
       torch::tensor({{{"box0, batch0"}}, {{"box1, batch1"}}}, torch::kChar);
 
