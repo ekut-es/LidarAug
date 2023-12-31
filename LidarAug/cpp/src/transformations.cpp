@@ -326,6 +326,8 @@ void delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
                                  at::Tensor names,
                                  const tensor_size_t min_points) {
 
+  // NOTE(tom): This pattern at least implies, if not requires that the number
+  //            of items is consistent across batches
   dimensions label_dims = {labels.size(0), labels.size(1), labels.size(2)};
   dimensions point_dims = {points.size(0), points.size(1), points.size(2)};
   dimensions names_dims = {names.size(0), names.size(1), names.size(2)};
