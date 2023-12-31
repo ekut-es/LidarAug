@@ -332,7 +332,7 @@ void delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
   dimensions point_dims = {points.size(0), points.size(1), points.size(2)};
   dimensions names_dims = {names.size(0), names.size(1), names.size(2)};
 
-  auto point_indeces =
+  auto point_indices =
       torch::zeros({label_dims.num_items, point_dims.num_items}, torch::kI32);
 
   for (tensor_size_t i = 0; i < label_dims.batch_size; i++) {
@@ -341,11 +341,11 @@ void delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
         points[i]
             .index({torch::indexing::None, torch::indexing::Slice(0, 3)})
             .contiguous(),
-        point_indeces);
+        point_indices);
 
-    assert(point_indeces.size(0) == label_dims.num_items);
+    assert(point_indices.size(0) == label_dims.num_items);
 
-    auto num_points = point_indeces.index({torch::indexing::None}).sum();
+    auto num_points = point_indices.index({torch::indexing::None}).sum();
     auto not_deleted = num_points.ge(min_points);
 
     auto not_deleted_labels = labels[i].masked_select(not_deleted);
@@ -365,7 +365,7 @@ void delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
       names.index_put_({i}, not_deleted_names);
     }
 
-    point_indeces.zero_();
+    point_indices.zero_();
   }
 }
 
