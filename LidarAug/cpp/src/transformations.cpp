@@ -290,7 +290,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
           torch::matmul(label_vec, rotation));
 
       labels[i][j][LABEL_ANGLE_IDX] =
-          (labels[i][j][LABEL_ANGLE_IDX] + angle_rad) % (2.0f * M_PI);
+          (labels[i][j][LABEL_ANGLE_IDX] + angle_rad) % (TWO_M_PI);
     }
   }
 

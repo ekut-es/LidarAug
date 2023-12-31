@@ -5,6 +5,7 @@
 #include <torch/serialize/tensor.h>
 
 #define PI_DEG 180.0
+#define TWO_M_PI 2.0f * M_PI
 
 /**
  * Generates a rotation matrix around the 'z' axis (yaw) from the provided
