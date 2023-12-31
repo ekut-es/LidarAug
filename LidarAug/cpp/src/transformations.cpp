@@ -302,8 +302,8 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
 
   const auto percent = get_truncated_normal_value(0, sigma, 0, 1);
 
-  const auto num_values =
-      static_cast<tensor_size_t>(std::ceil(dims.num_items * (1 - percent)));
+  const auto num_values = static_cast<tensor_size_t>(
+      std::ceil(static_cast<float>(dims.num_items) * (1 - percent)));
 
   auto new_tensor =
       torch::empty({dims.batch_size, num_values, dims.num_features});
