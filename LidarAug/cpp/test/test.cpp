@@ -147,6 +147,49 @@ TEST(RandomNoiseTest, BasicAssertions) {
   }
 }
 
+TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {
+
+  auto points = torch::tensor({{{-8.2224, -4.3151, -6.5488, -3.9899},
+                                {6.3092, -3.7737, 7.2516, -5.8651},
+                                {1.0, 1.0, 1.0, 10.0}},
+
+                               {{10.4966, 10.1144, 10.2182, -8.4158},
+                                {7.0241, 7.6908, -2.1535, 1.3416},
+                                {10.0, 10.0, 10.0, 10.0}}});
+
+  torch::Tensor labels =
+      torch::tensor({{{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0},
+                      {100.0, 100.0, 100.0, 1.0, 1.0, 1.0, 0.0}},
+                     {{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0},
+                      {10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 7.0}}});
+  torch::Tensor names = torch::tensor({{{"box0, batch0"}, {"box1, batch0"}},
+                                       {{"box0, batch1"}, {"box1, batch1"}}},
+                                      torch::kChar);
+
+  const std::uint64_t min_points = 1;
+
+  delete_labels_by_min_points(points, labels, names, min_points);
+
+  const auto expected_points =
+      torch::tensor({{{-8.2224, -4.3151, -6.5488, -3.9899},
+                      {6.3092, -3.7737, 7.2516, -5.8651},
+                      {1.0, 1.0, 1.0, 10.0}},
+
+                     {{10.4966, 10.1144, 10.2182, -8.4158},
+                      {7.0241, 7.6908, -2.1535, 1.3416},
+                      {10.0, 10.0, 10.0, 10.0}}});
+
+  const torch::Tensor expected_labels =
+      torch::tensor({{{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0}},
+                     {{10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 7.0}}});
+  const torch::Tensor expected_names =
+      torch::tensor({{{"box0, batch0"}}, {{"box1, batch1"}}}, torch::kChar);
+
+  EXPECT_TRUE(points.equal(expected_points));
+  EXPECT_TRUE(labels.equal(expected_labels));
+  EXPECT_TRUE(names.equal(expected_names));
+}
+
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
