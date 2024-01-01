@@ -119,7 +119,7 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
     points_in_boxes_cpu(
         labels[i].contiguous(),
         point_cloud[i]
-            .index({torch::indexing::None, torch::indexing::Slice(0, 3)})
+            .index({torch::indexing::Slice(), torch::indexing::Slice(0, 3)})
             .contiguous(),
         point_indeces);
 
