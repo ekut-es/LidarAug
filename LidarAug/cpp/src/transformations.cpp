@@ -339,7 +339,7 @@ void delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
     points_in_boxes_cpu(
         labels[i].contiguous(),
         points[i]
-            .index({torch::indexing::None, torch::indexing::Slice(0, 3)})
+            .index({torch::indexing::Slice(), torch::indexing::Slice(0, 3)})
             .contiguous(),
         point_indices);
 
