@@ -118,6 +118,10 @@ draw_unique_uniform_values(std::size_t size, std::size_t num_values) {
   std::vector<T> values(size);
   std::generate(values.begin(), values.end(),
                 [value = 0]() mutable { return value++; });
+
+  // TODO(tom): `sample` would work as well I think. It would replace the
+  //             `shuffle` + `resize`, but the `generate` still stays.
+  //             Maybe `sample` is a better option here.
   std::shuffle(values.begin(), values.end(), rng);
 
   values.resize(num_values);
