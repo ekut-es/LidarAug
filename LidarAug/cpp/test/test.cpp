@@ -185,9 +185,17 @@ TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {
   const torch::Tensor expected_names =
       torch::tensor({{{"box0, batch0"}}, {{"box1, batch1"}}}, torch::kChar);
 
-  EXPECT_TRUE(points.equal(expected_points));
-  EXPECT_TRUE(labels.equal(expected_labels));
-  EXPECT_TRUE(names.equal(expected_names));
+  EXPECT_TRUE(points.equal(expected_points))
+      << "Points should not have been modified!\nexpected:\n"
+      << expected_points << "\nactual:\n"
+      << points;
+  EXPECT_TRUE(labels.equal(expected_labels)) << "expected:\n"
+                                             << expected_labels << "\nactual:\n"
+                                             << labels;
+  EXPECT_TRUE(names.equal(expected_names)) << "expected:\n"
+                                           << expected_names << "\nactual:\n"
+                                           << names;
+  ;
 }
 
 // doing tests with controlled random number generation (no random seed)
