@@ -1,0 +1,31 @@
+name: CMake and Google Test
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up CMake
+      uses: cmake/setup-cmake@v1
+
+    - name: Create build directory
+      run: mkdir build
+      working-directory: ./LidarAug/cpp
+
+    - name: Configure and build
+      run: |
+        cd build
+        cmake ..
+        make
+      working-directory: ./LidarAug/cpp
+
+    - name: Run Google Test
+      run: |
+        cd build
+        ctest --output-on-failure
+      working-directory: ./LidarAug/cpp
