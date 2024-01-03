@@ -108,4 +108,51 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
 void delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
                                  at::Tensor names,
                                  const tensor_size_t min_points);
+
+/**
+ * Checks the amount of points for each bounding box.
+ * If the number of points is smaller than a given threshold, the box is removed
+ * along with its label.
+ * This function function expectes all tensors in the shape of (n, m), where m
+ * is the number of features and n is the number of elements.
+ * It does not handle batches.
+ *
+ * @param points     is the point_cloud.
+ * @param labels     are the bounding boxes of objects.
+ * @param names      are the names/labels of these boxes.
+ * @param min_points is the point threshold.
+ *
+ * @returns a `std::pair` of `torch::Tensor` containing the new labels and their
+ *          names (in that order).
+ */
+inline std::pair<torch::Tensor, torch::Tensor>
+_delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
+                             at::Tensor names, const tensor_size_t min_points) {
+
+  const tensor_size_t num_labels = labels.size(0);
+  const tensor_size_t num_points = points.size(0);
+
+  const tensor_size_t label_features = labels.size(1);
+  const tensor_size_t name_features = names.size(1);
+
+  auto point_indices = torch::zeros({num_labels, num_points}, torch::kI32);
+  points_in_boxes_cpu(
+      labels.contiguous(),
+      points.index({torch::indexing::Slice(), torch::indexing::Slice(0, 3)})
+          .contiguous(),
+      point_indices);
+
+  assert(point_indices.size(0) == num_labels);
+
+  auto not_deleted_indices = point_indices.sum(1).ge(min_points);
+
+  auto not_deleted_labels =
+      labels.index({not_deleted_indices.nonzero().squeeze()})
+          .view({-1, label_features});
+  auto not_deleted_names =
+      names.index({not_deleted_indices.nonzero().squeeze()})
+          .view({-1, name_features});
+
+  return {not_deleted_labels, not_deleted_names};
+}
 #endif // !TRANSFORMATIONS_HPP
