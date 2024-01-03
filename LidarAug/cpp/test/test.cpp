@@ -148,6 +148,46 @@ TEST(RandomNoiseTest, BasicAssertions) {
 }
 
 TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {
+  {
+    const auto points = torch::tensor({{10.4966, 10.1144, 10.2182, -8.4158},
+                                       {7.0241, 7.6908, -2.1535, 1.3416},
+                                       {10.0, 10.0, 10.0, 10.0}});
+
+    const torch::Tensor labels =
+        torch::tensor({{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0},
+                       {10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0}});
+    const torch::Tensor names =
+        torch::tensor({{"box0"}, {"box1"}}, torch::kChar);
+
+    constexpr std::uint64_t min_points = 2;
+
+    auto [result_labels, result_names] =
+        _delete_labels_by_min_points(points, labels, names, min_points);
+
+    const auto expected_points =
+        torch::tensor({{10.4966, 10.1144, 10.2182, -8.4158},
+                       {7.0241, 7.6908, -2.1535, 1.3416},
+                       {10.0, 10.0, 10.0, 10.0}});
+
+    const torch::Tensor expected_labels =
+        torch::tensor({{10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0}});
+    const torch::Tensor expected_names =
+        torch::tensor({{"box1"}}, torch::kChar);
+
+    EXPECT_TRUE(points.equal(expected_points))
+        << "Points should not have been modified!\nexpected:\n"
+        << expected_points << "\nactual:\n"
+        << points;
+    EXPECT_TRUE(result_labels.equal(expected_labels))
+        << "expected:\n"
+        << expected_labels << "\nactual:\n"
+        << labels;
+    EXPECT_TRUE(result_names.equal(expected_names))
+        << "expected:\n"
+        << expected_names << "\nactual:\n"
+        << names;
+  }
+
 
   auto points = torch::tensor({{{-8.2224, -4.3151, -6.5488, -3.9899},
                                 {6.3092, -3.7737, 7.2516, -5.8651},
