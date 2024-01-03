@@ -3,6 +3,7 @@
 #define TRANSFORMATIONS_HPP
 
 #include "../include/linalg.h"
+#include "../include/roiware_utils.h"
 #include "../include/tensor.hpp"
 #include <torch/serialize/tensor.h>
 

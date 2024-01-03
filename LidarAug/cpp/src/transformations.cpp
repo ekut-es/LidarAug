@@ -1,7 +1,6 @@
 #include "../include/transformations.hpp"
 #include "../include/label.hpp"
 #include "../include/point_cloud.hpp"
-#include "../include/roiware_utils.h"
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <algorithm>
