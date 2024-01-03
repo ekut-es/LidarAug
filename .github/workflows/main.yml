@@ -13,6 +13,14 @@ jobs:
     - name: Install CMake
       run: sudo apt-get update && sudo apt-get install -y cmake
 
+    - name: Install Boost
+      run: sudo apt-get update && sudo apt-get install -y libboost-all-dev
+
+    - name: Install libtorch
+      run: |
+        wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.0%2Bcpu.zip
+        unzip libtorch-cxx11-abi-shared-with-deps-1.10.0+cpu.zip -d /opt/
+
     - name: Create build directory
       run: mkdir build
       working-directory: ./LidarAug/cpp
@@ -20,7 +28,7 @@ jobs:
     - name: Configure and build
       run: |
         cd build
-        cmake ..
+        cmake -DBOOST_ROOT=/usr/include/boost -DCMAKE_PREFIX_PATH=/opt/libtorch ..
         make
       working-directory: ./LidarAug/cpp
 
