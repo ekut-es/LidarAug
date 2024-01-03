@@ -105,10 +105,13 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
  * @param labels     are the bounding boxes of objects.
  * @param names      are the names/labels of these boxes.
  * @param min_points is the point threshold.
+ *
+ * @returns a `std::pair` of `torch::List<torch::Tensor>` containing the new
+ *          labels and new names (in that order).
  */
-void delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
-                                 at::Tensor names,
-                                 const tensor_size_t min_points);
+std::pair<torch::List<torch::Tensor>, torch::List<torch::Tensor>>
+delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
+                            at::Tensor names, const tensor_size_t min_points);
 
 /**
  * Checks the amount of points for each bounding box.

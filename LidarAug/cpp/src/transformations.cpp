@@ -321,51 +321,28 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
   return new_tensor;
 }
 
-void delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
-                                 at::Tensor names,
-                                 const tensor_size_t min_points) {
+std::pair<torch::List<torch::Tensor>, torch::List<torch::Tensor>>
+delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
+                            at::Tensor names, const tensor_size_t min_points) {
 
-  // NOTE(tom): This pattern at least implies, if not requires that the number
-  //            of items is consistent across batches
-  dimensions label_dims = {labels.size(0), labels.size(1), labels.size(2)};
-  dimensions point_dims = {points.size(0), points.size(1), points.size(2)};
-  dimensions names_dims = {names.size(0), names.size(1), names.size(2)};
+  torch::List<torch::Tensor> batch_labels;
+  torch::List<torch::Tensor> batch_names;
 
-  auto point_indices =
-      torch::zeros({label_dims.num_items, point_dims.num_items}, torch::kI32);
+  tensor_size_t batch_size = labels.size(0);
 
-  for (tensor_size_t i = 0; i < label_dims.batch_size; i++) {
-    points_in_boxes_cpu(
-        labels[i].contiguous(),
-        points[i]
-            .index({torch::indexing::Slice(), torch::indexing::Slice(0, 3)})
-            .contiguous(),
-        point_indices);
+  batch_labels.reserve(static_cast<std::size_t>(batch_size));
+  batch_names.reserve(static_cast<std::size_t>(batch_size));
 
-    assert(point_indices.size(0) == label_dims.num_items);
+  for (tensor_size_t i = 0; i < batch_size; i++) {
 
-    auto num_points = point_indices.index({torch::indexing::None}).sum();
-    auto not_deleted = num_points.ge(min_points);
+    auto [filtered_labels, filtered_names] = _delete_labels_by_min_points(
+        points[i], labels[i], names[i], min_points);
 
-    auto not_deleted_labels = labels[i].masked_select(not_deleted);
-    auto not_deleted_names = names[i].masked_select(not_deleted);
-
-    // NOTE(tom): both sizes should always be the same (?)
-    if (not_deleted_labels.size(0) != 0 && not_deleted_names.size(0) != 0) {
-      // TODO(tom): Does reshaping work to avoid a crash?
-      labels.reshape({label_dims.batch_size, not_deleted_labels.size(0),
-                      label_dims.num_features});
-      names.reshape({names_dims.batch_size, not_deleted_names.size(0),
-                     names_dims.num_features});
-
-      // NOTE(tom): This does not work because of the batching. Overwriting the
-      //            original tensor would work, but I cannot edit part of it.
-      labels.index_put_({i}, not_deleted_labels);
-      names.index_put_({i}, not_deleted_names);
-    }
-
-    point_indices.zero_();
+    batch_labels.emplace_back(filtered_labels);
+    batch_names.emplace_back(filtered_names);
   }
+
+  return {batch_labels, batch_names};
 }
 
 #ifdef BUILD_MODULE
