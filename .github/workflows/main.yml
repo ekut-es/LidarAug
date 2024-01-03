@@ -6,6 +6,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        compiler: [gcc]
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
