@@ -100,7 +100,8 @@ def random_noise(points: Tensor, sigma: float,
 def thin_out(points: Tensor, sigma: float) -> None:
     _check_points(points)
 
-    transformations.thin_out(points, sigma)
+    batch_points: Tensor = transformations.thin_out(points, sigma)
+    points = batch_points
 
 
 def rotate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
