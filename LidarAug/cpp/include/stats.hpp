@@ -116,8 +116,7 @@ draw_unique_uniform_values(std::size_t size, std::size_t num_values) {
   auto rng = get_rng();
 
   std::vector<T> values(size);
-  std::generate(values.begin(), values.end(),
-                [value = 0]() mutable { return value++; });
+  std::iota(values.begin(), values.end(), 0);
 
   // TODO(tom): `sample` would work as well I think. It would replace the
   //             `shuffle` + `resize`, but the `generate` still stays.
