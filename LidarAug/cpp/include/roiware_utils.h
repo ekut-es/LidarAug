@@ -37,9 +37,10 @@ inline int check_pt_in_box3d_cpu(const float *pt, const float *box3d,
 
 inline int points_in_boxes_cpu(at::Tensor boxes_tensor, at::Tensor pts_tensor,
                                at::Tensor pts_indices_tensor) {
-  // params boxes: (N, 7) [x, y, z, dx, dy, dz, heading], (x, y, z) is the box
-  // center, each box DO NOT overlaps params pts: (num_points, 3) [x, y, z]
-  // params pts_indices: (N, num_points)
+  // params boxes: (num_boxes, 7) [x, y, z, dx, dy, dz, heading], (x, y, z) is
+  //               the box center, each box DO NOT overlaps
+  // params pts: (num_points, 3) [x, y, z]
+  // params pts_indices: (num_boxes, num_points)
 
   //    CHECK_CONTIGUOUS(boxes_tensor);
   //    CHECK_CONTIGUOUS(pts_tensor);
