@@ -9,15 +9,20 @@
 
 void translate(at::Tensor points, const at::Tensor &translation) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
-  auto *t = translation.data_ptr<float>();
-  linalg::aliases::float3 translate{t[0], t[1], t[2]};
+  const float *const translation_ptr = translation.data_ptr<float>();
+  const float x_translation =
+      translation_ptr[0]; // NOLINT: Allow pointer arithmetic to access contents
+  const float y_translation =
+      translation_ptr[1]; // NOLINT: Allow pointer arithmetic to access contents
+  const float z_translation =
+      translation_ptr[2]; // NOLINT: Allow pointer arithmetic to access contents
 
   // translate all point clouds in a batch by the same amount
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < dims.num_items; j++) {
-      points.index({i, j, POINT_CLOUD_X_IDX}) += translate.x;
-      points.index({i, j, POINT_CLOUD_Y_IDX}) += translate.y;
-      points.index({i, j, POINT_CLOUD_Z_IDX}) += translate.z;
+      points.index({i, j, POINT_CLOUD_X_IDX}) += x_translation;
+      points.index({i, j, POINT_CLOUD_Y_IDX}) += y_translation;
+      points.index({i, j, POINT_CLOUD_Z_IDX}) += z_translation;
     }
   }
 }
