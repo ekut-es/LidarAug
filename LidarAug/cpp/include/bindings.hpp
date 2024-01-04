@@ -24,6 +24,10 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "in C++");
   m.def("random_noise", &random_noise,
         "function to introduce random noise to a point clouds in C++");
+  m.def("delete_labels_by_min_points", &delete_labels_by_min_points,
+        "function to delete bounding boxes and their names that don't meet a "
+        "minimum point threshold in C++",
+        py::return_value_policy::reference_internal);
   pybind11::enum_<noise>(m, "noise")
       .value("UNIFORM", UNIFORM)
       .value("SALT_PEPPER", SALT_PEPPER)

@@ -107,3 +107,14 @@ def rotate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
     _check_labels_and_points(points, labels)
 
     transformations.rotate_random(points, labels, sigma)
+
+
+def delete_labels_by_min_points(points: Tensor, labels: Tensor, names: Tensor,
+                                min_points: int) -> None:
+    _check_labels_and_points(points, labels)
+
+    batch_labels, batch_names = transformations.delete_labels_by_min_points(
+        points, labels, names, min_points)
+
+    labels = batch_labels
+    names = batch_names
