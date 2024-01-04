@@ -27,8 +27,8 @@ jobs:
 
     - name: Install libtorch
       run: |
-        wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.0%2Bcpu.zip
-        unzip libtorch-cxx11-abi-shared-with-deps-1.10.0+cpu.zip -d /opt/
+        wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.1.2%2Bcpu.zip
+        unzip libtorch-cxx11-abi-shared-with-deps-2.1.2+cpu.zip -d /opt/
 
     - name: Create build directory
       run: mkdir build
