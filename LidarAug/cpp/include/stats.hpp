@@ -19,7 +19,7 @@
 [[nodiscard]] inline std::mt19937 get_rng() noexcept {
 
 #ifdef TEST_RNG
-  auto seed = 123u;
+  constexpr auto seed = 123u;
   std::mt19937 rng(seed);
 #else
   std::random_device seed;
