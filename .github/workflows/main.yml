@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+    - name: setup google test
+      uses: Bacondish2023/setup-googletest@v1
 
     - name: Install GCC 12
       run: |
