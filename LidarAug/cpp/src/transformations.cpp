@@ -326,7 +326,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
   return new_tensor;
 }
 
-std::pair<torch::List<torch::Tensor>, torch::List<torch::Tensor>>
+[[nodiscard]] std::pair<torch::List<torch::Tensor>, torch::List<torch::Tensor>>
 delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
                             at::Tensor names, const tensor_size_t min_points) {
 

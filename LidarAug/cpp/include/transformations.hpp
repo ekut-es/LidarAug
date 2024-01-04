@@ -124,7 +124,7 @@ delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
  * @returns a `std::pair` of `torch::Tensor` containing the new labels and their
  *          names (in that order).
  */
-inline std::pair<torch::Tensor, torch::Tensor>
+[[nodiscard]] inline std::pair<torch::Tensor, torch::Tensor>
 _delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
                              at::Tensor names, const tensor_size_t min_points) {
 
