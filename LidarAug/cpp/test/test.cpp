@@ -414,6 +414,53 @@ TEST(ScaleLocalTest, BasicAssertions) {
   }
 }
 
+TEST(FlipRandomTest, BasicAssertions) {
+  {
+    auto points = torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}});
+    auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 4.0, 2.5},
+                                  {2.0, 2.0, 2.0, 1.0, 1.0, 1.5, 0.5}}});
+
+    static constexpr auto probability = 69;
+
+    auto expected_points = torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}});
+    auto expected_labels =
+        torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 4.0, 2.5},
+                        {2.0, 2.0, 2.0, 1.0, 1.0, 1.5, 0.5}}});
+
+    flip_random(points, labels, probability);
+
+    EXPECT_TRUE(points.equal(expected_points)) << "Points unexpectidly changed";
+    EXPECT_TRUE(labels.equal(expected_labels)) << "Labels unexpectidly changed";
+  }
+  {
+    auto points = torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}});
+    auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 4.0, 2.5},
+                                  {2.0, 2.0, 2.0, 1.0, 1.0, 1.5, 0.5}}},
+                                torch::kFloat16);
+
+    static constexpr auto probability = 70;
+
+    auto expected_points =
+        torch::tensor({{{1.0, -2.0, 3.0}, {4.0, -5.0, 6.0}}});
+    auto expected_labels =
+        torch::tensor({{{1.0, -1.0, 1.0, 2.0, 3.0, 4.0, 5.641592653589793},
+                        {2.0, -2.0, 2.0, 1.0, 1.0, 1.5, 3.641592653589793}}},
+                      {torch::kFloat16});
+
+    flip_random(points, labels, probability);
+
+    EXPECT_TRUE(points.equal(expected_points))
+        << "Expected: \n"
+        << expected_points << "\nActual: \n"
+        << points;
+
+    EXPECT_TRUE(labels.equal(expected_labels))
+        << "Expected: \n"
+        << expected_labels << "\nActual: \n"
+        << labels;
+  }
+}
+
 TEST(RotateRandomTest, BasicAssertions) {
 
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
