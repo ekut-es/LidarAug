@@ -10,6 +10,8 @@
 #include <random>
 #include <variant>
 
+#define HUNDRED_PERCENT 100
+
 /**
  * Returns a random number generator using `std::random_device` as a seed and
  * `std::mt18837` as a generator.

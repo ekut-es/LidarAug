@@ -17,4 +17,6 @@
 #define POINT_CLOUD_Z_IDX 2
 #define POINT_CLOUD_I_IDX 3
 
+#define MAX_INTENSITY 255
+
 #endif // !POINT_CLOUD_HPP

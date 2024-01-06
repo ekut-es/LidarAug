@@ -154,7 +154,7 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
 void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
 
   auto rng = get_rng();
-  std::uniform_int_distribution<std::size_t> distrib(0, 99);
+  std::uniform_int_distribution<std::size_t> distrib(0, HUNDRED_PERCENT - 1);
   auto rand = distrib(rng);
 
   if (prob > rand) {
@@ -211,7 +211,7 @@ void random_noise(at::Tensor &points, float sigma,
       case SALT_PEPPER: {
         const auto salt_len = num_points / 2;
         const std::vector<float> salt(salt_len, 0);
-        const std::vector<float> pepper(num_points - salt_len, 255);
+        const std::vector<float> pepper(num_points - salt_len, MAX_INTENSITY);
 
         std::vector<float> noise_intensity;
         noise_intensity.reserve(num_points);
@@ -230,7 +230,8 @@ void random_noise(at::Tensor &points, float sigma,
       case MAX: {
         std::vector<float> noise_intensity;
         noise_intensity.reserve(num_points);
-        std::fill(noise_intensity.begin(), noise_intensity.end(), 255);
+        std::fill(noise_intensity.begin(), noise_intensity.end(),
+                  MAX_INTENSITY);
         return noise_intensity;
       }
 
