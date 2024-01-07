@@ -55,6 +55,18 @@ def translate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
 
 def scale_random(points: Tensor, labels: Tensor, sigma: float,
                  max_scale: float) -> None:
+    """
+    Scales the points and labels by a random factor.
+    This factor is drawn from a truncated normal distribution.
+    The truncated normal distribution has a mean of 1. The standard deviation, as
+    well as upper and lower limits are determined by the function parameters.
+
+    :param points:    is the point cloud that contains the points that will be scaled.
+    :param labels:    are the labels belonging to the aforementioned point cloud.
+    :param sigma:     is the the standard deviation of the truncated normal distribution.
+    :param max_scale: is the upper limit of the truncated normal distribution. The lower limit is the inverse.
+    """
+
     _check_labels_and_points(points, labels)
 
     transformations.scale_random(points, labels, sigma, max_scale)
@@ -62,6 +74,20 @@ def scale_random(points: Tensor, labels: Tensor, sigma: float,
 
 def scale_local(points: Tensor, labels: Tensor, sigma: float,
                 max_scale: float) -> None:
+    """
+    Scales the points that are part of a box and the corresponding labels by a
+    random factor.
+
+    This factor is drawn from a truncated normal distribution.
+    The truncated normal distribution has a mean of 1. The standard deviation, as
+    well as upper and lower limits are determined by the function parameters.
+
+    :param points:    is the point cloud that contains the points that will be scaled.
+    :param labels:    are the labels belonging to the aforementioned point cloud.
+    :param sigma:     is the the standard deviation of the truncated normal distribution.
+    :param max_scale: is the upper limit of the truncated normal distribution. The lower limit is the inverse.
+    """
+
     _check_labels_and_points(points, labels)
 
     transformations.scale_local(points, labels, sigma, max_scale)
@@ -98,6 +124,18 @@ def random_noise(points: Tensor, sigma: float,
 
 
 def thin_out(points: Tensor, sigma: float) -> None:
+    """
+     Randomly genereates a percentage from a norma distribution, which determines
+     how many items should be 'thinned out'. From that percentage random indeces
+     are uniformly drawn (in a random order, where each index is unique).
+
+     Finally a new tensor is created containing the items present at those
+     indeces.
+
+    :param points: is the point cloud.
+    :param sigma:  is the standard diviation of the distribution that genereates the percentage.
+    """
+
     _check_points(points)
 
     batch_points: Tensor = transformations.thin_out(points, sigma)
@@ -112,6 +150,17 @@ def rotate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
 
 def delete_labels_by_min_points(points: Tensor, labels: Tensor, names: Tensor,
                                 min_points: int) -> None:
+    """
+     Checks the amount of points for each bounding box.
+     If the number of points is smaller than a given threshold, the box is removed
+     along with its label.
+
+    :param points:     is the point_cloud.
+    :param labels:     are the bounding boxes of objects.
+    :param names:      are the names/labels of these boxes.
+    :param min_points: is the point threshold.
+    """
+
     _check_labels_and_points(points, labels)
 
     batch_labels, batch_names = transformations.delete_labels_by_min_points(
