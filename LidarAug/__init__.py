@@ -52,6 +52,10 @@ def translate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
 
     transformations.translate_random(points, labels, sigma)
 
+def scale(points: Tensor, scaling_factor: float) -> None:
+    _check_points(points)
+
+    transformations.scale_points(points, scaling_factor)
 
 def scale_random(points: Tensor, labels: Tensor, sigma: float,
                  max_scale: float) -> None:
