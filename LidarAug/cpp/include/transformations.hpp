@@ -63,6 +63,24 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
 void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
 
 /**
+ * Rotates a batch of points anlong the 'z' axis (yaw).
+ *
+ * @param points is the point cloud that the rotation is applied to.
+ * @param angle  is the angle (in degrees) by which the points are to be
+ * rotated.
+ */
+void rotate_deg(at::Tensor points, float angle);
+
+/**
+ * Rotates a batch of points anlong the 'z' axis (yaw).
+ *
+ * @param points is the point cloud that the rotation is applied to.
+ * @param angle  is the angle (in radians) by which the points are to be
+ *               rotated.
+ */
+void rotate_rad(at::Tensor points, float angle);
+
+/**
  * Introduces random noise to a point cloud.
  *
  * @param points is a (n, 4) tensor representing the point cloud

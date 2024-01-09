@@ -264,6 +264,39 @@ void random_noise(at::Tensor &points, float sigma,
   }
 }
 
+/**
+ * Applies a rotation matrix/vector to a batch of points.
+ *
+ * Expected shape is (b, n, f), where `b` is the batchsize, `n` is the number of
+ * items/points and `f` is the number of features.
+ *
+ * @param points   is the point cloud that is to be rotated.
+ * @param rotation is rotation matrix that is used to apply the rotation.
+ */
+inline void rotate(at::Tensor points, at::Tensor rotation) {
+
+  auto points_vec =
+      points.index({torch::indexing::Slice(), torch::indexing::Slice(),
+                    torch::indexing::Slice(torch::indexing::None, 3)});
+
+  points.index_put_({torch::indexing::Slice(), torch::indexing::Slice(),
+                     torch::indexing::Slice(torch::indexing::None, 3)},
+                    torch::matmul(points_vec, rotation));
+}
+
+void rotate_deg(at::Tensor points, float angle) {
+
+  auto angle_rad = to_rad(angle);
+  auto rotation = rotate_yaw(angle_rad);
+  rotate(points, rotation);
+}
+
+void rotate_rad(at::Tensor points, float angle) {
+
+  auto rotation = rotate_yaw(angle);
+  rotate(points, rotation);
+}
+
 void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
 
   dimensions point_dims = {points.size(0), points.size(1), points.size(2)};
