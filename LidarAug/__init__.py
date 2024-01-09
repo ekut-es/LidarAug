@@ -145,6 +145,15 @@ def thin_out(points: Tensor, sigma: float) -> None:
     batch_points: Tensor = transformations.thin_out(points, sigma)
     points = batch_points
 
+def rotate_deg(points: Tensor, angle: float) -> None:
+    _check_points(points)
+
+    transformations.rotate_deg(points, angle)
+
+def rotate_rad(points: Tensor, angle: float) -> None:
+    _check_points(points)
+
+    transformations.rotate_rad(points, angle)
 
 def rotate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
     _check_labels_and_points(points, labels)
