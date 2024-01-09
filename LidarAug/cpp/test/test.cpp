@@ -38,6 +38,101 @@ TEST(ScalingTest, BasicAssertions) {
   EXPECT_TRUE(labels.equal(expected_labels));
 }
 
+TEST(RotationTest, BasicAssertions) {
+
+  {
+
+    auto points =
+        torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}},
+                       {{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
+                      torch::kF32);
+
+    constexpr float ROT_ANGLE = 180.0f;
+    rotate_deg(points, ROT_ANGLE);
+    // rotate_random(points, labels, 50);
+
+    auto points_coordinates =
+        torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}},
+                       {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}},
+                      torch::kF32);
+    constexpr float ANGLE = ROT_ANGLE * (M_PI / PI_DEG);
+    const auto rotation_vector = rotate_yaw(ANGLE);
+
+    const auto v11 = torch::matmul(points_coordinates[0][0], rotation_vector);
+    const auto v12 = torch::matmul(points_coordinates[0][1], rotation_vector);
+    const auto v21 = torch::matmul(points_coordinates[1][0], rotation_vector);
+    const auto v22 = torch::matmul(points_coordinates[1][1], rotation_vector);
+
+    // The vectors need to contiguous for pointer pointer access
+    ASSERT_TRUE(v11.is_contiguous());
+    ASSERT_TRUE(v12.is_contiguous());
+    ASSERT_TRUE(v21.is_contiguous());
+    ASSERT_TRUE(v22.is_contiguous());
+
+    const float *const vec11 = v11.const_data_ptr<float>();
+    const float *const vec12 = v12.const_data_ptr<float>();
+    const float *const vec21 = v21.const_data_ptr<float>();
+    const float *const vec22 = v22.const_data_ptr<float>();
+
+    const auto expected_points =
+        torch::tensor({{{vec11[0], vec11[1], vec11[2], 10.0f},
+                        {vec12[0], vec12[1], vec12[2], -10.0f}},
+                       {{vec11[0], vec11[1], vec11[2], 10.0f},
+                        {vec12[0], vec12[1], vec12[2], -10.0f}}},
+                      torch::kF32);
+
+    EXPECT_TRUE(points.allclose(expected_points))
+        << "`points` not equal to `expected_points`:\npoints:" << points
+        << "\nexpected_points:\n"
+        << expected_points;
+  }
+  {
+
+    auto points =
+        torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}},
+                       {{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
+                      torch::kF32);
+
+    constexpr float ANGLE = M_PI;
+    rotate_rad(points, ANGLE);
+
+    auto points_coordinates =
+        torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}},
+                       {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}},
+                      torch::kF32);
+
+    const auto rotation_vector = rotate_yaw(ANGLE);
+
+    const auto v11 = torch::matmul(points_coordinates[0][0], rotation_vector);
+    const auto v12 = torch::matmul(points_coordinates[0][1], rotation_vector);
+    const auto v21 = torch::matmul(points_coordinates[1][0], rotation_vector);
+    const auto v22 = torch::matmul(points_coordinates[1][1], rotation_vector);
+
+    // The vectors need to contiguous for pointer pointer access
+    ASSERT_TRUE(v11.is_contiguous());
+    ASSERT_TRUE(v12.is_contiguous());
+    ASSERT_TRUE(v21.is_contiguous());
+    ASSERT_TRUE(v22.is_contiguous());
+
+    const float *const vec11 = v11.const_data_ptr<float>();
+    const float *const vec12 = v12.const_data_ptr<float>();
+    const float *const vec21 = v21.const_data_ptr<float>();
+    const float *const vec22 = v22.const_data_ptr<float>();
+
+    const auto expected_points =
+        torch::tensor({{{vec11[0], vec11[1], vec11[2], 10.0f},
+                        {vec12[0], vec12[1], vec12[2], -10.0f}},
+                       {{vec11[0], vec11[1], vec11[2], 10.0f},
+                        {vec12[0], vec12[1], vec12[2], -10.0f}}},
+                      torch::kF32);
+
+    EXPECT_TRUE(points.allclose(expected_points))
+        << "`points` not equal to `expected_points`:\npoints:" << points
+        << "\nexpected_points:\n"
+        << expected_points;
+  }
+}
+
 TEST(FlipTest, BasicAssertions) {
   {
     auto points = torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}});
