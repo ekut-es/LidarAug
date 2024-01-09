@@ -10,7 +10,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       "translate_random", &translate_random,
       "random translation function for point clouds and bounding boxes in C++");
   m.def("scale_points", &scale_points, "function to scale point clouds in C++");
-  m.def("scale_labels", &scale_labels, "function to scale labels in C++");
   m.def("scale_random", &scale_random,
         "function to randomly scale point clouds and bounding boxes in C++");
   m.def("scale_local", &scale_local, "TODO");
