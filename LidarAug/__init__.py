@@ -32,6 +32,7 @@ def _check_labels_and_points(points: Tensor, labels: Tensor) -> None:
     """
     Performs a bunch of assertions to make sure that a point cloud and the corresponding labels have the right shapes.
     """
+
     shape_points = points.shape
     shape_labels = labels.shape
 
