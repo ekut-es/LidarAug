@@ -42,6 +42,13 @@ def _check_labels_and_points(points: Tensor, labels: Tensor) -> None:
 
 
 def translate(points: Tensor, translation: Tensor) -> None:
+    """
+    Moves points by a specific amount.
+
+    :param points:      is the point cloud with the points are to be moved.
+    :param translation: is the translation vector that specifies by how much they points are moved.
+    """
+
     _check_points(points)
 
     transformations.translate(points, translation)
