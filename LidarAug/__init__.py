@@ -146,11 +146,25 @@ def thin_out(points: Tensor, sigma: float) -> None:
     points = batch_points
 
 def rotate_deg(points: Tensor, angle: float) -> None:
+    """
+    Rotates a batch of points anlong the 'z' axis (yaw).
+
+    :param points: is the point cloud that the rotation is applied to.
+    :param angle:  is the angle (in degrees) by which the points are to be rotated.
+    """
+
     _check_points(points)
 
     transformations.rotate_deg(points, angle)
 
 def rotate_rad(points: Tensor, angle: float) -> None:
+    """
+    Rotates a batch of points anlong the 'z' axis (yaw).
+
+    :param points: is the point cloud that the rotation is applied to.
+    :param angle:  is the angle (in radians) by which the points are to be rotated.
+    """
+
     _check_points(points)
 
     transformations.rotate_rad(points, angle)
