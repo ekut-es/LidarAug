@@ -77,8 +77,8 @@ TEST(RotationTest, BasicAssertions) {
     const auto expected_points =
         torch::tensor({{{vec11[0], vec11[1], vec11[2], 10.0f},
                         {vec12[0], vec12[1], vec12[2], -10.0f}},
-                       {{vec11[0], vec11[1], vec11[2], 10.0f},
-                        {vec12[0], vec12[1], vec12[2], -10.0f}}},
+                       {{vec21[0], vec21[1], vec21[2], 10.0f},
+                        {vec22[0], vec22[1], vec22[2], -10.0f}}},
                       torch::kF32);
 
     EXPECT_TRUE(points.allclose(expected_points))
@@ -122,8 +122,8 @@ TEST(RotationTest, BasicAssertions) {
     const auto expected_points =
         torch::tensor({{{vec11[0], vec11[1], vec11[2], 10.0f},
                         {vec12[0], vec12[1], vec12[2], -10.0f}},
-                       {{vec11[0], vec11[1], vec11[2], 10.0f},
-                        {vec12[0], vec12[1], vec12[2], -10.0f}}},
+                       {{vec21[0], vec21[1], vec21[2], 10.0f},
+                        {vec22[0], vec22[1], vec22[2], -10.0f}}},
                       torch::kF32);
 
     EXPECT_TRUE(points.allclose(expected_points))
