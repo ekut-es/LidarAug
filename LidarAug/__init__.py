@@ -60,10 +60,12 @@ def translate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
 
     transformations.translate_random(points, labels, sigma)
 
+
 def scale(points: Tensor, scaling_factor: float) -> None:
     _check_points(points)
 
     transformations.scale_points(points, scaling_factor)
+
 
 def scale_random(points: Tensor, labels: Tensor, sigma: float,
                  max_scale: float) -> None:
@@ -153,6 +155,7 @@ def thin_out(points: Tensor, sigma: float) -> None:
     batch_points: Tensor = transformations.thin_out(points, sigma)
     points = batch_points
 
+
 def rotate_deg(points: Tensor, angle: float) -> None:
     """
     Rotates a batch of points anlong the 'z' axis (yaw).
@@ -165,6 +168,7 @@ def rotate_deg(points: Tensor, angle: float) -> None:
 
     transformations.rotate_deg(points, angle)
 
+
 def rotate_rad(points: Tensor, angle: float) -> None:
     """
     Rotates a batch of points anlong the 'z' axis (yaw).
@@ -176,6 +180,7 @@ def rotate_rad(points: Tensor, angle: float) -> None:
     _check_points(points)
 
     transformations.rotate_rad(points, angle)
+
 
 def rotate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
     _check_labels_and_points(points, labels)
