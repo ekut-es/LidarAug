@@ -47,9 +47,9 @@ inline int points_in_boxes_cpu(at::Tensor boxes_tensor, at::Tensor pts_tensor,
   int boxes_num = boxes_tensor.size(0);
   int pts_num = pts_tensor.size(0);
 
-  const float *boxes = boxes_tensor.data<float>();
-  const float *pts = pts_tensor.data<float>();
-  int *pts_indices = pts_indices_tensor.data<int>();
+  const float *boxes = boxes_tensor.data_ptr<float>();
+  const float *pts = pts_tensor.data_ptr<float>();
+  int *pts_indices = pts_indices_tensor.data_ptr<int>();
 
   float local_x = 0, local_y = 0;
   for (int i = 0; i < boxes_num; i++) {
