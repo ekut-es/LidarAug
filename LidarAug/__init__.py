@@ -56,6 +56,14 @@ def translate(points: Tensor, translation: Tensor) -> None:
 
 
 def translate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
+    """
+    Generates a random (3D) translation vector using a normal distribution and applies it to all the points and labels.
+
+    :param points: is the point cloud with the points that are translated.
+    :param labels: are the labels belonging to the aforementioned point cloud.
+    :param sigma:  is the standard deviation of the normal distribution.
+    """
+
     _check_labels_and_points(points, labels)
 
     transformations.translate_random(points, labels, sigma)
