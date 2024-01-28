@@ -70,6 +70,14 @@ def translate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
 
 
 def scale(points: Tensor, scaling_factor: float) -> None:
+    """
+    Scales points by a constant factor.
+    Point cloud is expected to be of shape (b, n, f), where `b` is the number of batches, `n` is the number of points and `f` is the number of features.
+    `f` is supposed to be 4.
+
+    :param points:         is the point cloud whose points are scaled.
+    :param scaling_factor: is the factor that the (x, y, z) coordinates are multiplied by.
+    """
     _check_points(points)
 
     transformations.scale_points(points, scaling_factor)
