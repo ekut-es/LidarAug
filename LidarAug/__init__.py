@@ -191,6 +191,15 @@ def rotate_rad(points: Tensor, angle: float) -> None:
 
 
 def rotate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
+    """
+    Rotates points and labels.
+    The number of degrees that they are rotated by is determined by a randomly genereated value from a normal distribution.
+
+    :param points: is the point cloud that the rotation is applied to.
+    :param labels: are the labels belonging to the point cloud that the rotation is applied to.
+    :param sigma:  is the standard deviation of the normal distribution.
+    """
+
     _check_labels_and_points(points, labels)
 
     transformations.rotate_random(points, labels, sigma)
