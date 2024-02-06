@@ -6,10 +6,6 @@
 #include "../include/tensor.hpp"
 #include <torch/serialize/tensor.h>
 
-typedef struct {
-  tensor_size_t batch_size, num_items, num_features;
-} dimensions;
-
 template <typename T> struct range {
   T min, max;
 };
