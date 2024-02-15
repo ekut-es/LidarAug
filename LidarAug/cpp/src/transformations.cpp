@@ -417,6 +417,24 @@ constexpr inline void _random_point_noise(f3 &point_vector,
   point_vector[2] += noise;
 }
 
+void random_point_noise(torch::Tensor points, float sigma) {
+  dimensions dims = {points.size(0), points.size(1), points.size(2)};
+
+  std::normal_distribution<float> dist(sigma, 0);
+
+  // TODO(tom): perf measure this
+  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
+    for (tensor_size_t j = 0; j < dims.num_items; j++) {
+      const auto v = points[i][j].data_ptr<float>();
+      const auto values = std::get<VECTOR>(draw_values<float>(dist, 3));
+      auto point_vector = f3{v[0], v[1], v[2]};
+      const auto noise_vector = f3{values[0], values[1], values[2]};
+
+      _random_point_noise(point_vector, noise_vector);
+    }
+  }
+}
+
 #ifdef BUILD_MODULE
 #undef TEST_RNG
 #include "../include/bindings.hpp"

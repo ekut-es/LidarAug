@@ -168,4 +168,6 @@ _delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
 
   return {not_deleted_labels, not_deleted_names};
 }
+
+void random_point_noise(torch::Tensor points, float sigma);
 #endif // !TRANSFORMATIONS_HPP
