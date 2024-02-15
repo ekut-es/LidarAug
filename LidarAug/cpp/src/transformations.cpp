@@ -420,7 +420,7 @@ constexpr inline void _random_point_noise(f3 &point_vector,
 void random_point_noise(torch::Tensor points, float sigma) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
-  std::normal_distribution<float> dist(sigma, 0);
+  std::normal_distribution<float> dist(0, sigma);
 
   // TODO(tom): perf measure this
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
@@ -438,7 +438,7 @@ void random_point_noise(torch::Tensor points, float sigma) {
 void transform_along_ray(torch::Tensor points, float sigma) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
-  std::normal_distribution<float> dist(sigma, 0);
+  std::normal_distribution<float> dist(0, sigma);
 
   // TODO(tom): perf measure this
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
