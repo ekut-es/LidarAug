@@ -1,11 +1,14 @@
 #include "../include/transformations.hpp"
 #include "../include/label.hpp"
+#include "../include/linalg.h"
 #include "../include/point_cloud.hpp"
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <algorithm>
 #include <cmath>
 #include <torch/types.h>
+
+typedef linalg::aliases::float3 f3;
 
 void translate(at::Tensor points, const at::Tensor &translation) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
@@ -385,6 +388,33 @@ delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
   }
 
   return {batch_labels, batch_names};
+}
+
+/**
+ * Applies the `noise_vector` to the `point_vector`.
+ *
+ * @param point_vector A 3 dimensional point.
+ * @param noise_vector A 3 dimensional vector.
+ */
+constexpr inline void _random_point_noise(f3 &point_vector,
+                                          const f3 &noise_vector) noexcept {
+
+  point_vector[0] += noise_vector[0];
+  point_vector[1] += noise_vector[1];
+  point_vector[2] += noise_vector[2];
+}
+
+/**
+ * Applies the `noise` to every dimension of `point_vector`.
+ *
+ * @param point_vector A 3 dimensional point.
+ * @param noise_vector A 3 dimensional vector.
+ */
+constexpr inline void _random_point_noise(f3 &point_vector,
+                                          const float noise) noexcept {
+  point_vector[0] += noise;
+  point_vector[1] += noise;
+  point_vector[2] += noise;
 }
 
 #ifdef BUILD_MODULE
