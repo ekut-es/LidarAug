@@ -81,9 +81,9 @@ void translate_random(at::Tensor points, at::Tensor labels, float sigma) {
 
   std::normal_distribution<float> dist(sigma, 0);
 
-  auto x_translation = std::get<1>(draw_values<float>(dist));
-  auto y_translation = std::get<1>(draw_values<float>(dist));
-  auto z_translation = std::get<1>(draw_values<float>(dist));
+  auto x_translation = std::get<VALUE>(draw_values<float>(dist));
+  auto y_translation = std::get<VALUE>(draw_values<float>(dist));
+  auto z_translation = std::get<VALUE>(draw_values<float>(dist));
 
   auto translation = at::tensor({x_translation, y_translation, z_translation});
 
@@ -196,16 +196,19 @@ void random_noise(at::Tensor &points, float sigma,
   // iterate over batches
   for (tensor_size_t batch_num = 0; batch_num < dims.batch_size; batch_num++) {
 
-    const auto x = std::get<0>(draw_values<float>(x_distrib, num_points, true));
-    const auto y = std::get<0>(draw_values<float>(y_distrib, num_points, true));
-    const auto z = std::get<0>(draw_values<float>(z_distrib, num_points, true));
+    const auto x =
+        std::get<VECTOR>(draw_values<float>(x_distrib, num_points, true));
+    const auto y =
+        std::get<VECTOR>(draw_values<float>(y_distrib, num_points, true));
+    const auto z =
+        std::get<VECTOR>(draw_values<float>(z_distrib, num_points, true));
     const auto i = [type, num_points, min = ranges.uniform_range.min,
                     max = ranges.uniform_range.max]() -> std::vector<float> {
       switch (type) {
       case UNIFORM: {
         std::uniform_real_distribution<float> ud(min, max);
         auto noise_intensity =
-            std::get<0>(draw_values<float>(ud, num_points, true));
+            std::get<VECTOR>(draw_values<float>(ud, num_points, true));
         return noise_intensity;
       }
       case SALT_PEPPER: {
