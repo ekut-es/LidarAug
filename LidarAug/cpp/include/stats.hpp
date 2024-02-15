@@ -12,6 +12,10 @@
 
 #define HUNDRED_PERCENT 100
 
+// constants for `std::get` for `draw_values`
+#define VECTOR 0
+#define VALUE 1
+
 /**
  * Returns a random number generator using `std::random_device` as a seed and
  * `std::mt18837` as a generator.
