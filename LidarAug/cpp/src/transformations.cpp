@@ -8,7 +8,7 @@
 #include <cmath>
 #include <torch/types.h>
 
-typedef linalg::aliases::float3 f3;
+using f3 = linalg::aliases::float3;
 
 void translate(at::Tensor points, const at::Tensor &translation) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
