@@ -427,7 +427,9 @@ void random_point_noise(torch::Tensor points, float sigma) {
     for (tensor_size_t j = 0; j < dims.num_items; j++) {
       const auto v = points[i][j].data_ptr<float>();
       const auto values = std::get<VECTOR>(draw_values<float>(dist, 3));
-      auto point_vector = f3{v[0], v[1], v[2]};
+      auto point_vector =
+          f3{v[0], v[1],
+             v[2]}; // NOLINT: Allow pointer arithmetic to access contents
       const auto noise_vector = f3{values[0], values[1], values[2]};
 
       _random_point_noise(point_vector, noise_vector);
@@ -445,7 +447,9 @@ void transform_along_ray(torch::Tensor points, float sigma) {
     for (tensor_size_t j = 0; j < dims.num_items; j++) {
       const auto v = points[i][j].data_ptr<float>();
       const auto noise = std::get<VALUE>(draw_values<float>(dist));
-      auto point_vector = f3{v[0], v[1], v[2]};
+      auto point_vector =
+          f3{v[0], v[1],
+             v[2]}; // NOLINT: Allow pointer arithmetic to access contents
 
       _random_point_noise(point_vector, noise);
     }
