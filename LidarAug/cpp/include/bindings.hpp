@@ -34,7 +34,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "minimum point threshold in C++",
         py::return_value_policy::reference_internal);
   m.def("fog", &fog, "fog weather simulation");
-  pybind11::enum_<noise>(m, "noise")
+  pybind11::enum_<noise_type>(m, "noise")
       .value("UNIFORM", UNIFORM)
       .value("SALT_PEPPER", SALT_PEPPER)
       .value("MIN", MIN)

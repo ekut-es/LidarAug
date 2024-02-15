@@ -14,7 +14,7 @@ template <typename T> struct distribution_ranges {
   range<T> x_range, y_range, z_range, uniform_range;
 };
 
-typedef enum { UNIFORM, SALT_PEPPER, MIN, MAX } noise;
+typedef enum { UNIFORM, SALT_PEPPER, MIN, MAX } noise_type;
 
 void translate(at::Tensor points, const at::Tensor &translation);
 void scale_points(at::Tensor points, float factor);
@@ -85,7 +85,7 @@ void rotate_rad(at::Tensor points, float angle);
  * @param type   The type of noise that is to be introduced
  */
 void random_noise(at::Tensor &points, float sigma,
-                  const distribution_ranges<float> &ranges, noise type);
+                  const distribution_ranges<float> &ranges, noise_type type);
 
 /**
  * Randomly genereates a percentage from a norma distribution, which determines
