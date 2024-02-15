@@ -2,12 +2,13 @@
 #ifndef WEATHER_HPP
 #define WEATHER_HPP
 
-#include <cstddef>
+#include <ATen/core/List.h>
 #include <torch/serialize/tensor.h>
 
 typedef enum { DIST, CHAMFER } fog_metric;
 
-void fog(at::Tensor point_cloud, std::size_t prob, fog_metric metric,
-         float sigma, int mean);
+[[nodiscard]] std::optional<torch::List<torch::Tensor>>
+fog(const torch::Tensor &point_cloud, float prob, fog_metric metric,
+    float sigma, int mean);
 
 #endif // !WEATHER_HPP
