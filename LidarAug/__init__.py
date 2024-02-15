@@ -233,3 +233,11 @@ def delete_labels_by_min_points(points: Tensor, labels: Tensor, names: Tensor,
 
     labels = batch_labels
     names = batch_names
+
+
+def fog(point_cloud: Tensor, prob: float, metric: transformations.fog_metric,
+        sigma: float, mean: int) -> None:
+    result = transformations.fog(point_cloud, prob, metric, sigma, mean)
+
+    if result:
+        point_cloud = result.value()

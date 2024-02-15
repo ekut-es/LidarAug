@@ -1,6 +1,8 @@
 
 #include "../include/transformations.hpp"
+#include "../include/weather.hpp"
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <torch/extension.h>
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
@@ -31,11 +33,16 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "function to delete bounding boxes and their names that don't meet a "
         "minimum point threshold in C++",
         py::return_value_policy::reference_internal);
+  m.def("fog", &fog, "fog weather simulation");
   pybind11::enum_<noise>(m, "noise")
       .value("UNIFORM", UNIFORM)
       .value("SALT_PEPPER", SALT_PEPPER)
       .value("MIN", MIN)
       .value("MAX", MAX)
+      .export_values();
+  pybind11::enum_<fog_metric>(m, "fog_metric")
+      .value("DIST", DIST)
+      .value("CHAMFER", CHAMFER)
       .export_values();
 
   // NOTE(tom): Unfortunately it is necessary to export this with defined types,
