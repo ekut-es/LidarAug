@@ -405,16 +405,16 @@ constexpr inline void _random_point_noise(f3 &point_vector,
 }
 
 /**
- * Applies the `noise` to every dimension of `point_vector`.
+ * Applies the `noise_value` to every dimension of `point_vector`.
  *
  * @param point_vector A 3 dimensional point.
  * @param noise_vector A 3 dimensional vector.
  */
 constexpr inline void _random_point_noise(f3 &point_vector,
-                                          const float noise) noexcept {
-  point_vector[0] += noise;
-  point_vector[1] += noise;
-  point_vector[2] += noise;
+                                          const float noise_value) noexcept {
+  point_vector[0] += noise_value;
+  point_vector[1] += noise_value;
+  point_vector[2] += noise_value;
 }
 
 void random_point_noise(torch::Tensor points, float sigma) {
