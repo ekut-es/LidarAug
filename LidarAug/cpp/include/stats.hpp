@@ -42,6 +42,7 @@
  *                            - uniform_int_distribution
  *                            - uniform_real_distribution
  *                            - normal_distribution
+ *                            - exponential_distribution
  * @param number_of_values  Optional argument to draw more than one value.
  * @param force             Forces the function to use a vector even if there is
  *                          only one value.
@@ -56,6 +57,7 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
   static_assert(std::is_base_of<std::uniform_int_distribution<T>, D>::value ||
                 std::is_base_of<std::uniform_real_distribution<T>, D>::value ||
                 std::is_base_of<std::normal_distribution<T>, D>::value ||
+                std::is_base_of<std::exponential_distribution<T>, D>::value ||
                 "'dist' does not satisfy the type constaints!");
 
   auto rng = get_rng();
