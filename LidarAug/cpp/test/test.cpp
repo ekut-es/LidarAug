@@ -652,6 +652,32 @@ TEST(ThinOutTest, BasicAssertions) {
       << new_points;
 }
 
+TEST(RandomPointNoiseTest, BasicAssertions) {
+  constexpr float sigma = 1;
+  std::normal_distribution<float> dist(0, sigma);
+
+  auto points = torch::tensor({{{1.0, 2.0, 3.0, 4.0}, {-1.0, -2.0, -3.0, -4.0}},
+                               {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 1.0}}});
+
+  // noise_vector = {{1.08580697, 1.00174832, -0.566087246},
+  //                {-1.69251204, 0.729757607, -1.04425383}};
+  // NOTE(tom): The RNG is not reset after each iteration of the inner loop.
+  //            It only resets after each iteration of the outer loop.
+  const auto expected_points =
+      torch::tensor({{{2.08580697, 3.00174832, 2.433912754, 4.0},
+                      {-2.69251204, -1.270242393, -4.04425383, -4.0}},
+                     {{2.08580697, 2.00174832, 0.433912754, 0.0},
+                      {-1.69251204, 0.729757607, -0.04425383, 1.0}}});
+
+  random_point_noise(points, sigma);
+
+  // NOTE(tom): This currently fails because `draw_values` is behaving weirdly.
+  EXPECT_TRUE(points.allclose(expected_points))
+      << "Noise not as expected:\nexpected:\n"
+      << expected_points << "\nactual:\n"
+      << points;
+}
+
 TEST(TransformAlongRayTest, BasicAssertions) {
   constexpr float sigma = 1;
   std::normal_distribution<float> dist(0, sigma);
