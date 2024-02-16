@@ -235,6 +235,20 @@ def delete_labels_by_min_points(points: Tensor, labels: Tensor, names: Tensor,
     names = batch_names
 
 
+def random_point_noise(points: Tensor, sigma: float):
+    """
+    Moves each point in the point cloud randomly.
+    How much each coordinate is changed is decided by values drawn from a normal distribution.
+
+    :param points: is the point cloud from which each point is moved.
+    :param sigma:  is the standard diviation of the normal distribution.
+    """
+
+    _check_points(points)
+
+    transformations.random_point_noise(points, sigma)
+
+
 def fog(point_cloud: Tensor, prob: float, metric: transformations.fog_metric,
         sigma: float, mean: int) -> None:
     result = transformations.fog(point_cloud, prob, metric, sigma, mean)

@@ -33,6 +33,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "function to delete bounding boxes and their names that don't meet a "
         "minimum point threshold in C++",
         py::return_value_policy::reference_internal);
+  m.def("random_point_noise", &random_point_noise,
+        "Function to add random noise to point coordinates");
   m.def("fog", &fog, "fog weather simulation");
   pybind11::enum_<noise_type>(m, "noise")
       .value("UNIFORM", UNIFORM)
