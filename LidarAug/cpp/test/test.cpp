@@ -652,6 +652,29 @@ TEST(ThinOutTest, BasicAssertions) {
       << new_points;
 }
 
+TEST(TransformAlongRayTest, BasicAssertions) {
+  constexpr float sigma = 1;
+  std::normal_distribution<float> dist(0, sigma);
+
+  auto points = torch::tensor({{{1.0, 2.0, 3.0, 4.0}, {-1.0, -2.0, -3.0, -4.0}},
+                               {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 1.0}}});
+
+  // noise_value = 1.08580697, 1.00174832;
+  // NOTE(tom): The RNG is not reset after each iteration of the inner loop.
+  //            It only resets after each iteration of the outer loop.
+  const auto expected_points =
+      torch::tensor({{{2.08580697, 3.08580697, 4.08580697, 4.0},
+                      {0.00174832, -0.99825168, -1.99825168, -4.0}},
+                     {{2.08580697, 2.08580697, 2.08580697, 0.0},
+                      {1.00174832, 1.00174832, 2.00174832, 1.0}}});
+
+  transform_along_ray(points, sigma);
+  EXPECT_TRUE(points.allclose(expected_points))
+      << "Transformation not as expected:\nexpected:\n"
+      << expected_points << "\nactual:\n"
+      << points;
+}
+
 #endif
 
 // NOLINTEND
