@@ -1,14 +1,11 @@
 #include "../include/transformations.hpp"
 #include "../include/label.hpp"
-#include "../include/linalg.h"
 #include "../include/point_cloud.hpp"
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <algorithm>
 #include <cmath>
 #include <torch/types.h>
-
-using f3 = linalg::aliases::float3;
 
 void translate(at::Tensor points, const at::Tensor &translation) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
@@ -390,33 +387,6 @@ delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
   return {batch_labels, batch_names};
 }
 
-/**
- * Applies the `noise_vector` to the `point_vector`.
- *
- * @param point_vector A 3 dimensional point.
- * @param noise_vector A 3 dimensional vector.
- */
-constexpr inline void _random_point_noise(f3 &point_vector,
-                                          const f3 &noise_vector) noexcept {
-
-  point_vector[0] += noise_vector[0];
-  point_vector[1] += noise_vector[1];
-  point_vector[2] += noise_vector[2];
-}
-
-/**
- * Applies the `noise_value` to every dimension of `point_vector`.
- *
- * @param point_vector A 3 dimensional point.
- * @param noise_vector A 3 dimensional vector.
- */
-constexpr inline void _random_point_noise(f3 &point_vector,
-                                          const float noise_value) noexcept {
-  point_vector[0] += noise_value;
-  point_vector[1] += noise_value;
-  point_vector[2] += noise_value;
-}
-
 void random_point_noise(torch::Tensor points, float sigma) {
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
@@ -425,14 +395,19 @@ void random_point_noise(torch::Tensor points, float sigma) {
   // TODO(tom): perf measure this
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < dims.num_items; j++) {
-      const auto v = points[i][j].data_ptr<float>();
+      auto *const v = points[i][j].data_ptr<float>();
       const auto values = std::get<VECTOR>(draw_values<float>(dist, 3));
-      auto point_vector =
-          f3{v[0], v[1],
-             v[2]}; // NOLINT: Allow pointer arithmetic to access contents
-      const auto noise_vector = f3{values[0], values[1], values[2]};
 
-      _random_point_noise(point_vector, noise_vector);
+      std::printf("v1: %.9g\n", values[0]);
+      std::printf("v2: %.9g\n", values[1]);
+      std::printf("v3: %.9g\n", values[2]);
+
+      // NOLINTBEGIN
+      // Allow pointer arithmetic for accessing tensor contents
+      v[0] += values[0];
+      v[1] += values[1];
+      v[2] += values[2];
+      // NOLINTEND
     }
   }
 }
@@ -445,13 +420,15 @@ void transform_along_ray(torch::Tensor points, float sigma) {
   // TODO(tom): perf measure this
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < dims.num_items; j++) {
-      const auto v = points[i][j].data_ptr<float>();
+      auto *const v = points[i][j].data_ptr<float>();
       const auto noise = std::get<VALUE>(draw_values<float>(dist));
-      auto point_vector =
-          f3{v[0], v[1],
-             v[2]}; // NOLINT: Allow pointer arithmetic to access contents
 
-      _random_point_noise(point_vector, noise);
+      // NOLINTBEGIN
+      // Allow pointer arithmetic for accessing tensor contents
+      v[0] += noise;
+      v[1] += noise;
+      v[2] += noise;
+      // NOLINTEND
     }
   }
 }
