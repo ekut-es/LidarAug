@@ -249,6 +249,20 @@ def random_point_noise(points: Tensor, sigma: float):
     transformations.random_point_noise(points, sigma)
 
 
+def transform_along_ray(points: Tensor, sigma: float):
+    """
+    Moves each point in the point cloud randomly along a ray.
+    How much it is moved is decided by a value drawn from a normal distribution.
+
+    :param points: is the point cloud from which each point is moved.
+    :param sigma:  is the standard diviation of the normal distribution.
+    """
+
+    _check_points(points)
+
+    transformations.transform_along_ray(points, sigma)
+
+
 def fog(point_cloud: Tensor, prob: float, metric: transformations.fog_metric,
         sigma: float, mean: int) -> None:
     result = transformations.fog(point_cloud, prob, metric, sigma, mean)
