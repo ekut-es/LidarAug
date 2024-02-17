@@ -3,6 +3,7 @@
 #define WEATHER_HPP
 
 #include <ATen/core/List.h>
+#include <optional>
 #include <torch/serialize/tensor.h>
 
 typedef enum { DIST, CHAMFER } fog_metric;
