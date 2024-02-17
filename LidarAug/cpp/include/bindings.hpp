@@ -38,7 +38,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("transform_along_ray", &transform_along_ray,
         "Function to add move points along a ray");
   m.def("fog", &fog, "fog weather simulation");
-  pybind11::enum_<noise_type>(m, "noise")
+  pybind11::enum_<noise_type>(m, "noise_type")
       .value("UNIFORM", UNIFORM)
       .value("SALT_PEPPER", SALT_PEPPER)
       .value("MIN", MIN)
