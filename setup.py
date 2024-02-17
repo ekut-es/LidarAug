@@ -3,10 +3,7 @@ from setuptools import setup
 
 ext_modules = [
     CppExtension(name="LidarAug.transformations",
-                 sources=[
-                     "LidarAug/cpp/src/transformations.cpp",
-                     "LidarAug/cpp/src/weather.cpp"
-                 ],
+                 sources=["LidarAug/cpp/src/transformations.cpp"],
                  define_macros=[("BUILD_MODULE", None)]),
 ]
 
