@@ -653,7 +653,6 @@ TEST(ThinOutTest, BasicAssertions) {
 
 TEST(RandomPointNoiseTest, BasicAssertions) {
   constexpr float sigma = 1;
-  std::normal_distribution<float> dist(0, sigma);
 
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 4.0}, {-1.0, -2.0, -3.0, -4.0}},
                                {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 1.0}}});
@@ -679,7 +678,6 @@ TEST(RandomPointNoiseTest, BasicAssertions) {
 
 TEST(TransformAlongRayTest, BasicAssertions) {
   constexpr float sigma = 1;
-  std::normal_distribution<float> dist(0, sigma);
 
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 4.0}, {-1.0, -2.0, -3.0, -4.0}},
                                {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 1.0}}});
