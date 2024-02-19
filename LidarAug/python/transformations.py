@@ -140,15 +140,17 @@ def flip_random(points: Tensor, labels: Tensor, prob: int) -> None:
 
 def random_noise(points: Tensor, sigma: float,
                  ranges: list[float] | transformations.distribution_ranges,
-                 noise_type: transformations.noise_type) -> None:
+                 noise_type: transformations.noise_type,
+                 max_intensity: transformations.intensity_range) -> None:
     """
     Adds random amount of points (drawn using a normal distribution) at random coordinates
     (within predetermined ranges) with a random intensity according to specific noise type.
 
-    :param points:      is the point cloud that the points will be added to.
-    :param sigma:       is the standard deviation of the normal distribution that is used to draw the number of points to be added.
-    :param ranges:      are the boundaries in (min and max (x, y, z) values) in which the new points can be created.
-    :param noise_type:  is one of a number of 'patterns' that can be used to generate the points.
+    :param points:         is the point cloud that the points will be added to.
+    :param sigma:          is the standard deviation of the normal distribution that is used to draw the number of points to be added.
+    :param ranges:         are the boundaries in (min and max (x, y, z) values) in which the new points can be created.
+    :param noise_type:     is one of a number of 'patterns' that can be used to generate the points.
+    :param max_intensity:  is the maximum intensity value in the dataset
     """
 
     _check_points(points)
@@ -168,7 +170,7 @@ def random_noise(points: Tensor, sigma: float,
         distribution_ranges = ranges
 
     transformations.random_noise(points, sigma, distribution_ranges,
-                                 noise_type)
+                                 noise_type, max_intensity)
 
 
 def thin_out(points: Tensor, sigma: float) -> None:

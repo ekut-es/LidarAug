@@ -17,6 +17,14 @@
 #define POINT_CLOUD_Z_IDX 2
 #define POINT_CLOUD_I_IDX 3
 
-#define MAX_INTENSITY 255
+/**
+ * Defines options for maximum intensity values.
+ * Intensity goes from [0; MAX_INTENSITY], where MAX_INTENSITY is either 1 or
+ * 255.
+ */
+typedef enum {
+  MAX_INTENSITY_1 = 1,
+  MAX_INTENSITY_255 = 255,
+} intensity_range;
 
 #endif // !POINT_CLOUD_HPP

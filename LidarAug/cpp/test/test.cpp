@@ -218,7 +218,7 @@ TEST(RandomNoiseTest, BasicAssertions) {
   constexpr static distribution_ranges<float> ranges{
       {1, 2}, {1, 2}, {1, 2}, {1, 2}};
 
-  random_noise(points, sigma, ranges, UNIFORM);
+  random_noise(points, sigma, ranges, UNIFORM, MAX_INTENSITY_255);
 
   for (tensor_size_t i = 0; i < points.size(0); i++) {
     EXPECT_GT(points[i].size(0), points_original[i].size(0))

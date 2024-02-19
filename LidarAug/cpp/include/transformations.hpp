@@ -2,6 +2,7 @@
 #ifndef TRANSFORMATIONS_HPP
 #define TRANSFORMATIONS_HPP
 
+#include "../include/point_cloud.hpp"
 #include "../include/roiware_utils.h"
 #include "../include/tensor.hpp"
 #include <torch/serialize/tensor.h>
@@ -79,13 +80,15 @@ void rotate_rad(at::Tensor points, float angle);
 /**
  * Introduces random noise to a point cloud.
  *
- * @param points is a (n, 4) tensor representing the point cloud
- * @param sigma  TODO
- * @param ranges TODO
- * @param type   The type of noise that is to be introduced
+ * @param points          is a (n, 4) tensor representing the point cloud
+ * @param sigma           TODO
+ * @param ranges          TODO
+ * @param type            The type of noise that is to be introduced
+ * @param max_intensity   is the maximum intensity value in the dataset
  */
 void random_noise(at::Tensor &points, float sigma,
-                  const distribution_ranges<float> &ranges, noise_type type);
+                  const distribution_ranges<float> &ranges, noise_type type,
+                  intensity_range max_intensity);
 
 /**
  * Randomly genereates a percentage from a norma distribution, which determines

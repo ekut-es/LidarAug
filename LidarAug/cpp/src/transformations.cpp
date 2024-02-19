@@ -1,6 +1,5 @@
 #include "../include/transformations.hpp"
 #include "../include/label.hpp"
-#include "../include/point_cloud.hpp"
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <algorithm>
@@ -178,7 +177,8 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
 }
 
 void random_noise(at::Tensor &points, float sigma,
-                  const distribution_ranges<float> &ranges, noise_type type) {
+                  const distribution_ranges<float> &ranges, noise_type type,
+                  intensity_range max_intensity) {
 
   dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
@@ -203,7 +203,8 @@ void random_noise(at::Tensor &points, float sigma,
     const auto z =
         std::get<VECTOR>(draw_values<float>(z_distrib, num_points, true));
     const auto i = [type, num_points, min = ranges.uniform_range.min,
-                    max = ranges.uniform_range.max]() -> std::vector<float> {
+                    max = ranges.uniform_range.max,
+                    max_intensity]() -> std::vector<float> {
       switch (type) {
       case UNIFORM: {
         std::uniform_real_distribution<float> ud(min, max);
@@ -214,7 +215,8 @@ void random_noise(at::Tensor &points, float sigma,
       case SALT_PEPPER: {
         const auto salt_len = num_points / 2;
         const std::vector<float> salt(salt_len, 0);
-        const std::vector<float> pepper(num_points - salt_len, MAX_INTENSITY);
+        const std::vector<float> pepper(num_points - salt_len,
+                                        static_cast<float>(max_intensity));
 
         std::vector<float> noise_intensity;
         noise_intensity.reserve(num_points);
@@ -234,7 +236,7 @@ void random_noise(at::Tensor &points, float sigma,
         std::vector<float> noise_intensity;
         noise_intensity.reserve(num_points);
         std::fill(noise_intensity.begin(), noise_intensity.end(),
-                  MAX_INTENSITY);
+                  static_cast<float>(max_intensity));
         return noise_intensity;
       }
 

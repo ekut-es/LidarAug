@@ -44,6 +44,10 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       .value("MIN", MIN)
       .value("MAX", MAX)
       .export_values();
+  pybind11::enum_<intensity_range>(m, "intensity_range")
+      .value("MAX_INTENSITY_1", MAX_INTENSITY_1)
+      .value("MAX_INTENSITY_255", MAX_INTENSITY_255)
+      .export_values();
   pybind11::enum_<fog_metric>(m, "fog_metric")
       .value("DIST", DIST)
       .value("CHAMFER", CHAMFER)
