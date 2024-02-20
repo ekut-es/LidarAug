@@ -39,6 +39,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "Function to add move points along a ray");
   m.def("intensity_noise", &intensity_noise,
         "Introduce random noise in the intensity values");
+  m.def("intensity_shift", &intensity_shift,
+        "Shift intensities by a constant, random amount");
   m.def("fog", &fog, "fog weather simulation");
   pybind11::enum_<noise_type>(m, "noise_type")
       .value("UNIFORM", UNIFORM)
