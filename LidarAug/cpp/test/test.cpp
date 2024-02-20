@@ -698,6 +698,47 @@ TEST(TransformAlongRayTest, BasicAssertions) {
       << points;
 }
 
+TEST(IntensityShiftTest, BasicAssertions) {
+  {
+    auto points =
+        torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
+                       {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
+
+    constexpr float SIGMA = 20;
+    constexpr intensity_range MAX_INTENSITY = MAX_INTENSITY_255;
+
+    const auto expected_points =
+        torch::tensor({{{1.0, 2.0, 3.0, 25.7925453}, {-1.0, -2.0, -3.0, 255.0}},
+                       {{1.0, 1.0, 1.0, 21.2925453}, {0.0, 0.0, 1.0, 255.0}}});
+
+    intensity_shift(points, SIGMA, MAX_INTENSITY);
+
+    EXPECT_TRUE(points.allclose(expected_points))
+        << "Noise shift not as expected:\nexpected:\n"
+        << expected_points << "\nactual:\n"
+        << points;
+  }
+  {
+    auto points =
+        torch::tensor({{{1.0, 2.0, 3.0, 0.52}, {-1.0, -2.0, -3.0, 1.0}},
+                       {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 0.95}}});
+
+    constexpr float SIGMA = 0.2;
+    constexpr intensity_range MAX_INTENSITY = MAX_INTENSITY_1;
+
+    const auto expected_points =
+        torch::tensor({{{1.0, 2.0, 3.0, 0.732925255}, {-1.0, -2.0, -3.0, 1.0}},
+                       {{1.0, 1.0, 1.0, 0.212925255}, {0.0, 0.0, 1.0, 1.0}}});
+
+    intensity_shift(points, SIGMA, MAX_INTENSITY);
+
+    EXPECT_TRUE(points.allclose(expected_points))
+        << "Noise shift not as expected:\nexpected:\n"
+        << expected_points << "\nactual:\n"
+        << points;
+  }
+}
+
 #endif
 
 // NOLINTEND
