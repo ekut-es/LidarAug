@@ -283,6 +283,21 @@ def transform_along_ray(points: Tensor, sigma: float):
     transformations.transform_along_ray(points, sigma)
 
 
+def intensity_noise(points: Tensor, sigma: float,
+                    max_intensity: transformations.intensity_range):
+    """
+    Shifts the intensity value of every point in the point cloud by a random amount drawn from a normal distribution.
+
+    :param points:        is the point cloud with all the points.
+    :param sigma:         is the standard diviation of the normal distribution.
+    :param max_intensity: is the maximum intensity value (either 1 or 255, depending on the dataset).
+    """
+
+    _check_points(points)
+
+    transformations.intensity_noise(points, sigma, max_intensity)
+
+
 def fog(point_cloud: Tensor, prob: float, metric: transformations.fog_metric,
         sigma: float, mean: int) -> None:
     result = transformations.fog(point_cloud, prob, metric, sigma, mean)
