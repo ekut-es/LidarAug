@@ -176,6 +176,9 @@ void random_point_noise(torch::Tensor points, float sigma);
 
 void transform_along_ray(torch::Tensor points, float sigma);
 
+void intensity_noise(torch::Tensor points, float sigma,
+                     intensity_range max_intensity);
+
 void intensity_shift(torch::Tensor points, float sigma,
                      intensity_range max_intensity);
 
