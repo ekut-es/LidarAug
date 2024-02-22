@@ -100,6 +100,10 @@ fog(const torch::Tensor &point_cloud, float prob, fog_metric metric,
         const float delete_probability = -0.7 * exp(-0.024 * viewing_dist) + 1;
         return {extinction_factor, beta, delete_probability};
       }
+      default:
+        // NOTE(tom): The switch case should be exhaustive, so this statement
+        //            should never be reached!
+        assert(false);
       }
     };
 
