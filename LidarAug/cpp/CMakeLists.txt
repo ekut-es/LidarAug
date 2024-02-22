@@ -47,6 +47,8 @@ add_executable(
   transformations_test
   src/transformations.cpp
   include/transformations.hpp
+  include/weather.hpp
+  src/weather.cpp
   test/test.cpp
 )
 target_link_libraries(
