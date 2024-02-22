@@ -474,7 +474,7 @@ void intensity_shift(torch::Tensor points, float sigma,
 
 #ifdef BUILD_MODULE
 #undef TEST_RNG
-#include "../include/bindings.hpp"
+#include "../include/transformation_bindings.hpp"
 #else
 #include "gtest/gtest.h"
 

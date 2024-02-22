@@ -129,3 +129,8 @@ fog(const torch::Tensor &point_cloud, float prob, fog_metric metric,
     return std::nullopt;
   }
 }
+
+#ifdef BUILD_MODULE
+#undef TEST_RNG
+#include "../include/weather_bindings.hpp"
+#endif

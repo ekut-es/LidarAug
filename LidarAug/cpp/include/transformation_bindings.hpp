@@ -1,8 +1,6 @@
 
 #include "../include/transformations.hpp"
-#include "../include/weather.hpp"
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 #include <torch/extension.h>
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
@@ -41,7 +39,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "Introduce random noise in the intensity values");
   m.def("intensity_shift", &intensity_shift,
         "Shift intensities by a constant, random amount");
-  m.def("fog", &fog, "fog weather simulation");
   pybind11::enum_<noise_type>(m, "noise_type")
       .value("UNIFORM", UNIFORM)
       .value("SALT_PEPPER", SALT_PEPPER)
@@ -51,10 +48,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   pybind11::enum_<intensity_range>(m, "intensity_range")
       .value("MAX_INTENSITY_1", MAX_INTENSITY_1)
       .value("MAX_INTENSITY_255", MAX_INTENSITY_255)
-      .export_values();
-  pybind11::enum_<fog_metric>(m, "fog_metric")
-      .value("DIST", DIST)
-      .value("CHAMFER", CHAMFER)
       .export_values();
 
   // NOTE(tom): Unfortunately it is necessary to export this with defined types,
