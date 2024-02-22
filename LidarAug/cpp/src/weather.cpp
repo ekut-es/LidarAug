@@ -50,7 +50,7 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
       point_cloud.index({altered_points, Slice(None, 3)}).item<tensor_size_t>();
 
   if (num_altered_points > 0) {
-    std::exponential_distribution<> exp_d(beta);
+    std::exponential_distribution<float> exp_d(beta);
     const auto new_dist =
         torch::from_blob(
             std::get<VECTOR>(draw_values<float>(exp_d, num_altered_points))
