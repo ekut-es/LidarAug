@@ -8,10 +8,10 @@ configure_test:
 	cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="$(TORCH_PATH)" -S ./LidarAug/cpp/ -B ./LidarAug/cpp/build_files
 
 build: configure_test
-	cmake --build ./LidarAug/cpp/build_files
+	cmake --build ./LidarAug/cpp/build_files -j 4
 
 release: configure
-	cmake --build ./LidarAug/cpp/build_files --config
+	cmake --build ./LidarAug/cpp/build_files -j 4 --config
 
 test: ./LidarAug/cpp/build_files
 	cd ./LidarAug/cpp/build_files && ctest
