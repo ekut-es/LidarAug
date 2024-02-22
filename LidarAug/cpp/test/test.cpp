@@ -707,10 +707,11 @@ TEST(IntensityNoiseTest, BasicAssertions) {
     constexpr float SIGMA = 20;
     constexpr intensity_range MAX_INTENSITY = MAX_INTENSITY_255;
 
-    // NOTE(tom): value of intensity_shift = 21.2925453
-    const auto expected_points =
-        torch::tensor({{{1.0, 2.0, 3.0, 25.7925453}, {-1.0, -2.0, -3.0, 255.0}},
-                       {{1.0, 1.0, 1.0, 21.2925453}, {0.0, 0.0, 1.0, 255.0}}});
+    // NOTE(tom): values of intensity_shift =
+    //           {21.2925453, 0, 21.2925453, 6.91568279}
+    const auto expected_points = torch::tensor(
+        {{{1.0, 2.0, 3.0, 25.7925453}, {-1.0, -2.0, -3.0, 255.0}},
+         {{1.0, 1.0, 1.0, 21.2925453}, {0.0, 0.0, 1.0, 252.01568279}}});
 
     intensity_noise(points, SIGMA, MAX_INTENSITY);
 
@@ -727,10 +728,11 @@ TEST(IntensityNoiseTest, BasicAssertions) {
     constexpr float SIGMA = 0.2;
     constexpr intensity_range MAX_INTENSITY = MAX_INTENSITY_1;
 
-    // NOTE(tom): value of intensity_shift = 0.212925255
-    const auto expected_points =
-        torch::tensor({{{1.0, 2.0, 3.0, 0.732925255}, {-1.0, -2.0, -3.0, 1.0}},
-                       {{1.0, 1.0, 1.0, 0.212925255}, {0.0, 0.0, 1.0, 1.0}}});
+    // NOTE(tom): values of intensity_shift =
+    //           {0.207830608, 0, 0.212925255, 0.0354648978}
+    const auto expected_points = torch::tensor(
+        {{{1.0, 2.0, 3.0, 0.727830609}, {-1.0, -2.0, -3.0, 1.0}},
+         {{1.0, 1.0, 1.0, 0.212925255}, {0.0, 0.0, 1.0, 0.9854648978}}});
 
     intensity_noise(points, SIGMA, MAX_INTENSITY);
 

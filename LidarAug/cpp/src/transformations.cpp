@@ -442,16 +442,13 @@ void intensity_noise(torch::Tensor points, float sigma,
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < dims.num_items; j++) {
 
-      const float current_intensity =
-          points[i][j][POINT_CLOUD_I_IDX].item<float>();
+      const float max_shift = static_cast<float>(max_intensity) -
+                              points[i][j][POINT_CLOUD_I_IDX].item<float>();
 
-      const float intensity_shift = get_truncated_normal_value(
-          0, sigma, 0, static_cast<float>(max_intensity));
+      const float intensity_shift =
+          get_truncated_normal_value(0, sigma, 0, max_shift);
 
-      float new_intensity = std::min(current_intensity + intensity_shift,
-                                     static_cast<float>(max_intensity));
-
-      points[i][j][POINT_CLOUD_I_IDX] = new_intensity;
+      points[i][j][POINT_CLOUD_I_IDX] += intensity_shift;
     }
   }
 }
