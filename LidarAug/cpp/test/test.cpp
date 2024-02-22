@@ -2,6 +2,7 @@
 #include "../include/stats.hpp"
 #include "../include/transformations.hpp"
 #include "../include/utils.hpp"
+#include "../include/weather.hpp"
 #include <gtest/gtest.h>
 #include <torch/types.h>
 
@@ -784,6 +785,16 @@ TEST(IntensityShiftTest, BasicAssertions) {
         << expected_points << "\nactual:\n"
         << points;
   }
+}
+
+TEST(FogTest, BasicAssertions) {
+  auto points =
+      torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
+                     {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
+  const auto _ = fog(points, 10, DIST, 2, 0);
+
+  // NOTE(tom): currently just testing if the whether the function runs
+  EXPECT_TRUE(true);
 }
 
 #endif
