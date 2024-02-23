@@ -20,7 +20,7 @@ rerun: ./cpp/build_files
 	cd ./cpp/build_files && ctest --rerun-failed --output-on-failure
 
 install:
-	pip install .
+	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp pip install . && rm -rf ./tmp
 
 clean: ./cpp/build_files
 	rm -rfv ./cpp/build_files
