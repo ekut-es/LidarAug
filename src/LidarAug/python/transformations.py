@@ -1,4 +1,5 @@
 from torch import Tensor
+from torch.nested import nested_tensor
 from LidarAug import transformations
 from LidarAug import weather_simulations
 
@@ -252,8 +253,8 @@ def delete_labels_by_min_points(points: Tensor, labels: Tensor, names: Tensor,
     batch_labels, batch_names = transformations.delete_labels_by_min_points(
         points, labels, names, min_points)
 
-    labels = batch_labels
-    names = batch_names
+    labels = nested_tensor(batch_labels)
+    names = nested_tensor(batch_names)
 
 
 def random_point_noise(points: Tensor, sigma: float):
