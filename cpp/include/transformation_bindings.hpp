@@ -52,8 +52,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
   // NOTE(tom): Unfortunately it is necessary to export this with defined types,
   //            as PyBind does not appear to support generics/templates.
-  pybind11::class_<range<float>>(m, "distribution_range")
+  pybind11::class_<range<float>>(m, "DistributionRange")
       .def(pybind11::init<>());
-  pybind11::class_<distribution_ranges<float>>(m, "distribution_ranges")
+  pybind11::class_<distribution_ranges<float>>(m, "DistributionRanges")
       .def(pybind11::init<>());
 }

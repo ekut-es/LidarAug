@@ -140,7 +140,7 @@ def flip_random(points: Tensor, labels: Tensor, prob: int) -> None:
 
 
 def random_noise(points: Tensor, sigma: float,
-                 ranges: list[float] | transformations.distribution_ranges,
+                 ranges: list[float] | transformations.DistributionRanges,
                  noise_type: transformations.NoiseType,
                  max_intensity: transformations.ItensityRange) -> None:
     """
@@ -162,11 +162,11 @@ def random_noise(points: Tensor, sigma: float,
         z_min, z_max = ranges[4], ranges[5]
         uniform_min, uniform_max = ranges[6], ranges[7]
 
-        distribution_ranges = transformations.distribution_ranges(
-            transformations.distribution_range(x_min, x_max),
-            transformations.distribution_range(y_min, y_max),
-            transformations.distribution_range(z_min, z_max),
-            transformations.distribution_range(uniform_min, uniform_max))
+        distribution_ranges = transformations.DistributionRanges(
+            transformations.DistributionRange(x_min, x_max),
+            transformations.DistributionRange(y_min, y_max),
+            transformations.DistributionRange(z_min, z_max),
+            transformations.DistributionRange(uniform_min, uniform_max))
     else:
         distribution_ranges = ranges
 
