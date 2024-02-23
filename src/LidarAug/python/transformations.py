@@ -1,5 +1,6 @@
 from torch import Tensor
 from LidarAug import transformations
+from LidarAug import weather_simulations
 
 
 def _check_points(points: Tensor) -> None:
@@ -313,9 +314,11 @@ def intensity_shift(points: Tensor, sigma: float,
     transformations.intensity_shift(points, sigma, max_intensity)
 
 
-def fog(point_cloud: Tensor, prob: float, metric: transformations.fog_metric,
-        sigma: float, mean: int) -> None:
-    result = transformations.fog(point_cloud, prob, metric, sigma, mean)
+def fog(point_cloud: Tensor, prob: float,
+        metric: weather_simulations.FogMetric, sigma: float,
+        mean: int) -> None:
+    result = weather_simulations.fog(point_cloud, prob, metric, sigma, mean)
 
     if result:
-        point_cloud = result.value()
+        # NOTE(tom): It is necessary to call `value()` here, since this is a C++ optional
+        point_cloud = result.value()  # pyright: ignore
