@@ -19,6 +19,24 @@ class ItensityRange(Enum):
     MAX_INTENSITY_255: int
 
 
+class DistributionRange:
+    min: float
+    max: float
+
+    def __init__(self, min, max) -> None:
+        ...
+
+
+class DistributionRanges:
+    x_range: DistributionRange
+    y_range: DistributionRange
+    z_range: DistributionRange
+    uniform_range: DistributionRange
+
+    def __init__(self, x_range, y_range, z_range, uniform_range) -> None:
+        ...
+
+
 def translate(points: Tensor, translation: Tensor) -> None:
     """
     Moves points by a specific amount.
