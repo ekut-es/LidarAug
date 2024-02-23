@@ -189,7 +189,7 @@ def thin_out(points: Tensor, sigma: float) -> None:
 
     _check_points(points)
 
-    batch_points: Tensor = transformations.thin_out(points, sigma)
+    batch_points = transformations.thin_out(points, sigma)
     points = batch_points
 
 
