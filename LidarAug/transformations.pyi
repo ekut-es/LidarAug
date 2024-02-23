@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class noise_type(Enum):
+class NoiseType(Enum):
     UNIFORM: int
     SALT_PEPPER: int
     MIN: int

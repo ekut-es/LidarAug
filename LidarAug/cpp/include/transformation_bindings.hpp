@@ -39,13 +39,13 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "Introduce random noise in the intensity values");
   m.def("intensity_shift", &intensity_shift,
         "Shift intensities by a constant, random amount");
-  pybind11::enum_<noise_type>(m, "noise_type")
+  pybind11::enum_<noise_type>(m, "NoiseType")
       .value("UNIFORM", UNIFORM)
       .value("SALT_PEPPER", SALT_PEPPER)
       .value("MIN", MIN)
       .value("MAX", MAX)
       .export_values();
-  pybind11::enum_<intensity_range>(m, "intensity_range")
+  pybind11::enum_<intensity_range>(m, "IntensityRange")
       .value("MAX_INTENSITY_1", MAX_INTENSITY_1)
       .value("MAX_INTENSITY_255", MAX_INTENSITY_255)
       .export_values();
