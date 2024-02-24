@@ -30,14 +30,16 @@ For the Python library, just run `make install` after cloning and entering the r
 
 The library contains 3 modules:
 
-1. *transformations:*
+#### Modules
+
+1. **transformations:**
 
 `transformations` contains any C++ enums, structs and functions that are used for transformations, for which there are bindings.
 
-2. *weather_simulations:*
+2. **weather_simulations:**
 
 `weather_simulations` contains any C++ enums, structs and functions that are used for weather simulations, for which there are bindings.
 
-3. *augmentations:*
+3. **augmentations:**
 
 `augmentations` contains the Python wrappers for any C++ function (weather simulation or transformation).
