@@ -28,9 +28,9 @@ For the Python library, just run `make install` after cloning and entering the r
 
 ~The current nightly build of `torch` works, but there is no all around support for the tool chain yet.~
 
-The library contains 3 modules:
-
 #### Modules
+
+The library contains 3 modules:
 
 1. **transformations:**
 
