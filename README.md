@@ -34,11 +34,11 @@ The library contains 3 modules:
 
 1. **transformations:**
 
-`transformations` contains any C++ enums, structs and functions that are used for transformations, for which there are bindings.
+`transformations` contains any C++ enums, structs and functions that have bindings and are used for transformations.
 
 2. **weather_simulations:**
 
-`weather_simulations` contains any C++ enums, structs and functions that are used for weather simulations, for which there are bindings.
+`weather_simulations` contains any C++ enums, structs and functions that have bindings and are used for weather simulations.
 
 3. **augmentations:**
 
