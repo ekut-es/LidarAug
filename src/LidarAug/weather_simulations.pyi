@@ -3,7 +3,7 @@ from typing import Optional
 from torch import Tensor
 
 
-class FogMetric(Enum):
+class FogParameter(Enum):
     """
     Different parameters for the fog model/simulation.
 
@@ -14,6 +14,6 @@ class FogMetric(Enum):
     CHAMFER: int
 
 
-def fog(point_cloud: Tensor, prob: float, metric: FogMetric, sigma: float,
+def fog(point_cloud: Tensor, prob: float, metric: FogParameter, sigma: float,
         mean: int) -> Optional[list[Tensor]]:
     ...

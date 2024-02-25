@@ -74,7 +74,7 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
 }
 
 [[nodiscard]] std::optional<torch::List<torch::Tensor>>
-fog(const torch::Tensor &point_cloud, float prob, fog_metric metric,
+fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
     float sigma, int mean) {
 
   auto rng = get_rng();

@@ -316,7 +316,7 @@ def intensity_shift(points: Tensor, sigma: float,
 
 
 def fog(point_cloud: Tensor, prob: float,
-        metric: weather_simulations.FogMetric, sigma: float,
+        metric: weather_simulations.FogParameter, sigma: float,
         mean: int) -> None:
     result = weather_simulations.fog(point_cloud, prob, metric, sigma, mean)
 
