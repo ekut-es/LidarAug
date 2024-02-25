@@ -4,6 +4,14 @@ from torch import Tensor
 
 
 class NoiseType(Enum):
+    """
+    Indicates how the noise is added:
+
+    UNIFORM: The noise values are drawn from a uniform distribution.
+    SALT_PEPPER: Half of the added values have the maximum intensity, the other half the minimum intensity.
+    MIN: The noise values are equal to the minimum intensity.
+    MAX: The noise values are equal to the maximum intensity.
+    """
     UNIFORM: int
     SALT_PEPPER: int
     MIN: int
