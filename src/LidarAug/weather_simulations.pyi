@@ -4,6 +4,12 @@ from torch import Tensor
 
 
 class FogMetric(Enum):
+    """
+    Different parameters for the fog model/simulation.
+
+    DIST: Optimization of the distance distribution between the points.
+    CHAMFER: Optimization of the chamfer distance.
+    """
     DIST: int
     CHAMFER: int
 
