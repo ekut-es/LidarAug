@@ -250,6 +250,13 @@ def intensity_shift(points: Tensor, sigma: float,
 
 
 def local_to_local_transform(from_pose: Tensor, to_pose: Tensor) -> Tensor:
+    """
+    Creates a transformation matrix from the local system into a 'target' coordinate frame.
+
+    :param from_pose: is the local coordinate frame.
+    :param to_pose:   is the target coordinate frame.
+    :return: the homogeneous transformation matrix into the target coordinate frame.
+    """
     ...
 
 
