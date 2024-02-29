@@ -251,3 +251,7 @@ def intensity_shift(points: Tensor, sigma: float,
 
 def local_to_local_transform(from_pose: Tensor, to_pose: Tensor) -> Tensor:
     ...
+
+
+def local_to_world_transform(lidar_pose: Tensor) -> Tensor:
+    ...

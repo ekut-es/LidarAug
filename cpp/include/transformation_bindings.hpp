@@ -39,6 +39,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "Introduce random noise in the intensity values");
   m.def("intensity_shift", &intensity_shift,
         "Shift intensities by a constant, random amount");
+  m.def("local_to_world_transform", &local_to_world_transform,
+        "Create transformation matrix");
   m.def("local_to_local_transform", &local_to_local_transform,
         "Homogeneous Transformation");
   pybind11::enum_<noise_type>(m, "NoiseType")
