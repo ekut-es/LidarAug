@@ -199,7 +199,7 @@ local_to_world_transform(const torch::Tensor &lidar_pose);
  *
  * @param from_pose is the local coordinate frame.
  * @param to_pose   is the target coordinate frame.
- * @returns: the homogeneous transformation matrix into the target coordinate
+ * @returns  the homogeneous transformation matrix into the target coordinate
  *           frame.
  */
 [[nodiscard]] torch::Tensor
