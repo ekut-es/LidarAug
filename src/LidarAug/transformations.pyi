@@ -247,3 +247,7 @@ def intensity_shift(points: Tensor, sigma: float,
     :param max_intensity: is the maximum intensity value (either 1 or 255, depending on the dataset).
     """
     ...
+
+
+def local_to_local_transform(from_pose: Tensor, to_pose: Tensor) -> Tensor:
+    ...
