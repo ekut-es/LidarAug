@@ -4,6 +4,7 @@
 #include "../include/utils.hpp"
 #include <algorithm>
 #include <cmath>
+#include <torch/csrc/autograd/generated/variable_factories.h>
 #include <torch/types.h>
 
 void translate(at::Tensor points, const at::Tensor &translation) {
@@ -470,6 +471,54 @@ void intensity_shift(torch::Tensor points, float sigma,
       points[i][j][POINT_CLOUD_I_IDX] = new_intensity;
     }
   }
+}
+
+[[nodiscard]] inline torch::Tensor
+local_to_world_transform(const torch::Tensor &lidar_pose) {
+
+  assert(lidar_pose.dim() == 1 && lidar_pose.size(0) == 3);
+
+  auto transformation = torch::eye(4);
+
+  // translations
+  transformation[0][3] = lidar_pose[0];
+  transformation[1][3] = lidar_pose[1];
+  transformation[2][3] = lidar_pose[2];
+
+  // rotations
+  auto cos_roll = lidar_pose[3].deg2rad().cos();
+  auto sin_roll = lidar_pose[3].deg2rad().sin();
+  auto cos_yaw = lidar_pose[4].deg2rad().cos();
+  auto sin_yaw = lidar_pose[4].deg2rad().sin();
+  auto cos_pitch = lidar_pose[5].deg2rad().cos();
+  auto sin_pitch = lidar_pose[5].deg2rad().sin();
+
+  transformation[2][0] = sin_pitch;
+
+  transformation[0][0] = cos_pitch * cos_yaw;
+  transformation[1][0] = sin_yaw * cos_pitch;
+  transformation[2][1] = -cos_pitch * sin_roll;
+  transformation[2][2] = cos_pitch * cos_roll;
+
+  transformation[0][1] = cos_yaw * sin_pitch * sin_roll - sin_yaw * cos_roll;
+  transformation[0][2] = -cos_yaw * sin_pitch * cos_roll - sin_yaw * sin_roll;
+  transformation[1][1] = sin_yaw * sin_pitch * sin_roll + cos_yaw * cos_roll;
+  transformation[1][2] = -sin_yaw * sin_pitch * cos_roll + cos_yaw * sin_roll;
+
+  return transformation;
+}
+
+[[nodiscard]] torch::Tensor
+local_to_local_transform(const torch::Tensor &from_pose,
+                         const torch::Tensor &to_pose) {
+
+  assert(from_pose.dim() == 1 && from_pose.size(0) == 3);
+  assert(to_pose.dim() == 1 && to_pose.size(0) == 3);
+
+  auto local_to_world = local_to_world_transform(from_pose);
+  auto world_to_local = torch::linalg_inv(local_to_world_transform(to_pose));
+
+  return local_to_world.dot(world_to_local);
 }
 
 #ifdef BUILD_MODULE
