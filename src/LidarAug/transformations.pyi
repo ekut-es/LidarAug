@@ -151,6 +151,7 @@ def thin_out(points: Tensor, sigma: float) -> Tensor:
 
     :param points: is the point cloud.
     :param sigma:  is the standard diviation of the distribution that genereates the percentage.
+    :return: a new tensor containing the new set of points.
     """
     ...
 
@@ -199,6 +200,7 @@ def delete_labels_by_min_points(
     :param labels:     are the bounding boxes of objects.
     :param names:      are the names/labels of these boxes.
     :param min_points: is the point threshold.
+    :return: The batch with the new labels and the batch with the new names.
     """
     ...
 
