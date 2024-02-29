@@ -203,7 +203,7 @@ def delete_labels_by_min_points(
     ...
 
 
-def random_point_noise(points: Tensor, sigma: float):
+def random_point_noise(points: Tensor, sigma: float) -> None:
     """
     Moves each point in the point cloud randomly.
     How much each coordinate is changed is decided by values drawn from a normal distribution.
@@ -214,7 +214,7 @@ def random_point_noise(points: Tensor, sigma: float):
     ...
 
 
-def transform_along_ray(points: Tensor, sigma: float):
+def transform_along_ray(points: Tensor, sigma: float) -> None:
     """
     Moves each point in the point cloud randomly along a ray.
     How much it is moved is decided by a value drawn from a normal distribution.
@@ -226,7 +226,7 @@ def transform_along_ray(points: Tensor, sigma: float):
 
 
 def intensity_noise(points: Tensor, sigma: float,
-                    max_intensity: ItensityRange):
+                    max_intensity: ItensityRange) -> None:
     """
     Shifts the intensity value of every point in the point cloud by a random amount drawn from a normal distribution.
 
@@ -238,7 +238,7 @@ def intensity_noise(points: Tensor, sigma: float,
 
 
 def intensity_shift(points: Tensor, sigma: float,
-                    max_intensity: ItensityRange):
+                    max_intensity: ItensityRange) -> None:
     """
     Shifts the intensity value of every point in the point cloud by a single value drawn from a normal distribution.
 
