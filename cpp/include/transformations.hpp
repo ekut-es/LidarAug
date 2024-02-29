@@ -182,9 +182,26 @@ void intensity_noise(torch::Tensor points, float sigma,
 void intensity_shift(torch::Tensor points, float sigma,
                      intensity_range max_intensity);
 
+/**
+ * Creates a transformation matrix from the local system into the global
+ * coordinate frame.
+ *
+ * @param lidar_pose is the local coordinate frame.
+ * @returns the homogeneous transformation matrix into the global coordinate
+ *           frame.
+ */
 [[nodiscard]] torch::Tensor
 local_to_world_transform(const torch::Tensor &lidar_pose);
 
+/**
+ * Creates a transformation matrix from the local system into a 'target'
+ * coordinate frame.
+ *
+ * @param from_pose is the local coordinate frame.
+ * @param to_pose   is the target coordinate frame.
+ * @returns: the homogeneous transformation matrix into the target coordinate
+ *           frame.
+ */
 [[nodiscard]] torch::Tensor
 local_to_local_transform(const torch::Tensor &from_pose,
                          const torch::Tensor &to_pose);
