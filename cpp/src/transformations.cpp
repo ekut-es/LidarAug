@@ -473,7 +473,7 @@ void intensity_shift(torch::Tensor points, float sigma,
   }
 }
 
-[[nodiscard]] inline torch::Tensor
+[[nodiscard]] torch::Tensor
 local_to_world_transform(const torch::Tensor &lidar_pose) {
 
   assert(lidar_pose.dim() == 1 && lidar_pose.size(0) == 3);

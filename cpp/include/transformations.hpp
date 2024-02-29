@@ -183,6 +183,9 @@ void intensity_shift(torch::Tensor points, float sigma,
                      intensity_range max_intensity);
 
 [[nodiscard]] torch::Tensor
+local_to_world_transform(const torch::Tensor &lidar_pose);
+
+[[nodiscard]] torch::Tensor
 local_to_local_transform(const torch::Tensor &from_pose,
                          const torch::Tensor &to_pose);
 
