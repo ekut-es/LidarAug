@@ -261,4 +261,10 @@ def local_to_local_transform(from_pose: Tensor, to_pose: Tensor) -> Tensor:
 
 
 def local_to_world_transform(lidar_pose: Tensor) -> Tensor:
+    """
+    Creates a transformation matrix from the local system into the global coordinate frame.
+
+    :param lidar_pose: is the local coordinate frame.
+    :return: the homogeneous transformation matrix into the global coordinate frame.
+    """
     ...
