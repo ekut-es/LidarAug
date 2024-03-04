@@ -19,14 +19,16 @@ The following dependencies are necessary to build and test the C++ library for d
 
 It is also necessary to set the environment variable `TORCH_PATH` to point to where `libtorch` is installed on your system.
 
-After that, just run `make` to compile the library and run the tests.
+After that, just run `make ctest` to compile the library and run google test.
 
 ### Python library
 
-For the Python library, just run `make install` after cloning and entering the repository.
+To use the Python library, just run `make install` after cloning and entering the repository.
 ~Currently, this does not work with Python 3.12, as there is no official release for [torch](https://github.com/pytorch/pytorch/issues/110436) yet.~
 
 ~The current nightly build of `torch` works, but there is no all around support for the tool chain yet.~
+
+To test the python functions/wrappers, install [pytest](https://docs.pytest.org/en/8.0.x/) (`pip install pytest`) and run `make testpy`.
 
 #### Modules
 
