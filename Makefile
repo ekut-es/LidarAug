@@ -13,7 +13,7 @@ build: configure_test
 release: configure
 	cmake --build ./cpp/build_files -j 4 --config
 
-ctest: ./cpp/build_files
+ctest: build
 	cd ./cpp/build_files && ctest
 
 testpy: ./pytest/test.py
