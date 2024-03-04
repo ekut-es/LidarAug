@@ -21,6 +21,8 @@ WRONG_SHAPE_PC = re.escape(
 WRONG_SHAPE_LABELS = re.escape(
     "Tensor is not of shape (B, N, F), where B is the batchsize, N is the number of labels and F is the number of features!"
 )
+INCOMPATIBLE_BATCH_SIZES = re.escape(
+    "Batch sizes for points and labels are not equal!")
 
 
 @pytest.mark.shapetest
@@ -61,3 +63,18 @@ def test_check_points(tensor, expectation):
 def test_check_labels(tensor, expectation):
     with expectation:
         aug._check_labels(tensor)
+
+
+@pytest.mark.shapetest
+@pytest.mark.parametrize("points,labels,expectation", [
+    (torch.randn([1, 2, POINT_CLOUD_FEATRUES
+                  ]), torch.randn([1, 2, LABEL_FEATRUES]), does_not_raise()),
+    (torch.randn([1, 1, POINT_CLOUD_FEATRUES
+                  ]), torch.randn([1, 2, LABEL_FEATRUES]), does_not_raise()),
+    (torch.randn([2, 2, POINT_CLOUD_FEATRUES
+                  ]), torch.randn([1, 2, LABEL_FEATRUES]),
+     pytest.raises(AssertionError, match=INCOMPATIBLE_BATCH_SIZES)),
+])
+def test_check_points_and_labels(points, labels, expectation):
+    with expectation:
+        aug._check_labels_and_points(points, labels)
