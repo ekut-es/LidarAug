@@ -315,6 +315,22 @@ def intensity_shift(points: Tensor, sigma: float,
     transformations.intensity_shift(points, sigma, max_intensity)
 
 
+def apply_transformation(points: Tensor,
+                         transformations_matrix: Tensor) -> None:
+    """
+    Applies a transformation matrix to an entire point cloud with the shape (B,
+    N, F), where B is the number of batches and N is the number of points.
+
+    :param points:                is the point cloud that the transformation
+                                  matrix is applied to.
+    :param transformation_matrix: is the transformation matrix.
+    """
+
+    _check_points(points)
+
+    transformations.apply_transformation(points, transformations_matrix)
+
+
 def fog(point_cloud: Tensor, prob: float,
         metric: weather_simulations.FogParameter, sigma: float,
         mean: int) -> None:
