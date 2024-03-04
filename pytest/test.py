@@ -78,3 +78,13 @@ def test_check_labels(tensor, expectation):
 def test_check_points_and_labels(points, labels, expectation):
     with expectation:
         aug._check_labels_and_points(points, labels)
+
+
+@pytest.mark.xfail(reason="Not implemented")
+def test_random_noise():
+    assert False
+
+
+@pytest.mark.xfail(reason="Not implemented")
+def test_thin_out():
+    assert False
