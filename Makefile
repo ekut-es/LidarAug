@@ -1,5 +1,5 @@
 
-all: build test
+all: build testpy ctest
 
 configure:
 	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$(TORCH_PATH)" -S ./cpp/ -B ./cpp/build_files
@@ -13,8 +13,11 @@ build: configure_test
 release: configure
 	cmake --build ./cpp/build_files -j 4 --config
 
-test: ./cpp/build_files
+ctest: ./cpp/build_files
 	cd ./cpp/build_files && ctest
+
+testpy: ./pytest/test.py
+	pytest ./pytest/test.py -v
 
 rerun: ./cpp/build_files
 	cd ./cpp/build_files && ctest --rerun-failed --output-on-failure
