@@ -18,7 +18,7 @@ class NoiseType(Enum):
     MAX: int
 
 
-class ItensityRange(Enum):
+class IntensityRange(Enum):
     """
     Defines options for maximum intensity values.
     Intensity goes from [0; MAX_INTENSITY], where MAX_INTENSITY is either 1 or
@@ -126,7 +126,7 @@ def flip_random(points: Tensor, labels: Tensor, prob: int) -> None:
 
 def random_noise(points: Tensor, sigma: float,
                  ranges: list[float] | DistributionRanges,
-                 noise_type: NoiseType, max_intensity: ItensityRange) -> None:
+                 noise_type: NoiseType, max_intensity: IntensityRange) -> None:
     """
     Adds random amount of points (drawn using a normal distribution) at random coordinates
     (within predetermined ranges) with a random intensity according to specific noise type.
@@ -228,7 +228,7 @@ def transform_along_ray(points: Tensor, sigma: float) -> None:
 
 
 def intensity_noise(points: Tensor, sigma: float,
-                    max_intensity: ItensityRange) -> None:
+                    max_intensity: IntensityRange) -> None:
     """
     Shifts the intensity value of every point in the point cloud by a random amount drawn from a normal distribution.
 
@@ -240,7 +240,7 @@ def intensity_noise(points: Tensor, sigma: float,
 
 
 def intensity_shift(points: Tensor, sigma: float,
-                    max_intensity: ItensityRange) -> None:
+                    max_intensity: IntensityRange) -> None:
     """
     Shifts the intensity value of every point in the point cloud by a single value drawn from a normal distribution.
 
