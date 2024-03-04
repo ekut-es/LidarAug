@@ -1,5 +1,5 @@
 
-all: build testpy ctest
+all: install testpy build ctest
 
 configure:
 	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$(TORCH_PATH)" -S ./cpp/ -B ./cpp/build_files
