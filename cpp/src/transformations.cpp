@@ -2,6 +2,7 @@
 #include "../include/label.hpp"
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
+#include <ATen/ops/index_select.h>
 #include <algorithm>
 #include <cmath>
 #include <torch/csrc/autograd/generated/variable_factories.h>
@@ -519,6 +520,22 @@ local_to_local_transform(const torch::Tensor &from_pose,
   auto world_to_local = torch::linalg_inv(local_to_world_transform(to_pose));
 
   return local_to_world.dot(world_to_local);
+}
+
+void apply_transformation(torch::Tensor points,
+                          const torch::Tensor &transformation_matrix) {
+
+  // save intensity values
+  const auto intensity =
+      torch::index_select(points, 2, torch::tensor({POINT_CLOUD_I_IDX}))
+          .flatten(0);
+
+  // apply transformation
+  points.dot(transformation_matrix.permute({1, 0}));
+
+  // write back intensity
+  points.index({torch::indexing::Slice(), torch::indexing::Slice(),
+                POINT_CLOUD_I_IDX}) = intensity;
 }
 
 #ifdef BUILD_MODULE

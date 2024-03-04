@@ -206,4 +206,15 @@ local_to_world_transform(const torch::Tensor &lidar_pose);
 local_to_local_transform(const torch::Tensor &from_pose,
                          const torch::Tensor &to_pose);
 
+/**
+ * Applies a transformation matrix to an entire point cloud with the shape (B,
+ * N, F), where B is the number of batches and N is the number of points.
+ *
+ * @param points                is the point cloud that the transformation
+ *                              matrix is applied to.
+ * @param transformation_matrix is the transformation matrix.
+ */
+void apply_transformation(torch::Tensor points,
+                          const torch::Tensor &transformation_matrix);
+
 #endif // !TRANSFORMATIONS_HPP

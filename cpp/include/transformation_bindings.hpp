@@ -43,6 +43,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "Create transformation matrix");
   m.def("local_to_local_transform", &local_to_local_transform,
         "Homogeneous Transformation");
+  m.def("apply_transformation", &apply_transformation,
+        "Applies a transformation matrix to a point cloud");
   pybind11::enum_<noise_type>(m, "NoiseType")
       .value("UNIFORM", UNIFORM)
       .value("SALT_PEPPER", SALT_PEPPER)

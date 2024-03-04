@@ -270,3 +270,16 @@ def local_to_world_transform(lidar_pose: Tensor) -> Tensor:
     :return: the homogeneous transformation matrix into the global coordinate frame.
     """
     ...
+
+
+def apply_transformation(points: Tensor,
+                         transformation_matrix: Tensor) -> None:
+    """
+    Applies a transformation matrix to an entire point cloud with the shape (B,
+    N, F), where B is the number of batches and N is the number of points.
+
+    :param points:                is the point cloud that the transformation
+                                  matrix is applied to.
+    :param transformation_matrix: is the transformation matrix.
+    """
+    ...
