@@ -477,8 +477,6 @@ void intensity_shift(torch::Tensor points, float sigma,
 [[nodiscard]] torch::Tensor
 local_to_world_transform(const torch::Tensor &lidar_pose) {
 
-  assert(lidar_pose.dim() == 1 && lidar_pose.size(0) == 3);
-
   auto transformation = torch::eye(4);
 
   // translations
@@ -512,9 +510,6 @@ local_to_world_transform(const torch::Tensor &lidar_pose) {
 [[nodiscard]] torch::Tensor
 local_to_local_transform(const torch::Tensor &from_pose,
                          const torch::Tensor &to_pose) {
-
-  assert(from_pose.dim() == 1 && from_pose.size(0) == 3);
-  assert(to_pose.dim() == 1 && to_pose.size(0) == 3);
 
   auto local_to_world = local_to_world_transform(from_pose);
   auto world_to_local = torch::linalg_inv(local_to_world_transform(to_pose));

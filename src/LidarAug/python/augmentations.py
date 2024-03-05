@@ -324,6 +324,34 @@ def intensity_shift(points: Tensor, sigma: float,
     transformations.intensity_shift(points, sigma, max_intensity)
 
 
+def local_to_world_transform(lidar_pose: Tensor) -> Tensor:
+    """
+    Creates a transformation matrix from the local system into the global coordinate frame.
+
+    :param lidar_pose: is the local coordinate frame.
+    :return: the homogeneous transformation matrix into the global coordinate frame.
+    """
+
+    _check_frame_coordinate_dimensions(lidar_pose)
+
+    return transformations.local_to_world_transform(lidar_pose)
+
+
+def local_to_local_transform(from_pose: Tensor, to_pose: Tensor) -> Tensor:
+    """
+    Creates a transformation matrix from the local system into a 'target' coordinate frame.
+
+    :param from_pose: is the local coordinate frame.
+    :param to_pose:   is the target coordinate frame.
+    :return: the homogeneous transformation matrix into the target coordinate frame.
+    """
+
+    _check_frame_coordinate_dimensions(from_pose)
+    _check_frame_coordinate_dimensions(to_pose)
+
+    return transformations.local_to_local_transform(from_pose, to_pose)
+
+
 def apply_transformation(points: Tensor,
                          transformations_matrix: Tensor) -> None:
     """
