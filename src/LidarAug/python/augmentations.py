@@ -44,6 +44,15 @@ def _check_labels_and_points(points: Tensor, labels: Tensor) -> None:
     _check_labels(labels)
 
 
+def _check_frame_coordinate_dimensions(frame: Tensor) -> None:
+    """
+    Checks whether a frame has the correct shape.
+    """
+    shape = frame.shape
+    assert len(shape) == 1 and shape[
+        0] == 3, "`frame` is supposed to be a 3-vector (x, y, z)"
+
+
 def translate(points: Tensor, translation: Tensor) -> None:
     """
     Moves points by a specific amount.
