@@ -402,10 +402,6 @@ void random_point_noise(torch::Tensor points, float sigma) {
       auto *const v = points[i][j].data_ptr<float>();
       const auto values = std::get<VECTOR>(draw_values<float>(dist, 3));
 
-      std::printf("v1: %.9g\n", values[0]);
-      std::printf("v2: %.9g\n", values[1]);
-      std::printf("v3: %.9g\n", values[2]);
-
       // NOLINTBEGIN
       // Allow pointer arithmetic for accessing tensor contents
       v[0] += values[0];
