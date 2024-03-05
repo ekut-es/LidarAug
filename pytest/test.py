@@ -25,7 +25,7 @@ INCOMPATIBLE_BATCH_SIZES = re.escape(
     "Batch sizes for points and labels are not equal!")
 
 WRONG_FRAME_DIMENSIONS = re.escape(
-    "`frame` is supposed to be a 3-vector (x, y, z)")
+    "`frame` is supposed to be a 6-vector (x, y, z, roll, yaw, pitch)")
 
 
 @pytest.mark.shapetest
@@ -89,8 +89,8 @@ def test_check_points_and_labels(points, labels, expectation):
      pytest.raises(AssertionError, match=WRONG_FRAME_DIMENSIONS)),
     (torch.randn([1, 2, LABEL_FEATRUES]),
      pytest.raises(AssertionError, match=WRONG_FRAME_DIMENSIONS)),
-    (torch.randn([3]), does_not_raise()),
-    (torch.tensor([1, 2, 3]), does_not_raise()),
+    (torch.randn([6]), does_not_raise()),
+    (torch.tensor([1, 2, 3, 4, 5, 6]), does_not_raise()),
 ])
 def test_check_frame_coordinate_dimensions(frame, expectation):
     with expectation:

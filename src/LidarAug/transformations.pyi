@@ -255,8 +255,8 @@ def local_to_local_transform(from_pose: Tensor, to_pose: Tensor) -> Tensor:
     """
     Creates a transformation matrix from the local system into a 'target' coordinate frame.
 
-    :param from_pose: is the local coordinate frame.
-    :param to_pose:   is the target coordinate frame.
+    :param from_pose: is the local coordinate frame (x, y, z, roll, yaw, pitch).
+    :param to_pose:   is the target coordinate frame (x, y, z, roll, yaw, pitch).
     :return: the homogeneous transformation matrix into the target coordinate frame.
     """
     ...
@@ -266,7 +266,7 @@ def local_to_world_transform(lidar_pose: Tensor) -> Tensor:
     """
     Creates a transformation matrix from the local system into the global coordinate frame.
 
-    :param lidar_pose: is the local coordinate frame.
+    :param lidar_pose: is the local coordinate frame (x, y, z, roll, yaw, pitch).
     :return: the homogeneous transformation matrix into the global coordinate frame.
     """
     ...

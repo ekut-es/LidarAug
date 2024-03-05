@@ -50,7 +50,7 @@ def _check_frame_coordinate_dimensions(frame: Tensor) -> None:
     """
     shape = frame.shape
     assert len(shape) == 1 and shape[
-        0] == 3, "`frame` is supposed to be a 3-vector (x, y, z)"
+        0] == 6, "`frame` is supposed to be a 6-vector (x, y, z, roll, yaw, pitch)"
 
 
 def translate(points: Tensor, translation: Tensor) -> None:
@@ -328,7 +328,7 @@ def local_to_world_transform(lidar_pose: Tensor) -> Tensor:
     """
     Creates a transformation matrix from the local system into the global coordinate frame.
 
-    :param lidar_pose: is the local coordinate frame.
+    :param lidar_pose: is the local coordinate frame (x, y, z, roll, yaw, pitch).
     :return: the homogeneous transformation matrix into the global coordinate frame.
     """
 
@@ -341,8 +341,8 @@ def local_to_local_transform(from_pose: Tensor, to_pose: Tensor) -> Tensor:
     """
     Creates a transformation matrix from the local system into a 'target' coordinate frame.
 
-    :param from_pose: is the local coordinate frame.
-    :param to_pose:   is the target coordinate frame.
+    :param from_pose: is the local coordinate frame (x, y, z, roll, yaw, pitch).
+    :param to_pose:   is the target coordinate frame (x, y, z, roll, yaw, pitch).
     :return: the homogeneous transformation matrix into the target coordinate frame.
     """
 
