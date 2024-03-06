@@ -3,6 +3,9 @@ requires = [
     "setuptools>=42",
     "pybind11>=2.10.0",
     "torch",
+    "scipy",
+    "matplotlib",
+    "open3d"
 ]
 build-backend = "setuptools.build_meta"
 
