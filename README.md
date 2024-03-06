@@ -24,9 +24,10 @@ After that, just run `make ctest` to compile the library and run google test.
 ### Python library
 
 To use the Python library, just run `make install` after cloning and entering the repository.
-~Currently, this does not work with Python 3.12, as there is no official release for [torch](https://github.com/pytorch/pytorch/issues/110436) yet.~
+Currently, this branch does not work with Python 3.12, as there is no official release for [open3d](https://github.com/isl-org/Open3D/issues/6433) yet, which is used for visualization.
+Open3d is waiting for the full release of TensorFlow 2.16.0, which adds Python 3.12 support.
 
-~The current nightly build of `torch` works, but there is no all around support for the tool chain yet.~
+On Linux at least TensorFlow 2.16.0-rc0 is available, but open3d is waiting for a full release before adding 3.12 support.
 
 To test the python functions/wrappers, install [pytest](https://docs.pytest.org/en/8.0.x/) (`pip install pytest`) and run `make testpy`.
 
