@@ -27,6 +27,8 @@ INCOMPATIBLE_BATCH_SIZES = re.escape(
 WRONG_FRAME_DIMENSIONS = re.escape(
     "`frame` is supposed to be a 6-vector (x, y, z, roll, yaw, pitch)")
 
+test_points: torch.Tensor = torch.randn([3, 100, POINT_CLOUD_FEATRUES])
+
 
 @pytest.mark.shapetest
 @pytest.mark.parametrize(
@@ -102,6 +104,8 @@ def test_random_noise():
     assert False
 
 
-@pytest.mark.xfail(reason="Not implemented")
+@pytest.mark.transtest
 def test_thin_out():
-    assert False
+    points = test_points.clone()
+    aug.thin_out(points, 10)
+    assert points.shape[1] != test_points.shape[1]
