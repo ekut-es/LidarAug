@@ -26,7 +26,7 @@
   return rotation;
 }
 
-[[nodiscard]] inline float to_rad(float angle) noexcept {
+[[nodiscard]] constexpr inline float to_rad(float angle) noexcept {
   return angle * (M_PI / PI_DEG);
 }
 
