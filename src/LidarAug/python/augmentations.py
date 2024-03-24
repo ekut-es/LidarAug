@@ -200,7 +200,8 @@ def thin_out(points: Tensor, sigma: float) -> None:
     _check_points(points)
 
     batch_points = transformations.thin_out(points, sigma)
-    points = batch_points
+    points.resize_(batch_points.shape)
+    points.copy_(batch_points)
 
 
 def rotate_deg(points: Tensor, angle: float) -> None:
