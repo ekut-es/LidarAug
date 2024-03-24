@@ -186,12 +186,12 @@ def random_noise(points: Tensor, sigma: float,
 
 def thin_out(points: Tensor, sigma: float) -> None:
     """
-     Randomly genereates a percentage from a norma distribution, which determines
-     how many items should be 'thinned out'. From that percentage random indeces
-     are uniformly drawn (in a random order, where each index is unique).
+    Randomly genereates a percentage from a normal distribution, which determines
+    how many items should be 'thinned out'. From that percentage random indeces
+    are uniformly drawn (in a random order, where each index is unique).
 
-     Finally a new tensor is created containing the items present at those
-     indeces.
+    Finally a new tensor is created containing the items present at those
+    indeces.
 
     :param points: is the point cloud.
     :param sigma:  is the standard diviation of the distribution that genereates the percentage.
