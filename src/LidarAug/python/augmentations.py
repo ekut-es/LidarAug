@@ -180,8 +180,12 @@ def random_noise(points: Tensor, sigma: float,
     else:
         distribution_ranges = ranges
 
-    transformations.random_noise(points, sigma, distribution_ranges,
-                                 noise_type, max_intensity)
+    point_cloud = transformations.random_noise(points, sigma,
+                                               distribution_ranges, noise_type,
+                                               max_intensity)
+
+    points.resize_(point_cloud.shape)
+    points.copy_(point_cloud)
 
 
 def thin_out(points: Tensor, sigma: float) -> None:
