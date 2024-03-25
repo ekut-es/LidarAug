@@ -221,10 +221,8 @@ TEST(RandomNoiseTest, BasicAssertions) {
 
   random_noise(points, sigma, ranges, UNIFORM, MAX_INTENSITY_255);
 
-  for (tensor_size_t i = 0; i < points.size(0); i++) {
-    EXPECT_GT(points[i].size(0), points_original[i].size(0))
-        << "No noise has been added...";
-  }
+  EXPECT_GT(points.size(1), points_original.size(1))
+      << "No noise has been added...";
 }
 
 TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {
