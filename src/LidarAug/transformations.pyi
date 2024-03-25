@@ -32,7 +32,7 @@ class DistributionRange:
     min: float
     max: float
 
-    def __init__(self, min, max) -> None:
+    def __init__(self, min: float, max: float) -> None:
         ...
 
 
@@ -42,7 +42,9 @@ class DistributionRanges:
     z_range: DistributionRange
     uniform_range: DistributionRange
 
-    def __init__(self, x_range, y_range, z_range, uniform_range) -> None:
+    def __init__(self, x_range: DistributionRange, y_range: DistributionRange,
+                 z_range: DistributionRange,
+                 uniform_range: DistributionRange) -> None:
         ...
 
 
