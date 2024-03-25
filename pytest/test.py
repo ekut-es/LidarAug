@@ -3,6 +3,7 @@ import pytest
 
 import torch
 from LidarAug import augmentations as aug
+from LidarAug.transformations import NoiseType, DistributionRange, DistributionRanges, IntensityRange
 
 import re
 
@@ -99,9 +100,20 @@ def test_check_frame_coordinate_dimensions(frame, expectation):
         aug._check_frame_coordinate_dimensions(frame)
 
 
-@pytest.mark.xfail(reason="Not implemented")
+@pytest.mark.transtest
 def test_random_noise():
-    assert False
+    points = torch.empty([1, 0, 4])
+    ranges_list = [1.0, 10.0, 3.0, 5.0, 4.0, 7.0, 0.0, 10.0]
+    aug.random_noise(points, 2, ranges_list, NoiseType.UNIFORM,
+                     IntensityRange.MAX_INTENSITY_255)
+
+    assert points.shape[1] > 0, "No points have been added!"
+    for point in points[0]:
+        assert point[0] <= 10 and point[0] >= 1, "x range not as parametrized"
+        assert point[1] <= 5 and point[1] >= 3, "y range not as parametrized"
+        assert point[2] <= 7 and point[2] >= 4, "z range not as parametrized"
+        assert point[3] <= 255 and point[
+            3] >= 0, "intensity range not as parametrized"
 
 
 @pytest.mark.transtest
