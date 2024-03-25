@@ -209,9 +209,7 @@ TEST(DrawUniformValuesTest, BasicAssertions) {
 }
 
 TEST(RandomNoiseTest, BasicAssertions) {
-  auto points =
-      torch::tensor({{{1.0, 2.0, 3.0, 10.9}, {4.0, 5.0, 6.0, -10.0}}});
-  const auto points_original =
+  const auto points =
       torch::tensor({{{1.0, 2.0, 3.0, 10.9}, {4.0, 5.0, 6.0, -10.0}}});
 
   constexpr static float sigma = 2;
@@ -219,10 +217,10 @@ TEST(RandomNoiseTest, BasicAssertions) {
   constexpr static distribution_ranges<float> ranges{
       {1, 2}, {1, 2}, {1, 2}, {1, 2}};
 
-  random_noise(points, sigma, ranges, UNIFORM, MAX_INTENSITY_255);
+  auto new_points =
+      random_noise(points, sigma, ranges, UNIFORM, MAX_INTENSITY_255);
 
-  EXPECT_GT(points.size(1), points_original.size(1))
-      << "No noise has been added...";
+  EXPECT_GT(new_points.size(1), points.size(1)) << "No noise has been added...";
 }
 
 TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {

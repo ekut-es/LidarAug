@@ -182,9 +182,9 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
   }
 }
 
-void random_noise(at::Tensor &points, float sigma,
-                  const distribution_ranges<float> &ranges, noise_type type,
-                  intensity_range max_intensity) {
+torch::Tensor random_noise(const at::Tensor &points, float sigma,
+                           const distribution_ranges<float> &ranges,
+                           noise_type type, intensity_range max_intensity) {
 
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
@@ -198,6 +198,10 @@ void random_noise(at::Tensor &points, float sigma,
                                                   ranges.z_range.max);
 
   const auto num_points = static_cast<std::size_t>(std::abs(normal(rng)));
+
+  auto point_cloud = torch::empty(
+      {dims.batch_size, dims.num_items + static_cast<tensor_size_t>(num_points),
+       dims.num_features});
 
   // iterate over batches
   for (tensor_size_t batch_num = 0; batch_num < dims.batch_size; batch_num++) {
@@ -271,8 +275,10 @@ void random_noise(at::Tensor &points, float sigma,
     }
 
     // concatenate points
-    points = torch::cat({points, noise_tensor.unsqueeze(0)}, 1);
+    point_cloud = torch::cat({points, noise_tensor.unsqueeze(0)}, 1);
   }
+
+  return point_cloud;
 }
 
 /**

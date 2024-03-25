@@ -128,7 +128,8 @@ def flip_random(points: Tensor, labels: Tensor, prob: int) -> None:
 
 def random_noise(points: Tensor, sigma: float,
                  ranges: list[float] | DistributionRanges,
-                 noise_type: NoiseType, max_intensity: IntensityRange) -> None:
+                 noise_type: NoiseType,
+                 max_intensity: IntensityRange) -> Tensor:
     """
     Adds random amount of points (drawn using a normal distribution) at random coordinates
     (within predetermined ranges) with a random intensity according to specific noise type.
