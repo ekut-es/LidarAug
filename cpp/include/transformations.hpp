@@ -87,9 +87,10 @@ void rotate_rad(at::Tensor points, float angle);
  * @param max_intensity   is the maximum intensity value in the dataset
  * @returns a new tensor with the new points added.
  */
-torch::Tensor random_noise(const at::Tensor &points, float sigma,
-                           const distribution_ranges<float> &ranges,
-                           noise_type type, intensity_range max_intensity);
+[[nodiscard]] torch::Tensor
+random_noise(const at::Tensor &points, float sigma,
+             const distribution_ranges<float> &ranges, noise_type type,
+             intensity_range max_intensity);
 
 /**
  * Randomly genereates a percentage from a norma distribution, which determines
