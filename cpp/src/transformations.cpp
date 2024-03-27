@@ -182,9 +182,10 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
   }
 }
 
-torch::Tensor random_noise(const at::Tensor &points, float sigma,
-                           const distribution_ranges<float> &ranges,
-                           noise_type type, intensity_range max_intensity) {
+[[nodiscard]] torch::Tensor
+random_noise(const at::Tensor &points, float sigma,
+             const distribution_ranges<float> &ranges, noise_type type,
+             intensity_range max_intensity) {
 
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
