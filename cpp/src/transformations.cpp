@@ -402,7 +402,7 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
     batch_names.emplace_back(filtered_names);
   }
 
-  return {batch_labels, batch_names};
+  return std::make_pair(batch_labels, batch_names);
 }
 
 void random_point_noise(torch::Tensor points, float sigma) {
