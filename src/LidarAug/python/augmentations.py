@@ -267,8 +267,11 @@ def delete_labels_by_min_points(points: Tensor, labels: Tensor, names: Tensor,
     batch_labels, batch_names = transformations.delete_labels_by_min_points(
         points, labels, names, min_points)
 
-    labels = nested_tensor(batch_labels)
-    names = nested_tensor(batch_names)
+    labels.resize_(batch_labels.shape)
+    labels.copy_(batch_labels)
+
+    names.resize_(batch_names.shape)
+    names.copy_(batch_names)
 
 
 def random_point_noise(points: Tensor, sigma: float) -> None:
