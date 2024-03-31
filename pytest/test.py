@@ -121,3 +121,42 @@ def test_thin_out():
     points = test_points.clone()
     aug.thin_out(points, 10)
     assert points.shape[1] != test_points.shape[1]
+
+
+@pytest.mark.transtest
+def test_delete_labels_by_min_points():
+    points = torch.tensor([[[-8.2224, -4.3151, -6.5488, -3.9899],
+                            [6.3092, -3.7737, 7.2516, -5.8651],
+                            [1.0, 1.0, 1.0, 10.0]],
+                           [[10.4966, 10.1144, 10.2182, -8.4158],
+                            [7.0241, 7.6908, -2.1535, 1.3416],
+                            [10.0, 10.0, 10.0, 10.0]]])
+
+    labels = torch.tensor([[[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0],
+                            [100.0, 100.0, 100.0, 1.0, 1.0, 1.0, 0.0]],
+                           [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0],
+                            [10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0]]])
+    names = torch.tensor([[[0x00], [0x01]], [[0x10], [0x11]]])
+
+    min_points = 1
+    aug.delete_labels_by_min_points(points, labels, names, min_points)
+
+    expected_points = torch.tensor([[[-8.2224, -4.3151, -6.5488, -3.9899],
+                                     [6.3092, -3.7737, 7.2516, -5.8651],
+                                     [1.0, 1.0, 1.0, 10.0]],
+                                    [[10.4966, 10.1144, 10.2182, -8.4158],
+                                     [7.0241, 7.6908, -2.1535, 1.3416],
+                                     [10.0, 10.0, 10.0, 10.0]]])
+
+    expected_labels = torch.tensor(
+        [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0],
+         [10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0, 1.0]])
+
+    expected_names = torch.tensor([[0x00, 0], [0x11, 1]])
+
+    assert points.equal(
+        expected_points), "Points should not have been modified!"
+
+    assert labels.equal(expected_labels)
+
+    assert names.equal(expected_names)
