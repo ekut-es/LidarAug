@@ -191,9 +191,8 @@ def rotate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
     ...
 
 
-def delete_labels_by_min_points(
-        points: Tensor, labels: Tensor, names: Tensor,
-        min_points: int) -> Tuple[list[Tensor], list[Tensor]]:
+def delete_labels_by_min_points(points: Tensor, labels: Tensor, names: Tensor,
+                                min_points: int) -> Tuple[Tensor, Tensor]:
     """
      Checks the amount of points for each bounding box.
      If the number of points is smaller than a given threshold, the box is removed

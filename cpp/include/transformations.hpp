@@ -120,10 +120,11 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
  * @param names      are the names/labels of these boxes.
  * @param min_points is the point threshold.
  *
- * @returns a `std::pair` of `torch::List<torch::Tensor>` containing the new
- *          labels and new names (in that order).
+ * @returns a `std::pair` of `torch::Tensor` containing the new labels and new
+ * names (in that order) as a flat tensor with the batch index they were in as
+ * an additional feature.
  */
-[[nodiscard]] std::pair<torch::List<torch::Tensor>, torch::List<torch::Tensor>>
+[[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
                             const at::Tensor &names,
                             const tensor_size_t min_points);
@@ -134,20 +135,21 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
  * along with its label.
  * This function function expectes all tensors in the shape of (n, m), where m
  * is the number of features and n is the number of elements.
- * It does not handle batches.
+ * It does not handle batches, but adds the batch index to the point.
  *
  * @param points     is the point_cloud.
  * @param labels     are the bounding boxes of objects.
  * @param names      are the names/labels of these boxes.
  * @param min_points is the point threshold.
+ * @param batch_idx  is the index of the batch being currently processed.
  *
  * @returns a `std::pair` of `torch::Tensor` containing the new labels and their
- *          names (in that order).
+ *          names (in that order), as well as the batch index.
  */
 [[nodiscard]] inline std::pair<torch::Tensor, torch::Tensor>
 _delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
-                             const at::Tensor &names,
-                             const tensor_size_t min_points) {
+                             const at::Tensor &names, tensor_size_t min_points,
+                             tensor_size_t batch_idx) {
 
   const tensor_size_t num_labels = labels.size(0);
   const tensor_size_t num_points = points.size(0);
@@ -166,14 +168,29 @@ _delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
 
   auto not_deleted_indices = point_indices.sum(1).ge(min_points);
 
-  auto not_deleted_labels =
+  const auto not_deleted_labels =
       labels.index({not_deleted_indices.nonzero().squeeze()})
           .view({-1, label_features});
-  auto not_deleted_names =
+  const auto not_deleted_names =
       names.index({not_deleted_indices.nonzero().squeeze()})
           .view({-1, name_features});
 
-  return {not_deleted_labels, not_deleted_names};
+  // create tensors for the index
+  const auto idx_labels =
+      torch::empty({not_deleted_labels.size(0)}, labels.options().dtype());
+  const auto idx_names =
+      torch::empty({not_deleted_names.size(0)}, names.options().dtype());
+
+  idx_labels.fill_(batch_idx);
+  idx_names.fill_(batch_idx);
+
+  // merge filtered tensors with index
+  auto merged_labels =
+      torch::cat({not_deleted_labels, idx_labels.reshape({1, -1})}, 1);
+  auto merged_names =
+      torch::cat({not_deleted_names, idx_names.reshape({1, -1})}, 1);
+
+  return {merged_labels, merged_names};
 }
 
 void random_point_noise(torch::Tensor points, float sigma);

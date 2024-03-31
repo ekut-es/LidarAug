@@ -1,5 +1,6 @@
 #include "../include/transformations.hpp"
 #include "../include/label.hpp"
+#include "../include/name.hpp"
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <ATen/ops/index_select.h>
@@ -380,27 +381,31 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
   return new_tensor;
 }
 
-[[nodiscard]] std::pair<torch::List<torch::Tensor>, torch::List<torch::Tensor>>
+[[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
                             const at::Tensor &names,
                             const tensor_size_t min_points) {
-
-  torch::List<torch::Tensor> batch_labels;
-  torch::List<torch::Tensor> batch_names;
-
   const tensor_size_t batch_size = labels.size(0);
 
-  batch_labels.reserve(static_cast<std::size_t>(batch_size));
-  batch_names.reserve(static_cast<std::size_t>(batch_size));
+  std::vector<torch::Tensor> labels_list;
+  std::vector<torch::Tensor> names_list;
+
+  labels_list.reserve(static_cast<std::size_t>(batch_size));
+  names_list.reserve(static_cast<std::size_t>(batch_size));
 
   for (tensor_size_t i = 0; i < batch_size; i++) {
 
     auto [filtered_labels, filtered_names] = _delete_labels_by_min_points(
-        points[i], labels[i], names[i], min_points);
+        points[i], labels[i], names[i], min_points, i);
 
-    batch_labels.emplace_back(filtered_labels);
-    batch_names.emplace_back(filtered_names);
+    labels_list.emplace_back(filtered_labels);
+    names_list.emplace_back(filtered_names);
   }
+
+  auto batch_labels =
+      torch::stack(labels_list).reshape({-1, LABEL_NUM_FEATURES + 1});
+  auto batch_names =
+      torch::stack(names_list).reshape({-1, NAME_NUM_FEATURES + 1});
 
   return std::make_pair(batch_labels, batch_names);
 }
