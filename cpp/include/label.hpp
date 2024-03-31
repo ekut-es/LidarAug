@@ -21,5 +21,6 @@
 #define LABEL_H_IDX 4
 #define LABEL_L_IDX 5
 #define LABEL_ANGLE_IDX 6
+#define LABEL_NUM_FEATURES 7
 
 #endif // !LABEL_HPP
