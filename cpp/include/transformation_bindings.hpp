@@ -1,4 +1,5 @@
 
+#include "../include/tensor.hpp"
 #include "../include/transformations.hpp"
 #include <pybind11/pybind11.h>
 #include <torch/extension.h>
@@ -45,6 +46,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "Homogeneous Transformation");
   m.def("apply_transformation", &apply_transformation,
         "Applies a transformation matrix to a point cloud");
+  m.def("change_sparse_representation", &change_sparse_representation,
+        "Changes the representation of sparse tensors.");
   pybind11::enum_<noise_type>(m, "NoiseType")
       .value("UNIFORM", UNIFORM)
       .value("SALT_PEPPER", SALT_PEPPER)

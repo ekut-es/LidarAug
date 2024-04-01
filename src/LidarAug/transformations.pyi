@@ -285,3 +285,19 @@ def apply_transformation(points: Tensor,
     :param transformation_matrix: is the transformation matrix.
     """
     ...
+
+
+def change_sparse_representation(input: Tensor, batch_idx: int) -> Tensor:
+    """
+    Changes the representation of a sparse tensor from a flat 2D tensor (N, F),
+    where F is the number of features to a 3D tensor (B, n, f), where B is the
+    number of batches, n is the number of tensors in each batch and f is the
+    number of features (equal to F-1).
+    0s are used for padding.
+
+    :param input:     is the input tensor.
+    :param batch_idx: is the index of the batch index.
+
+    :return: a new tensor with 0s for padding.
+    """
+    ...
