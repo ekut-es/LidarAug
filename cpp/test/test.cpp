@@ -1,5 +1,6 @@
 
 #include "../include/stats.hpp"
+#include "../include/tensor.hpp"
 #include "../include/transformations.hpp"
 #include "../include/utils.hpp"
 #include "../include/weather.hpp"
@@ -315,6 +316,40 @@ TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {
         << expected_names << "\nactual:\n"
         << result_names;
   }
+}
+
+TEST(ChangeSparseRepresentationTest, BasicAssertions) {
+
+  // clang-format off
+  const auto in = torch::tensor({
+      {1, 2, 0},
+      {4, 1, 0},
+      {7, 7, 0},
+      {3, 1, 1},
+      {2, 2, 2},
+      {3, 2, 2},
+  });
+
+  const tensor_size_t batch_idx = 2;
+
+  const auto expected = torch::tensor({
+      {{1, 2},
+       {4, 1},
+       {7, 7}},
+      {{3, 1},
+       {0, 0},
+       {0, 0}},
+      {{2, 2},
+       {3, 2},
+       {0, 0}},
+  });
+  // clang-format on
+
+  const auto result = change_sparse_representation(in, batch_idx);
+
+  EXPECT_TRUE(result.equal(expected)) << "expected:\n"
+                                      << expected << "\nactual:\n"
+                                      << result;
 }
 
 // doing tests with controlled random number generation (no random seed)
