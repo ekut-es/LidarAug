@@ -30,4 +30,8 @@
   return angle * (M_PI / PI_DEG);
 }
 
+namespace torch_utils {
+constexpr auto F32 = torch::kF32;
+}
+
 #endif // !UTILS_HPP
