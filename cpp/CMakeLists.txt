@@ -49,6 +49,8 @@ add_executable(
   include/transformations.hpp
   include/weather.hpp
   src/weather.cpp
+  include/tensor.hpp
+  src/tensor.cpp
   test/test.cpp
 )
 target_link_libraries(
