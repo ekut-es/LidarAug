@@ -4,8 +4,10 @@
 #include <cmath>
 #include <torch/serialize/tensor.h>
 
-#define PI_DEG 180.0
-#define TWO_M_PI 2.0f * M_PI
+namespace math_utils {
+
+constexpr float PI_DEG = 180.0;
+constexpr float TWO_M_PI = 2.0f * M_PI;
 
 /**
  * Generates a rotation matrix around the 'z' axis (yaw) from the provided
@@ -29,5 +31,7 @@
 [[nodiscard]] constexpr inline float to_rad(float angle) noexcept {
   return angle * (M_PI / PI_DEG);
 }
+
+} // namespace math_utils
 
 #endif // !UTILS_HPP
