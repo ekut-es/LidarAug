@@ -7,7 +7,8 @@
 namespace math_utils {
 
 constexpr float PI_DEG = 180.0;
-constexpr float TWO_M_PI = 2.0f * M_PI;
+constexpr float PI_RAD = static_cast<float>(M_PI);
+constexpr float TWO_M_PI = 2.0f * PI_RAD;
 
 /**
  * Generates a rotation matrix around the 'z' axis (yaw) from the provided
@@ -29,7 +30,7 @@ constexpr float TWO_M_PI = 2.0f * M_PI;
 }
 
 [[nodiscard]] constexpr inline float to_rad(float angle) noexcept {
-  return angle * (M_PI / PI_DEG);
+  return angle * (PI_RAD / PI_DEG);
 }
 
 } // namespace math_utils
