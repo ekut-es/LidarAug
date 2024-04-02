@@ -32,7 +32,7 @@ class DistributionRange:
     min: float
     max: float
 
-    def __init__(self, min, max) -> None:
+    def __init__(self, min: float, max: float) -> None:
         ...
 
 
@@ -42,7 +42,9 @@ class DistributionRanges:
     z_range: DistributionRange
     uniform_range: DistributionRange
 
-    def __init__(self, x_range, y_range, z_range, uniform_range) -> None:
+    def __init__(self, x_range: DistributionRange, y_range: DistributionRange,
+                 z_range: DistributionRange,
+                 uniform_range: DistributionRange) -> None:
         ...
 
 
@@ -126,7 +128,8 @@ def flip_random(points: Tensor, labels: Tensor, prob: int) -> None:
 
 def random_noise(points: Tensor, sigma: float,
                  ranges: list[float] | DistributionRanges,
-                 noise_type: NoiseType, max_intensity: IntensityRange) -> None:
+                 noise_type: NoiseType,
+                 max_intensity: IntensityRange) -> Tensor:
     """
     Adds random amount of points (drawn using a normal distribution) at random coordinates
     (within predetermined ranges) with a random intensity according to specific noise type.
@@ -188,9 +191,8 @@ def rotate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
     ...
 
 
-def delete_labels_by_min_points(
-        points: Tensor, labels: Tensor, names: Tensor,
-        min_points: int) -> Tuple[list[Tensor], list[Tensor]]:
+def delete_labels_by_min_points(points: Tensor, labels: Tensor, names: Tensor,
+                                min_points: int) -> Tuple[Tensor, Tensor]:
     """
      Checks the amount of points for each bounding box.
      If the number of points is smaller than a given threshold, the box is removed
@@ -281,5 +283,21 @@ def apply_transformation(points: Tensor,
     :param points:                is the point cloud that the transformation
                                   matrix is applied to.
     :param transformation_matrix: is the transformation matrix.
+    """
+    ...
+
+
+def change_sparse_representation(input: Tensor, batch_idx: int) -> Tensor:
+    """
+    Changes the representation of a sparse tensor from a flat 2D tensor (N, F),
+    where F is the number of features to a 3D tensor (B, n, f), where B is the
+    number of batches, n is the number of tensors in each batch and f is the
+    number of features (equal to F-1).
+    0s are used for padding.
+
+    :param input:     is the input tensor.
+    :param batch_idx: is the index of the batch index.
+
+    :return: a new tensor with 0s for padding.
     """
     ...

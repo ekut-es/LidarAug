@@ -180,18 +180,22 @@ def random_noise(points: Tensor, sigma: float,
     else:
         distribution_ranges = ranges
 
-    transformations.random_noise(points, sigma, distribution_ranges,
-                                 noise_type, max_intensity)
+    point_cloud = transformations.random_noise(points, sigma,
+                                               distribution_ranges, noise_type,
+                                               max_intensity)
+
+    points.resize_(point_cloud.shape)
+    points.copy_(point_cloud)
 
 
 def thin_out(points: Tensor, sigma: float) -> None:
     """
-     Randomly genereates a percentage from a norma distribution, which determines
-     how many items should be 'thinned out'. From that percentage random indeces
-     are uniformly drawn (in a random order, where each index is unique).
+    Randomly genereates a percentage from a normal distribution, which determines
+    how many items should be 'thinned out'. From that percentage random indeces
+    are uniformly drawn (in a random order, where each index is unique).
 
-     Finally a new tensor is created containing the items present at those
-     indeces.
+    Finally a new tensor is created containing the items present at those
+    indeces.
 
     :param points: is the point cloud.
     :param sigma:  is the standard diviation of the distribution that genereates the percentage.
@@ -200,7 +204,8 @@ def thin_out(points: Tensor, sigma: float) -> None:
     _check_points(points)
 
     batch_points = transformations.thin_out(points, sigma)
-    points = batch_points
+    points.resize_(batch_points.shape)
+    points.copy_(batch_points)
 
 
 def rotate_deg(points: Tensor, angle: float) -> None:
@@ -262,8 +267,11 @@ def delete_labels_by_min_points(points: Tensor, labels: Tensor, names: Tensor,
     batch_labels, batch_names = transformations.delete_labels_by_min_points(
         points, labels, names, min_points)
 
-    labels = nested_tensor(batch_labels)
-    names = nested_tensor(batch_names)
+    labels.resize_(batch_labels.shape)
+    labels.copy_(batch_labels)
+
+    names.resize_(batch_names.shape)
+    names.copy_(batch_names)
 
 
 def random_point_noise(points: Tensor, sigma: float) -> None:

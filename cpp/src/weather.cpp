@@ -83,7 +83,7 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
 
   if (prob > rand) {
 
-    auto viewing_dist = get_truncated_normal_value(mean, sigma, 10, mean);
+    const auto viewing_dist = get_truncated_normal_value(mean, sigma, 10, mean);
 
     const auto calculate_factors =
         [metric, viewing_dist]() -> std::tuple<float, float, float> {

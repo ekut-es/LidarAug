@@ -1,5 +1,6 @@
 
 #include "../include/stats.hpp"
+#include "../include/tensor.hpp"
 #include "../include/transformations.hpp"
 #include "../include/utils.hpp"
 #include "../include/weather.hpp"
@@ -55,8 +56,9 @@ TEST(RotationTest, BasicAssertions) {
         torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}},
                        {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}},
                       torch::kF32);
-    constexpr float ANGLE = ROT_ANGLE * (M_PI / PI_DEG);
-    const auto rotation_vector = rotate_yaw(ANGLE);
+    constexpr float ANGLE =
+        ROT_ANGLE * (math_utils::PI_RAD / math_utils::PI_DEG);
+    const auto rotation_vector = math_utils::rotate_yaw(ANGLE);
 
     const auto v11 = torch::matmul(points_coordinates[0][0], rotation_vector);
     const auto v12 = torch::matmul(points_coordinates[0][1], rotation_vector);
@@ -93,7 +95,7 @@ TEST(RotationTest, BasicAssertions) {
                        {{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
                       torch::kF32);
 
-    constexpr float ANGLE = M_PI;
+    constexpr float ANGLE = math_utils::PI_RAD;
     rotate_rad(points, ANGLE);
 
     auto points_coordinates =
@@ -101,7 +103,7 @@ TEST(RotationTest, BasicAssertions) {
                        {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}},
                       torch::kF32);
 
-    const auto rotation_vector = rotate_yaw(ANGLE);
+    const auto rotation_vector = math_utils::rotate_yaw(ANGLE);
 
     const auto v11 = torch::matmul(points_coordinates[0][0], rotation_vector);
     const auto v12 = torch::matmul(points_coordinates[0][1], rotation_vector);
@@ -186,12 +188,17 @@ TEST(AngleConversionTest, BasicAssertions) {
   constexpr static float one_eighty_deg = 180;
   constexpr static float ninety_deg = 90;
 
-  EXPECT_EQ(to_rad(three_sixty_deg), 2 * static_cast<float>(M_PI));
-  EXPECT_EQ(to_rad(zero_deg), 0);
-  EXPECT_EQ(to_rad(one_eighty_deg), static_cast<float>(M_PI));
-  EXPECT_EQ(to_rad(-one_eighty_deg), static_cast<float>(-M_PI));
-  EXPECT_EQ(to_rad(ninety_deg), static_cast<float>(M_PI / 2));
-  EXPECT_EQ(to_rad(-ninety_deg), static_cast<float>((-M_PI) / 2));
+  EXPECT_EQ(math_utils::to_rad(three_sixty_deg),
+            2 * static_cast<float>(math_utils::PI_RAD));
+  EXPECT_EQ(math_utils::to_rad(zero_deg), 0);
+  EXPECT_EQ(math_utils::to_rad(one_eighty_deg),
+            static_cast<float>(math_utils::PI_RAD));
+  EXPECT_EQ(math_utils::to_rad(-one_eighty_deg),
+            static_cast<float>(-math_utils::PI_RAD));
+  EXPECT_EQ(math_utils::to_rad(ninety_deg),
+            static_cast<float>(math_utils::PI_RAD / 2));
+  EXPECT_EQ(math_utils::to_rad(-ninety_deg),
+            static_cast<float>((-math_utils::PI_RAD) / 2));
 }
 
 TEST(DrawUniformValuesTest, BasicAssertions) {
@@ -209,9 +216,7 @@ TEST(DrawUniformValuesTest, BasicAssertions) {
 }
 
 TEST(RandomNoiseTest, BasicAssertions) {
-  auto points =
-      torch::tensor({{{1.0, 2.0, 3.0, 10.9}, {4.0, 5.0, 6.0, -10.0}}});
-  const auto points_original =
+  const auto points =
       torch::tensor({{{1.0, 2.0, 3.0, 10.9}, {4.0, 5.0, 6.0, -10.0}}});
 
   constexpr static float sigma = 2;
@@ -219,52 +224,51 @@ TEST(RandomNoiseTest, BasicAssertions) {
   constexpr static distribution_ranges<float> ranges{
       {1, 2}, {1, 2}, {1, 2}, {1, 2}};
 
-  random_noise(points, sigma, ranges, UNIFORM, MAX_INTENSITY_255);
+  auto new_points =
+      random_noise(points, sigma, ranges, UNIFORM, MAX_INTENSITY_255);
 
-  for (tensor_size_t i = 0; i < points.size(0); i++) {
-    EXPECT_GT(points[i].size(0), points_original[i].size(0))
-        << "No noise has been added...";
-  }
+  EXPECT_GT(new_points.size(1), points.size(1)) << "No noise has been added...";
+}
+
+TEST(DeleteLabelsByMinPointsHelperTest, BasicAssertions) {
+  const auto points = torch::tensor({{10.4966, 10.1144, 10.2182, -8.4158},
+                                     {7.0241, 7.6908, -2.1535, 1.3416},
+                                     {10.0, 10.0, 10.0, 10.0}});
+
+  const torch::Tensor labels =
+      torch::tensor({{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0},
+                     {10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0}});
+  const torch::Tensor names = torch::tensor({{0}, {1}});
+
+  constexpr std::uint64_t min_points = 2;
+
+  const auto [result_labels, result_names] =
+      _delete_labels_by_min_points(points, labels, names, min_points, 0);
+
+  const auto expected_points =
+      torch::tensor({{10.4966, 10.1144, 10.2182, -8.4158},
+                     {7.0241, 7.6908, -2.1535, 1.3416},
+                     {10.0, 10.0, 10.0, 10.0}});
+
+  const torch::Tensor expected_labels =
+      torch::tensor({{10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0, 0.0}});
+  const torch::Tensor expected_names = torch::tensor({{1, 0}});
+
+  EXPECT_TRUE(points.equal(expected_points))
+      << "Points should not have been modified!\nexpected:\n"
+      << expected_points << "\nactual:\n"
+      << points;
+  EXPECT_TRUE(result_labels.equal(expected_labels))
+      << "expected:\n"
+      << expected_labels << "\nactual:\n"
+      << result_labels;
+  EXPECT_TRUE(result_names.equal(expected_names))
+      << "expected:\n"
+      << expected_names << "\nactual:\n"
+      << result_names;
 }
 
 TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {
-  {
-    const auto points = torch::tensor({{10.4966, 10.1144, 10.2182, -8.4158},
-                                       {7.0241, 7.6908, -2.1535, 1.3416},
-                                       {10.0, 10.0, 10.0, 10.0}});
-
-    const torch::Tensor labels =
-        torch::tensor({{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0},
-                       {10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0}});
-    const torch::Tensor names = torch::tensor({{0}, {1}});
-
-    constexpr std::uint64_t min_points = 2;
-
-    auto [result_labels, result_names] =
-        _delete_labels_by_min_points(points, labels, names, min_points);
-
-    const auto expected_points =
-        torch::tensor({{10.4966, 10.1144, 10.2182, -8.4158},
-                       {7.0241, 7.6908, -2.1535, 1.3416},
-                       {10.0, 10.0, 10.0, 10.0}});
-
-    const torch::Tensor expected_labels =
-        torch::tensor({{10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0}});
-    const torch::Tensor expected_names = torch::tensor({{1}});
-
-    EXPECT_TRUE(points.equal(expected_points))
-        << "Points should not have been modified!\nexpected:\n"
-        << expected_points << "\nactual:\n"
-        << points;
-    EXPECT_TRUE(result_labels.equal(expected_labels))
-        << "expected:\n"
-        << expected_labels << "\nactual:\n"
-        << labels;
-    EXPECT_TRUE(result_names.equal(expected_names))
-        << "expected:\n"
-        << expected_names << "\nactual:\n"
-        << names;
-  }
 
   {
 
@@ -298,39 +302,60 @@ TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {
                         {7.0241, 7.6908, -2.1535, 1.3416},
                         {10.0, 10.0, 10.0, 10.0}}});
 
-    const auto expected_labels = torch::List<torch::Tensor>(
-        {torch::tensor({{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0}}),
-         torch::tensor({{10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0}})});
-    const auto expected_names = torch::List<torch::Tensor>(
-        {torch::tensor({{0x00}}), torch::tensor({{0x11}})});
+    const auto expected_labels =
+        torch::tensor({{1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0},
+                       {10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0, 1.0}});
+    const auto expected_names = torch::tensor({{0x00, 0}, {0x11, 1}});
 
     EXPECT_TRUE(points.equal(expected_points))
         << "Points should not have been modified!\nexpected:\n"
         << expected_points << "\nactual:\n"
         << points;
 
-    ASSERT_EQ(result_labels.size(), expected_labels.size());
+    EXPECT_TRUE(result_labels.equal(expected_labels))
+        << "expected:\n"
+        << expected_labels << "\nactual:\n"
+        << result_labels;
 
-    for (std::size_t i = 0; i < result_labels.size(); i++) {
-      const torch::Tensor result = result_labels[i];
-      const torch::Tensor expected = expected_labels[i];
-
-      EXPECT_TRUE(result.equal(expected)) << "expected:\n"
-                                          << expected << "\nactual:\n"
-                                          << result;
-    }
-
-    ASSERT_EQ(result_names.size(), expected_names.size());
-
-    for (std::size_t i = 0; i < result_names.size(); i++) {
-      const torch::Tensor result = result_names[i];
-      const torch::Tensor expected = expected_names[i];
-
-      EXPECT_TRUE(result.equal(expected)) << "expected:\n"
-                                          << expected << "\nactual:\n"
-                                          << result;
-    }
+    EXPECT_TRUE(result_names.equal(expected_names))
+        << "expected:\n"
+        << expected_names << "\nactual:\n"
+        << result_names;
   }
+}
+
+TEST(ChangeSparseRepresentationTest, BasicAssertions) {
+
+  // clang-format off
+  const auto in = torch::tensor({
+      {1, 2, 0},
+      {4, 1, 0},
+      {7, 7, 0},
+      {3, 1, 1},
+      {2, 2, 2},
+      {3, 2, 2},
+  });
+
+  const tensor_size_t batch_idx = 2;
+
+  const auto expected = torch::tensor({
+      {{1, 2},
+       {4, 1},
+       {7, 7}},
+      {{3, 1},
+       {0, 0},
+       {0, 0}},
+      {{2, 2},
+       {3, 2},
+       {0, 0}},
+  });
+  // clang-format on
+
+  const auto result = change_sparse_representation(in, batch_idx);
+
+  EXPECT_TRUE(result.equal(expected)) << "expected:\n"
+                                      << expected << "\nactual:\n"
+                                      << result;
 }
 
 // doing tests with controlled random number generation (no random seed)
@@ -565,8 +590,8 @@ TEST(RotateRandomTest, BasicAssertions) {
 
   auto points_coordinates =
       torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}}, torch::kF32);
-  constexpr float angle = ROT_ANGLE * (M_PI / PI_DEG);
-  const auto rotation_vector = rotate_yaw(angle);
+  constexpr float angle = ROT_ANGLE * (math_utils::PI_RAD / math_utils::PI_DEG);
+  const auto rotation_vector = math_utils::rotate_yaw(angle);
 
   const auto v1 = torch::matmul(points_coordinates[0][0], rotation_vector);
   const auto v2 = torch::matmul(points_coordinates[0][1], rotation_vector);
@@ -604,8 +629,10 @@ TEST(RotateRandomTest, BasicAssertions) {
   const float *const label1 = l1.const_data_ptr<float>();
   const float *const label2 = l2.const_data_ptr<float>();
 
-  const float angle_label1 = fmodf32((M_PI + angle), (2.0f * M_PI));
-  const float angle_label2 = fmodf32((M_PI + angle), (2.0f * M_PI));
+  const float angle_label1 =
+      fmodf32((math_utils::PI_RAD + angle), (2.0f * math_utils::PI_RAD));
+  const float angle_label2 =
+      fmodf32((math_utils::PI_RAD + angle), (2.0f * math_utils::PI_RAD));
 
   const auto expected_labels = torch::tensor(
       {{label1[0], label1[1], label1[2], 2.0f, 3.0f, 2.5f, angle_label1},

@@ -1,5 +1,6 @@
 #include "../include/transformations.hpp"
 #include "../include/label.hpp"
+#include "../include/name.hpp"
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <ATen/ops/index_select.h>
@@ -9,7 +10,7 @@
 #include <torch/types.h>
 
 void translate(at::Tensor points, const at::Tensor &translation) {
-  dimensions dims = {points.size(0), points.size(1), points.size(2)};
+  const dimensions dims = {points.size(0), points.size(1), points.size(2)};
   const float *const translation_ptr = translation.data_ptr<float>();
   const float x_translation =
       translation_ptr[0]; // NOLINT: Allow pointer arithmetic to access contents
@@ -29,7 +30,7 @@ void translate(at::Tensor points, const at::Tensor &translation) {
 }
 
 void scale_points(at::Tensor points, float factor) {
-  dimensions dims = {points.size(0), points.size(1), points.size(2)};
+  const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   // scale all point clouds by the same amount
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
@@ -42,7 +43,7 @@ void scale_points(at::Tensor points, float factor) {
 }
 
 void scale_labels(at::Tensor labels, float factor) {
-  dimensions dims = {labels.size(0), labels.size(1), labels.size(2)};
+  const dimensions dims = {labels.size(0), labels.size(1), labels.size(2)};
 
   // scale all the labels by the same amount
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
@@ -66,7 +67,7 @@ void scale_labels(at::Tensor labels, float factor) {
  * @param factor is the constant factor to scale the box dimensions by.
  */
 inline void scale_box_dimensions(at::Tensor labels, float factor) {
-  dimensions dims = {labels.size(0), labels.size(1), labels.size(2)};
+  const dimensions dims = {labels.size(0), labels.size(1), labels.size(2)};
 
   // scale all the boxes by the same amount
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
@@ -82,11 +83,12 @@ void translate_random(at::Tensor points, at::Tensor labels, float sigma) {
 
   std::normal_distribution<float> dist(sigma, 0);
 
-  auto x_translation = std::get<VALUE>(draw_values<float>(dist));
-  auto y_translation = std::get<VALUE>(draw_values<float>(dist));
-  auto z_translation = std::get<VALUE>(draw_values<float>(dist));
+  const auto x_translation = std::get<VALUE>(draw_values<float>(dist));
+  const auto y_translation = std::get<VALUE>(draw_values<float>(dist));
+  const auto z_translation = std::get<VALUE>(draw_values<float>(dist));
 
-  auto translation = at::tensor({x_translation, y_translation, z_translation});
+  const auto translation =
+      at::tensor({x_translation, y_translation, z_translation});
 
   translate(points, translation);
   translate(labels, translation);
@@ -97,7 +99,7 @@ void translate_random(at::Tensor points, at::Tensor labels, float sigma) {
 void scale_random(at::Tensor points, at::Tensor labels, float sigma,
                   float max_scale) {
 
-  auto scale_factor =
+  const auto scale_factor =
       get_truncated_normal_value(1, sigma, (1 / max_scale), max_scale);
 
   scale_points(points, scale_factor);
@@ -109,12 +111,13 @@ void scale_random(at::Tensor points, at::Tensor labels, float sigma,
 void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
                  float max_scale) {
 
-  auto scale_factor =
+  const auto scale_factor =
       get_truncated_normal_value(1, sigma, (1 / max_scale), max_scale);
 
-  dimensions label_dims = {labels.size(0), labels.size(1), labels.size(2)};
-  dimensions point_dims = {point_cloud.size(0), point_cloud.size(1),
-                           point_cloud.size(2)};
+  const dimensions label_dims = {labels.size(0), labels.size(1),
+                                 labels.size(2)};
+  const dimensions point_dims = {point_cloud.size(0), point_cloud.size(1),
+                                 point_cloud.size(2)};
 
   auto point_indeces =
       torch::zeros({label_dims.num_items, point_dims.num_items}, torch::kI32);
@@ -159,7 +162,8 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
   auto rand = distrib(rng);
 
   if (prob > rand) {
-    dimensions point_dims = {points.size(0), points.size(1), points.size(2)};
+    const dimensions point_dims = {points.size(0), points.size(1),
+                                   points.size(2)};
 
     for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
       for (tensor_size_t j = 0; j < point_dims.num_items; j++) {
@@ -167,22 +171,25 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
       }
     }
 
-    dimensions label_dims = {labels.size(0), labels.size(1), labels.size(2)};
+    const dimensions label_dims = {labels.size(0), labels.size(1),
+                                   labels.size(2)};
     for (tensor_size_t i = 0; i < label_dims.batch_size; i++) {
       for (tensor_size_t j = 0; j < label_dims.num_items; j++) {
         labels.index({i, j, LABEL_Y_IDX}) *= -1;
         labels.index({i, j, LABEL_ANGLE_IDX}) =
-            (labels.index({i, j, LABEL_ANGLE_IDX}) + M_PI) % (2 * M_PI);
+            (labels.index({i, j, LABEL_ANGLE_IDX}) + math_utils::PI_RAD) %
+            math_utils::TWO_PI_RAD;
       }
     }
   }
 }
 
-void random_noise(at::Tensor &points, float sigma,
-                  const distribution_ranges<float> &ranges, noise_type type,
-                  intensity_range max_intensity) {
+[[nodiscard]] torch::Tensor
+random_noise(const at::Tensor &points, float sigma,
+             const distribution_ranges<float> &ranges, noise_type type,
+             intensity_range max_intensity) {
 
-  dimensions dims = {points.size(0), points.size(1), points.size(2)};
+  const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   auto rng = get_rng();
   std::normal_distribution<float> normal(0.0, sigma);
@@ -194,6 +201,10 @@ void random_noise(at::Tensor &points, float sigma,
                                                   ranges.z_range.max);
 
   const auto num_points = static_cast<std::size_t>(std::abs(normal(rng)));
+
+  auto point_cloud = torch::empty(
+      {dims.batch_size, dims.num_items + static_cast<tensor_size_t>(num_points),
+       dims.num_features});
 
   // iterate over batches
   for (tensor_size_t batch_num = 0; batch_num < dims.batch_size; batch_num++) {
@@ -267,8 +278,10 @@ void random_noise(at::Tensor &points, float sigma,
     }
 
     // concatenate points
-    points = torch::cat({points, noise_tensor.unsqueeze(0)}, 1);
+    point_cloud = torch::cat({points, noise_tensor.unsqueeze(0)}, 1);
   }
+
+  return point_cloud;
 }
 
 /**
@@ -282,7 +295,7 @@ void random_noise(at::Tensor &points, float sigma,
  */
 inline void rotate(at::Tensor points, at::Tensor rotation) {
 
-  auto points_vec =
+  const auto points_vec =
       points.index({torch::indexing::Slice(), torch::indexing::Slice(),
                     torch::indexing::Slice(torch::indexing::None, 3)});
 
@@ -293,24 +306,26 @@ inline void rotate(at::Tensor points, at::Tensor rotation) {
 
 void rotate_deg(at::Tensor points, float angle) {
 
-  auto angle_rad = to_rad(angle);
-  auto rotation = rotate_yaw(angle_rad);
+  const auto angle_rad = math_utils::to_rad(angle);
+  const auto rotation = math_utils::rotate_yaw(angle_rad);
   rotate(points, rotation);
 }
 
 void rotate_rad(at::Tensor points, float angle) {
 
-  auto rotation = rotate_yaw(angle);
+  const auto rotation = math_utils::rotate_yaw(angle);
   rotate(points, rotation);
 }
 
 void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
 
-  dimensions point_dims = {points.size(0), points.size(1), points.size(2)};
-  auto rot_angle = get_truncated_normal_value(0, sigma, -PI_DEG, PI_DEG);
-  auto angle_rad = to_rad(rot_angle);
+  const dimensions point_dims = {points.size(0), points.size(1),
+                                 points.size(2)};
+  const auto rot_angle = get_truncated_normal_value(
+      0, sigma, -math_utils::PI_DEG, math_utils::PI_DEG);
+  const auto angle_rad = math_utils::to_rad(rot_angle);
 
-  auto rotation = rotate_yaw(angle_rad);
+  const auto rotation = math_utils::rotate_yaw(angle_rad);
 
   for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < point_dims.num_items; j++) {
@@ -324,7 +339,8 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
     }
   }
 
-  dimensions label_dims = {labels.size(0), labels.size(1), labels.size(2)};
+  const dimensions label_dims = {labels.size(0), labels.size(1),
+                                 labels.size(2)};
   for (tensor_size_t i = 0; i < label_dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < label_dims.num_items; j++) {
       auto label_vec = labels.index(
@@ -335,7 +351,8 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
           torch::matmul(label_vec, rotation));
 
       labels[i][j][LABEL_ANGLE_IDX] =
-          (labels[i][j][LABEL_ANGLE_IDX] + angle_rad) % (TWO_M_PI);
+          (labels[i][j][LABEL_ANGLE_IDX] + angle_rad) %
+          (math_utils::TWO_PI_RAD);
     }
   }
 
@@ -343,7 +360,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
 }
 
 [[nodiscard]] torch::Tensor thin_out(at::Tensor points, float sigma) {
-  dimensions dims = {points.size(0), points.size(1), points.size(2)};
+  const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   const auto percent = get_truncated_normal_value(0, sigma, 0, 1);
 
@@ -367,32 +384,37 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
   return new_tensor;
 }
 
-[[nodiscard]] std::pair<torch::List<torch::Tensor>, torch::List<torch::Tensor>>
-delete_labels_by_min_points(at::Tensor points, at::Tensor labels,
-                            at::Tensor names, const tensor_size_t min_points) {
+[[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
+delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
+                            const at::Tensor &names,
+                            const tensor_size_t min_points) {
+  const tensor_size_t batch_size = labels.size(0);
 
-  torch::List<torch::Tensor> batch_labels;
-  torch::List<torch::Tensor> batch_names;
+  std::vector<torch::Tensor> labels_list;
+  std::vector<torch::Tensor> names_list;
 
-  tensor_size_t batch_size = labels.size(0);
-
-  batch_labels.reserve(static_cast<std::size_t>(batch_size));
-  batch_names.reserve(static_cast<std::size_t>(batch_size));
+  labels_list.reserve(static_cast<std::size_t>(batch_size));
+  names_list.reserve(static_cast<std::size_t>(batch_size));
 
   for (tensor_size_t i = 0; i < batch_size; i++) {
 
     auto [filtered_labels, filtered_names] = _delete_labels_by_min_points(
-        points[i], labels[i], names[i], min_points);
+        points[i], labels[i], names[i], min_points, i);
 
-    batch_labels.emplace_back(filtered_labels);
-    batch_names.emplace_back(filtered_names);
+    labels_list.emplace_back(filtered_labels);
+    names_list.emplace_back(filtered_names);
   }
 
-  return {batch_labels, batch_names};
+  auto batch_labels =
+      torch::stack(labels_list).reshape({-1, LABEL_NUM_FEATURES + 1});
+  auto batch_names =
+      torch::stack(names_list).reshape({-1, NAME_NUM_FEATURES + 1});
+
+  return std::make_pair(batch_labels, batch_names);
 }
 
 void random_point_noise(torch::Tensor points, float sigma) {
-  dimensions dims = {points.size(0), points.size(1), points.size(2)};
+  const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   std::normal_distribution<float> dist(0, sigma);
 
@@ -413,7 +435,7 @@ void random_point_noise(torch::Tensor points, float sigma) {
 }
 
 void transform_along_ray(torch::Tensor points, float sigma) {
-  dimensions dims = {points.size(0), points.size(1), points.size(2)};
+  const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   std::normal_distribution<float> dist(0, sigma);
 
@@ -435,7 +457,7 @@ void transform_along_ray(torch::Tensor points, float sigma) {
 
 void intensity_noise(torch::Tensor points, float sigma,
                      intensity_range max_intensity) {
-  dimensions dims = {points.size(0), points.size(1), points.size(2)};
+  const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < dims.num_items; j++) {
@@ -456,7 +478,7 @@ void intensity_shift(torch::Tensor points, float sigma,
   const float intensity_shift = get_truncated_normal_value(
       0, sigma, 0, static_cast<float>(max_intensity));
 
-  dimensions dims = {points.size(0), points.size(1), points.size(2)};
+  const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < dims.num_items; j++) {
@@ -481,12 +503,12 @@ local_to_world_transform(const torch::Tensor &lidar_pose) {
   transformation[2][3] = lidar_pose[2];
 
   // rotations
-  auto cos_roll = lidar_pose[3].deg2rad().cos();
-  auto sin_roll = lidar_pose[3].deg2rad().sin();
-  auto cos_yaw = lidar_pose[4].deg2rad().cos();
-  auto sin_yaw = lidar_pose[4].deg2rad().sin();
-  auto cos_pitch = lidar_pose[5].deg2rad().cos();
-  auto sin_pitch = lidar_pose[5].deg2rad().sin();
+  const auto cos_roll = lidar_pose[3].deg2rad().cos();
+  const auto sin_roll = lidar_pose[3].deg2rad().sin();
+  const auto cos_yaw = lidar_pose[4].deg2rad().cos();
+  const auto sin_yaw = lidar_pose[4].deg2rad().sin();
+  const auto cos_pitch = lidar_pose[5].deg2rad().cos();
+  const auto sin_pitch = lidar_pose[5].deg2rad().sin();
 
   transformation[2][0] = sin_pitch;
 

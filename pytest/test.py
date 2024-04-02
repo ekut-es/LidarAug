@@ -3,6 +3,7 @@ import pytest
 
 import torch
 from LidarAug import augmentations as aug
+from LidarAug.transformations import NoiseType, DistributionRange, DistributionRanges, IntensityRange
 
 import re
 
@@ -26,6 +27,8 @@ INCOMPATIBLE_BATCH_SIZES = re.escape(
 
 WRONG_FRAME_DIMENSIONS = re.escape(
     "`frame` is supposed to be a 6-vector (x, y, z, roll, yaw, pitch)")
+
+test_points: torch.Tensor = torch.randn([3, 100, POINT_CLOUD_FEATRUES])
 
 
 @pytest.mark.shapetest
@@ -97,11 +100,63 @@ def test_check_frame_coordinate_dimensions(frame, expectation):
         aug._check_frame_coordinate_dimensions(frame)
 
 
-@pytest.mark.xfail(reason="Not implemented")
+@pytest.mark.transtest
 def test_random_noise():
-    assert False
+    points = torch.empty([1, 0, 4])
+    ranges_list = [1.0, 10.0, 3.0, 5.0, 4.0, 7.0, 0.0, 10.0]
+    aug.random_noise(points, 2, ranges_list, NoiseType.UNIFORM,
+                     IntensityRange.MAX_INTENSITY_255)
+
+    assert points.shape[1] > 0, "No points have been added!"
+    for point in points[0]:
+        assert point[0] <= 10 and point[0] >= 1, "x range not as parametrized"
+        assert point[1] <= 5 and point[1] >= 3, "y range not as parametrized"
+        assert point[2] <= 7 and point[2] >= 4, "z range not as parametrized"
+        assert point[3] <= 255 and point[
+            3] >= 0, "intensity range not as parametrized"
 
 
-@pytest.mark.xfail(reason="Not implemented")
+@pytest.mark.transtest
 def test_thin_out():
-    assert False
+    points = test_points.clone()
+    aug.thin_out(points, 10)
+    assert points.shape[1] != test_points.shape[1]
+
+
+@pytest.mark.transtest
+def test_delete_labels_by_min_points():
+    points = torch.tensor([[[-8.2224, -4.3151, -6.5488, -3.9899],
+                            [6.3092, -3.7737, 7.2516, -5.8651],
+                            [1.0, 1.0, 1.0, 10.0]],
+                           [[10.4966, 10.1144, 10.2182, -8.4158],
+                            [7.0241, 7.6908, -2.1535, 1.3416],
+                            [10.0, 10.0, 10.0, 10.0]]])
+
+    labels = torch.tensor([[[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0],
+                            [100.0, 100.0, 100.0, 1.0, 1.0, 1.0, 0.0]],
+                           [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0],
+                            [10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0]]])
+    names = torch.tensor([[[0x00], [0x01]], [[0x10], [0x11]]])
+
+    min_points = 1
+    aug.delete_labels_by_min_points(points, labels, names, min_points)
+
+    expected_points = torch.tensor([[[-8.2224, -4.3151, -6.5488, -3.9899],
+                                     [6.3092, -3.7737, 7.2516, -5.8651],
+                                     [1.0, 1.0, 1.0, 10.0]],
+                                    [[10.4966, 10.1144, 10.2182, -8.4158],
+                                     [7.0241, 7.6908, -2.1535, 1.3416],
+                                     [10.0, 10.0, 10.0, 10.0]]])
+
+    expected_labels = torch.tensor(
+        [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0],
+         [10.0, 10.0, 10.0, 4.0, 5.0, 6.0, 0.0, 1.0]])
+
+    expected_names = torch.tensor([[0x00, 0], [0x11, 1]])
+
+    assert points.equal(
+        expected_points), "Points should not have been modified!"
+
+    assert labels.equal(expected_labels)
+
+    assert names.equal(expected_names)
