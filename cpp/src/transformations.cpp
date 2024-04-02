@@ -178,7 +178,7 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
         labels.index({i, j, LABEL_Y_IDX}) *= -1;
         labels.index({i, j, LABEL_ANGLE_IDX}) =
             (labels.index({i, j, LABEL_ANGLE_IDX}) + math_utils::PI_RAD) %
-            math_utils::TWO_M_PI;
+            math_utils::TWO_PI_RAD;
       }
     }
   }
@@ -351,7 +351,8 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
           torch::matmul(label_vec, rotation));
 
       labels[i][j][LABEL_ANGLE_IDX] =
-          (labels[i][j][LABEL_ANGLE_IDX] + angle_rad) % (math_utils::TWO_M_PI);
+          (labels[i][j][LABEL_ANGLE_IDX] + angle_rad) %
+          (math_utils::TWO_PI_RAD);
     }
   }
 
