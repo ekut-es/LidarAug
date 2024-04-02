@@ -56,8 +56,9 @@ TEST(RotationTest, BasicAssertions) {
         torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}},
                        {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}},
                       torch::kF32);
-    constexpr float ANGLE = ROT_ANGLE * (M_PI / PI_DEG);
-    const auto rotation_vector = rotate_yaw(ANGLE);
+    constexpr float ANGLE =
+        ROT_ANGLE * (math_utils::PI_RAD / math_utils::PI_DEG);
+    const auto rotation_vector = math_utils::rotate_yaw(ANGLE);
 
     const auto v11 = torch::matmul(points_coordinates[0][0], rotation_vector);
     const auto v12 = torch::matmul(points_coordinates[0][1], rotation_vector);
@@ -94,7 +95,7 @@ TEST(RotationTest, BasicAssertions) {
                        {{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
                       torch::kF32);
 
-    constexpr float ANGLE = M_PI;
+    constexpr float ANGLE = math_utils::PI_RAD;
     rotate_rad(points, ANGLE);
 
     auto points_coordinates =
@@ -102,7 +103,7 @@ TEST(RotationTest, BasicAssertions) {
                        {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}},
                       torch::kF32);
 
-    const auto rotation_vector = rotate_yaw(ANGLE);
+    const auto rotation_vector = math_utils::rotate_yaw(ANGLE);
 
     const auto v11 = torch::matmul(points_coordinates[0][0], rotation_vector);
     const auto v12 = torch::matmul(points_coordinates[0][1], rotation_vector);
@@ -187,12 +188,17 @@ TEST(AngleConversionTest, BasicAssertions) {
   constexpr static float one_eighty_deg = 180;
   constexpr static float ninety_deg = 90;
 
-  EXPECT_EQ(to_rad(three_sixty_deg), 2 * static_cast<float>(M_PI));
-  EXPECT_EQ(to_rad(zero_deg), 0);
-  EXPECT_EQ(to_rad(one_eighty_deg), static_cast<float>(M_PI));
-  EXPECT_EQ(to_rad(-one_eighty_deg), static_cast<float>(-M_PI));
-  EXPECT_EQ(to_rad(ninety_deg), static_cast<float>(M_PI / 2));
-  EXPECT_EQ(to_rad(-ninety_deg), static_cast<float>((-M_PI) / 2));
+  EXPECT_EQ(math_utils::to_rad(three_sixty_deg),
+            2 * static_cast<float>(math_utils::PI_RAD));
+  EXPECT_EQ(math_utils::to_rad(zero_deg), 0);
+  EXPECT_EQ(math_utils::to_rad(one_eighty_deg),
+            static_cast<float>(math_utils::PI_RAD));
+  EXPECT_EQ(math_utils::to_rad(-one_eighty_deg),
+            static_cast<float>(-math_utils::PI_RAD));
+  EXPECT_EQ(math_utils::to_rad(ninety_deg),
+            static_cast<float>(math_utils::PI_RAD / 2));
+  EXPECT_EQ(math_utils::to_rad(-ninety_deg),
+            static_cast<float>((-math_utils::PI_RAD) / 2));
 }
 
 TEST(DrawUniformValuesTest, BasicAssertions) {
@@ -584,8 +590,8 @@ TEST(RotateRandomTest, BasicAssertions) {
 
   auto points_coordinates =
       torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}}, torch::kF32);
-  constexpr float angle = ROT_ANGLE * (M_PI / PI_DEG);
-  const auto rotation_vector = rotate_yaw(angle);
+  constexpr float angle = ROT_ANGLE * (math_utils::PI_RAD / math_utils::PI_DEG);
+  const auto rotation_vector = math_utils::rotate_yaw(angle);
 
   const auto v1 = torch::matmul(points_coordinates[0][0], rotation_vector);
   const auto v2 = torch::matmul(points_coordinates[0][1], rotation_vector);
@@ -623,8 +629,10 @@ TEST(RotateRandomTest, BasicAssertions) {
   const float *const label1 = l1.const_data_ptr<float>();
   const float *const label2 = l2.const_data_ptr<float>();
 
-  const float angle_label1 = fmodf32((M_PI + angle), (2.0f * M_PI));
-  const float angle_label2 = fmodf32((M_PI + angle), (2.0f * M_PI));
+  const float angle_label1 =
+      fmodf32((math_utils::PI_RAD + angle), (2.0f * math_utils::PI_RAD));
+  const float angle_label2 =
+      fmodf32((math_utils::PI_RAD + angle), (2.0f * math_utils::PI_RAD));
 
   const auto expected_labels = torch::tensor(
       {{label1[0], label1[1], label1[2], 2.0f, 3.0f, 2.5f, angle_label1},

@@ -177,7 +177,8 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
       for (tensor_size_t j = 0; j < label_dims.num_items; j++) {
         labels.index({i, j, LABEL_Y_IDX}) *= -1;
         labels.index({i, j, LABEL_ANGLE_IDX}) =
-            (labels.index({i, j, LABEL_ANGLE_IDX}) + M_PI) % (2 * M_PI);
+            (labels.index({i, j, LABEL_ANGLE_IDX}) + math_utils::PI_RAD) %
+            math_utils::TWO_PI_RAD;
       }
     }
   }
@@ -305,14 +306,14 @@ inline void rotate(at::Tensor points, at::Tensor rotation) {
 
 void rotate_deg(at::Tensor points, float angle) {
 
-  const auto angle_rad = to_rad(angle);
-  const auto rotation = rotate_yaw(angle_rad);
+  const auto angle_rad = math_utils::to_rad(angle);
+  const auto rotation = math_utils::rotate_yaw(angle_rad);
   rotate(points, rotation);
 }
 
 void rotate_rad(at::Tensor points, float angle) {
 
-  const auto rotation = rotate_yaw(angle);
+  const auto rotation = math_utils::rotate_yaw(angle);
   rotate(points, rotation);
 }
 
@@ -320,10 +321,11 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
 
   const dimensions point_dims = {points.size(0), points.size(1),
                                  points.size(2)};
-  const auto rot_angle = get_truncated_normal_value(0, sigma, -PI_DEG, PI_DEG);
-  const auto angle_rad = to_rad(rot_angle);
+  const auto rot_angle = get_truncated_normal_value(
+      0, sigma, -math_utils::PI_DEG, math_utils::PI_DEG);
+  const auto angle_rad = math_utils::to_rad(rot_angle);
 
-  const auto rotation = rotate_yaw(angle_rad);
+  const auto rotation = math_utils::rotate_yaw(angle_rad);
 
   for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < point_dims.num_items; j++) {
@@ -349,7 +351,8 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
           torch::matmul(label_vec, rotation));
 
       labels[i][j][LABEL_ANGLE_IDX] =
-          (labels[i][j][LABEL_ANGLE_IDX] + angle_rad) % (TWO_M_PI);
+          (labels[i][j][LABEL_ANGLE_IDX] + angle_rad) %
+          (math_utils::TWO_PI_RAD);
     }
   }
 
