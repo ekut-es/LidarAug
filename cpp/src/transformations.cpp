@@ -32,32 +32,11 @@ void translate(at::Tensor points, const at::Tensor &translation) {
 }
 
 void scale_points(at::Tensor points, float factor) {
-  const dimensions dims = {points.size(0), points.size(1), points.size(2)};
-
-  // scale all point clouds by the same amount
-  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    for (tensor_size_t j = 0; j < dims.num_items; j++) {
-      points.index({i, j, POINT_CLOUD_X_IDX}) *= factor;
-      points.index({i, j, POINT_CLOUD_Y_IDX}) *= factor;
-      points.index({i, j, POINT_CLOUD_Z_IDX}) *= factor;
-    }
-  }
+  points.index({Slice(), Slice(), Slice(0, 3)}) *= factor;
 }
 
 void scale_labels(at::Tensor labels, float factor) {
-  const dimensions dims = {labels.size(0), labels.size(1), labels.size(2)};
-
-  // scale all the labels by the same amount
-  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    for (tensor_size_t j = 0; j < dims.num_items; j++) {
-      labels.index({i, j, LABEL_X_IDX}) *= factor;
-      labels.index({i, j, LABEL_Y_IDX}) *= factor;
-      labels.index({i, j, LABEL_Z_IDX}) *= factor;
-      labels.index({i, j, LABEL_W_IDX}) *= factor;
-      labels.index({i, j, LABEL_H_IDX}) *= factor;
-      labels.index({i, j, LABEL_L_IDX}) *= factor;
-    }
-  }
+  labels.index({Slice(), Slice(), Slice(0, 6)}) *= factor;
 }
 
 /**
@@ -69,16 +48,7 @@ void scale_labels(at::Tensor labels, float factor) {
  * @param factor is the constant factor to scale the box dimensions by.
  */
 inline void scale_box_dimensions(at::Tensor labels, float factor) {
-  const dimensions dims = {labels.size(0), labels.size(1), labels.size(2)};
-
-  // scale all the boxes by the same amount
-  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    for (tensor_size_t j = 0; j < dims.num_items; j++) {
-      labels.index({i, j, LABEL_W_IDX}) *= factor;
-      labels.index({i, j, LABEL_H_IDX}) *= factor;
-      labels.index({i, j, LABEL_L_IDX}) *= factor;
-    }
-  }
+  labels.index({Slice(), Slice(), Slice(3, 6)}) *= factor;
 }
 
 void translate_random(at::Tensor points, at::Tensor labels, float sigma) {
