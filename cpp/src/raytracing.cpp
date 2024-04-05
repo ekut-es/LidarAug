@@ -6,6 +6,8 @@
 using namespace torch_utils;
 using Slice = torch::indexing::Slice;
 
+#define NF_SPLIT_FACTOR 32
+
 [[nodiscard]] torch::Tensor
 trace(torch::Tensor point_cloud, torch::Tensor noise_filter,
       torch::Tensor split_index,
@@ -35,3 +37,36 @@ trace(torch::Tensor point_cloud, torch::Tensor noise_filter,
   return result;
 }
 
+[[nodiscard]] float trace(const torch::Tensor &noise_filter,
+                          const torch::Tensor &beam,
+                          const torch::Tensor &split_index) {
+
+  // TODO(tom): this is very messy and needs revisiting
+
+  const auto si = split_index.const_data_ptr<int>();
+  const auto b = beam.const_data_ptr<float>();
+
+  const auto index = static_cast<int>(((atan2(b[1], b[0]) * 180 / M_PI) + 360) *
+                                      NF_SPLIT_FACTOR) %
+                     (360 * NF_SPLIT_FACTOR);
+
+  for (auto i = si[index]; i < si[index + 1]; i++) {
+    const auto nf = noise_filter[i].const_data_ptr<float>();
+
+    const auto sphere =
+        (noise_filter[i][0], noise_filter[i][1], noise_filter[i][2]);
+    const auto beam_dist = vector_length(beam);
+    if (beam_dist < nf[3])
+      return -1;
+
+    const auto length_beam_sphere = scalar(sphere, normalize(beam));
+    if (length_beam_sphere > 0.0) {
+      const auto dist_beam_sphere =
+          sqrt((nf[3] * nf[3]) - (length_beam_sphere * length_beam_sphere));
+      if (dist_beam_sphere < nf[4])
+        return nf[3];
+    }
+  }
+
+  return -1;
+}
