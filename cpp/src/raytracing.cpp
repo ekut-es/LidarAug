@@ -9,9 +9,9 @@ using Slice = torch::indexing::Slice;
 #define NF_SPLIT_FACTOR 32
 
 [[nodiscard]] torch::Tensor
-trace(torch::Tensor point_cloud, torch::Tensor noise_filter,
-      torch::Tensor split_index,
-      std::optional<float> intensity_factor /*= 0.9*/) {
+rt::trace(torch::Tensor point_cloud, torch::Tensor noise_filter,
+          torch::Tensor split_index,
+          std::optional<float> intensity_factor /*= 0.9*/) {
 
   const auto num_points = point_cloud.size(0);
   constexpr auto num_rays = 11l;
@@ -24,9 +24,10 @@ trace(torch::Tensor point_cloud, torch::Tensor noise_filter,
 
   // TODO(tom): Since this used to be CUDA code, it would probably be a
   //            nobrainer to make it multithreaded on the CPU as well
-  intersects(point_cloud, noise_filter, split_index, intersections, distances,
-             distance_count, most_intersect_count, most_intersect_dist,
-             num_points, intensity_factor.value_or(0.9));
+  rt::intersects(point_cloud, noise_filter, split_index, intersections,
+                 distances, distance_count, most_intersect_count,
+                 most_intersect_dist, num_points,
+                 intensity_factor.value_or(0.9));
 
   // select all points where x & y & z != 0
   const auto indices =
@@ -37,9 +38,9 @@ trace(torch::Tensor point_cloud, torch::Tensor noise_filter,
   return result;
 }
 
-[[nodiscard]] float trace(const torch::Tensor &noise_filter,
-                          const torch::Tensor &beam,
-                          const torch::Tensor &split_index) {
+[[nodiscard]] float rt::trace(const torch::Tensor &noise_filter,
+                              const torch::Tensor &beam,
+                              const torch::Tensor &split_index) {
 
   // TODO(tom): this is very messy and needs revisiting
 
@@ -55,11 +56,11 @@ trace(torch::Tensor point_cloud, torch::Tensor noise_filter,
 
     const auto sphere =
         (noise_filter[i][0], noise_filter[i][1], noise_filter[i][2]);
-    const auto beam_dist = vector_length(beam);
+    const auto beam_dist = rt::vector_length(beam);
     if (beam_dist < nf[3])
       return -1;
 
-    const auto length_beam_sphere = scalar(sphere, normalize(beam));
+    const auto length_beam_sphere = rt::scalar(sphere, rt::normalize(beam));
     if (length_beam_sphere > 0.0) {
       const auto dist_beam_sphere =
           sqrt((nf[3] * nf[3]) - (length_beam_sphere * length_beam_sphere));

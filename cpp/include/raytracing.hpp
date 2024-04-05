@@ -6,6 +6,8 @@
 #ifndef RAYTRACING_HPP
 #define RAYTRACING_HPP
 
+namespace rt {
+
 [[nodiscard]] torch::Tensor trace(torch::Tensor point_cloud,
                                   torch::Tensor noise_filter,
                                   torch::Tensor split_index,
@@ -70,12 +72,13 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
 
 [[nodiscard]] inline torch::Tensor rotate(const torch::Tensor &v,
                                           const torch::Tensor &k, float angle) {
-  return add(mul(v, cos(angle)), mul(cross(v, k), sin(angle)),
+  return add(mul(v, cos(angle)), mul(rt::cross(v, k), sin(angle)),
              mul(k, scalar(k, v) * (1 - cos(angle))));
 }
 
 [[nodiscard]] float trace(const torch::Tensor &noise_filter,
                           const torch::Tensor &beam,
                           const torch::Tensor &split_index);
+} // namespace rt
 
 #endif // !RAYTRACING_HPP
