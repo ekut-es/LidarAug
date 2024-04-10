@@ -817,6 +817,25 @@ TEST(IntensityShiftTest, BasicAssertions) {
   }
 }
 
+TEST(LocalToWorldTest, BasicAssertions) {
+  const auto lidar_pose =
+      torch::tensor({1.0, 2.0, 3.0, 180.0, 10.0, 0.0}, torch::kF64);
+
+  const auto expected = torch::tensor(
+      {
+          {9.84807753e-01, 1.73648178e-01, -2.12657685e-17, 1.0},
+          {1.73648178e-01, -9.84807753e-01, 1.20604166e-16, 2.0},
+          {0.0, -1.22464680e-16, -1.0, 3.0},
+          {0.0, 0.0, 0.0, 1.0},
+      },
+      torch::kF64);
+  const auto result = local_to_world_transform(lidar_pose);
+
+  EXPECT_TRUE(result.toType(torch::kF64).allclose(expected))
+      << "Transformation matrix not as expected:\nexpected:\n"
+      << expected << "\nactual:\n"
+      << result;
+}
 TEST(FogTest, BasicAssertions) {
   auto points =
       torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
