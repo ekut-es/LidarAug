@@ -7,6 +7,8 @@
 #include <gtest/gtest.h>
 #include <torch/types.h>
 
+using namespace torch_utils;
+
 // NOLINTBEGIN
 
 TEST(TranslationTest, BasicAssertions) {
@@ -46,7 +48,7 @@ TEST(RotationTest, BasicAssertions) {
     auto points =
         torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}},
                        {{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
-                      torch::kF32);
+                      F32);
 
     constexpr float ROT_ANGLE = 180.0f;
     rotate_deg(points, ROT_ANGLE);
@@ -55,7 +57,7 @@ TEST(RotationTest, BasicAssertions) {
     auto points_coordinates =
         torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}},
                        {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}},
-                      torch::kF32);
+                      F32);
     constexpr float ANGLE =
         ROT_ANGLE * (math_utils::PI_RAD / math_utils::PI_DEG);
     const auto rotation_vector = math_utils::rotate_yaw(ANGLE);
@@ -81,7 +83,7 @@ TEST(RotationTest, BasicAssertions) {
                         {vec12[0], vec12[1], vec12[2], -10.0f}},
                        {{vec21[0], vec21[1], vec21[2], 10.0f},
                         {vec22[0], vec22[1], vec22[2], -10.0f}}},
-                      torch::kF32);
+                      F32);
 
     EXPECT_TRUE(points.allclose(expected_points))
         << "`points` not equal to `expected_points`:\npoints:" << points
@@ -93,7 +95,7 @@ TEST(RotationTest, BasicAssertions) {
     auto points =
         torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}},
                        {{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
-                      torch::kF32);
+                      F32);
 
     constexpr float ANGLE = math_utils::PI_RAD;
     rotate_rad(points, ANGLE);
@@ -101,7 +103,7 @@ TEST(RotationTest, BasicAssertions) {
     auto points_coordinates =
         torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}},
                        {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}},
-                      torch::kF32);
+                      F32);
 
     const auto rotation_vector = math_utils::rotate_yaw(ANGLE);
 
@@ -126,7 +128,7 @@ TEST(RotationTest, BasicAssertions) {
                         {vec12[0], vec12[1], vec12[2], -10.0f}},
                        {{vec21[0], vec21[1], vec21[2], 10.0f},
                         {vec22[0], vec22[1], vec22[2], -10.0f}}},
-                      torch::kF32);
+                      F32);
 
     EXPECT_TRUE(points.allclose(expected_points))
         << "`points` not equal to `expected_points`:\npoints:" << points
@@ -425,21 +427,21 @@ TEST(DrawValuesTest, BasicAssertions) {
 
 TEST(TranslateRandomTest, BasicAssertions) {
 
-  auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
-                              torch::kF32);
+  auto points =
+      torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}}, F32);
   auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 2.5, M_PI},
                                 {2.0, 2.0, 2.0, 1.0, 1.0, 0.5, M_PI}}},
-                              torch::kF32);
+                              F32);
   const float sigma = 1;
 
   // NOTE(tom): the generated translation vector should be {1, 1, 1}
   translate_random(points, labels, sigma);
 
-  auto expected_points = torch::tensor(
-      {{{2.0, 3.0, 4.0, 10.0}, {5.0, 6.0, 7.0, -10.0}}}, torch::kF32);
+  auto expected_points =
+      torch::tensor({{{2.0, 3.0, 4.0, 10.0}, {5.0, 6.0, 7.0, -10.0}}}, F32);
   auto expected_labels = torch::tensor({{{2.0, 2.0, 2.0, 2.0, 3.0, 2.5, M_PI},
                                          {3.0, 3.0, 3.0, 1.0, 1.0, 0.5, M_PI}}},
-                                       torch::kF32);
+                                       F32);
 
   EXPECT_TRUE(points.equal(expected_points));
   EXPECT_TRUE(labels.equal(expected_labels));
@@ -447,11 +449,11 @@ TEST(TranslateRandomTest, BasicAssertions) {
 
 TEST(ScaleRandomTest, BasicAssertions) {
 
-  auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
-                              torch::kF32);
+  auto points =
+      torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}}, F32);
   auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 2.5, M_PI},
                                 {2.0, 2.0, 2.0, 1.0, 1.0, 0.5, M_PI}}},
-                              torch::kF32);
+                              F32);
   const float sigma = 10;
   const float max_scale = 11;
 
@@ -461,13 +463,13 @@ TEST(ScaleRandomTest, BasicAssertions) {
   auto expected_points =
       torch::tensor({{{7.21812582, 14.43625164, 21.65437746, 10.0},
                       {28.87250328, 36.0906291, 43.30875492, -10.0}}},
-                    torch::kF32);
+                    F32);
   auto expected_labels =
       torch::tensor({{{7.21812582, 7.21812582, 7.21812582, 14.43625164,
                        21.65437746, 18.04531455, M_PI},
                       {14.43625164, 14.43625164, 14.43625164, 7.21812582,
                        7.21812582, 3.60906291, M_PI}}},
-                    torch::kF32);
+                    F32);
 
   EXPECT_TRUE(points.equal(expected_points));
   EXPECT_TRUE(labels.equal(expected_labels));
@@ -477,9 +479,8 @@ TEST(ScaleLocalTest, BasicAssertions) {
 
   {
     auto points = torch::tensor(
-        {{{1.0, 2.0, 3.0, 10.0}, {100.0, 100.0, 100.0, -10.0}}}, torch::kF32);
-    auto labels =
-        torch::tensor({{{1.0, 1.0, 1.0, 9.0, 9.0, 9.0, 0.0}}}, torch::kF32);
+        {{{1.0, 2.0, 3.0, 10.0}, {100.0, 100.0, 100.0, -10.0}}}, F32);
+    auto labels = torch::tensor({{{1.0, 1.0, 1.0, 9.0, 9.0, 9.0, 0.0}}}, F32);
 
     constexpr float sigma = 10;
     constexpr float max_scale = 11;
@@ -491,11 +492,11 @@ TEST(ScaleLocalTest, BasicAssertions) {
     const auto expected_points = torch::tensor(
         {{{scale_factor * 1.0, scale_factor * 2.0, scale_factor * 3.0, 10.0},
           {100.0, 100.0, 100.0, -10.0}}},
-        torch::kF32);
+        F32);
     const auto expected_labels =
         torch::tensor({{{1.0, 1.0, 1.0, scale_factor * 9.0, scale_factor * 9.0,
                          scale_factor * 9.0, 0.0}}},
-                      torch::kF32);
+                      F32);
 
     EXPECT_TRUE(points.equal(expected_points))
         << "points should be scaled: \nexpected" << expected_points
@@ -508,8 +509,8 @@ TEST(ScaleLocalTest, BasicAssertions) {
   }
   {
 
-    auto points = torch::tensor(
-        {{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}}, torch::kF32);
+    auto points =
+        torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}}, F32);
     auto labels = torch::zeros({1, 0, 7});
 
     constexpr float sigma = 10;
@@ -518,8 +519,8 @@ TEST(ScaleLocalTest, BasicAssertions) {
     // NOTE(tom): scale_factor = 7.21812582
     scale_local(points, labels, sigma, max_scale);
 
-    const auto expected_points = torch::tensor(
-        {{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}}, torch::kF32);
+    const auto expected_points =
+        torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}}, F32);
     const auto expected_labels = torch::zeros({1, 0, 7});
 
     EXPECT_TRUE(points.equal(expected_points))
@@ -578,18 +579,18 @@ TEST(FlipRandomTest, BasicAssertions) {
 
 TEST(RotateRandomTest, BasicAssertions) {
 
-  auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
-                              torch::kF32);
+  auto points =
+      torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}}, F32);
 
   auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 2.5, M_PI},
                                 {2.0, 2.0, 2.0, 1.0, 1.0, 0.5, M_PI}}},
-                              torch::kF32);
+                              F32);
 
   constexpr float ROT_ANGLE = 28.0920143;
   rotate_random(points, labels, 50);
 
   auto points_coordinates =
-      torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}}, torch::kF32);
+      torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}}, F32);
   constexpr float angle = ROT_ANGLE * (math_utils::PI_RAD / math_utils::PI_DEG);
   const auto rotation_vector = math_utils::rotate_yaw(angle);
 
@@ -605,7 +606,7 @@ TEST(RotateRandomTest, BasicAssertions) {
 
   const auto expected_points = torch::tensor(
       {{vec1[0], vec1[1], vec1[2], 10.0f}, {vec2[0], vec2[1], vec2[2], -10.0f}},
-      torch::kF32);
+      F32);
 
   // NOTE(tom): Using allclose here because the equality check ends up failing
   //            despite there being no visible difference between the tensor
@@ -617,7 +618,7 @@ TEST(RotateRandomTest, BasicAssertions) {
       << expected_points;
 
   auto label_coordinates =
-      torch::tensor({{{1.0, 1.0, 1.0}, {2.0, 2.0, 2.0}}}, torch::kF32);
+      torch::tensor({{{1.0, 1.0, 1.0}, {2.0, 2.0, 2.0}}}, F32);
 
   const auto l1 = torch::matmul(label_coordinates[0][0], rotation_vector);
   const auto l2 = torch::matmul(label_coordinates[0][1], rotation_vector);
@@ -637,7 +638,7 @@ TEST(RotateRandomTest, BasicAssertions) {
   const auto expected_labels = torch::tensor(
       {{label1[0], label1[1], label1[2], 2.0f, 3.0f, 2.5f, angle_label1},
        {label2[0], label2[1], label2[2], 1.0f, 1.0f, 0.5f, angle_label2}},
-      torch::kF32);
+      F32);
 
   // NOTE(tom): Using allclose here because the equality check ends up failing
   //            despite there being no visible difference between the tensor
@@ -653,7 +654,7 @@ TEST(ThinOutTest, BasicAssertions) {
   constexpr tensor_size_t BATCHES = 2;
   constexpr tensor_size_t ITEMS = 10;
 
-  const auto points = torch::rand({BATCHES, ITEMS, 4}, torch::kF32);
+  const auto points = torch::rand({BATCHES, ITEMS, 4}, F32);
   auto new_points = thin_out(points, 1);
 
   // NOTE(tom): percent = 0.653750002, indices = {9, 4, 8, 0}
@@ -818,8 +819,7 @@ TEST(IntensityShiftTest, BasicAssertions) {
 }
 
 TEST(LocalToWorldTest, BasicAssertions) {
-  const auto lidar_pose =
-      torch::tensor({1.0, 2.0, 3.0, 180.0, 10.0, 0.0}, torch::kF64);
+  const auto lidar_pose = torch::tensor({1.0, 2.0, 3.0, 180.0, 10.0, 0.0}, F64);
 
   const auto expected = torch::tensor(
       {
@@ -828,10 +828,10 @@ TEST(LocalToWorldTest, BasicAssertions) {
           {0.0, -1.22464680e-16, -1.0, 3.0},
           {0.0, 0.0, 0.0, 1.0},
       },
-      torch::kF64);
+      F64);
   const auto result = local_to_world_transform(lidar_pose);
 
-  EXPECT_TRUE(result.toType(torch::kF64).allclose(expected))
+  EXPECT_TRUE(result.toType(F64).allclose(expected))
       << "Transformation matrix not as expected:\nexpected:\n"
       << expected << "\nactual:\n"
       << result;
