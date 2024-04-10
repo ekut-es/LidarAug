@@ -37,6 +37,7 @@ constexpr float TWO_PI_RAD = 2.0f * PI_RAD;
 
 namespace torch_utils {
 constexpr auto F32 = torch::kF32;
+constexpr auto F64 = torch::kF64;
 } // namespace torch_utils
 
 #endif // !UTILS_HPP
