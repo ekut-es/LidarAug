@@ -33,6 +33,21 @@ constexpr float TWO_PI_RAD = 2.0f * PI_RAD;
   return angle * (PI_RAD / PI_DEG);
 }
 
+[[nodiscard]] inline double
+compute_condition_number(const torch::Tensor &matrix) {
+
+  // Perform Singular Value Decomposition (SVD)
+  const auto svd_result = torch::svd(matrix);
+  const auto singular_values = std::get<1>(svd_result);
+
+  // Compute the condition number
+  const auto max_singular_value = singular_values.max().item<double>();
+  const auto min_singular_value = singular_values.min().item<double>();
+  const double condition_number = max_singular_value / min_singular_value;
+
+  return condition_number;
+}
+
 } // namespace math_utils
 
 namespace torch_utils {
