@@ -836,6 +836,33 @@ TEST(LocalToWorldTest, BasicAssertions) {
       << expected << "\nactual:\n"
       << result;
 }
+
+TEST(LocalToWorldConditionTest, BasicAssertions) {
+  {
+
+    const auto m = torch::tensor({1.0, 2.0, 3.0, 180.0, 10.0, 0.0}, F64);
+    const auto result = local_to_world_transform(m);
+    const auto cn = math_utils::compute_condition_number(result);
+    constexpr double expected_max_cn = 15.94;
+
+    EXPECT_LT(cn, expected_max_cn)
+        << "Regression in the condition number for:\n"
+        << m << "\nExpected it to be smaller than " << expected_max_cn
+        << " but is " << cn << "!";
+  }
+  {
+
+    const auto m = torch::tensor({-7.0, 3.0, 5.2, 0.0, 100.0, 0.0}, F64);
+    const auto result = local_to_world_transform(m);
+    const auto cn = math_utils::compute_condition_number(result);
+    constexpr double expected_max_cn = 87.03;
+
+    EXPECT_LT(cn, expected_max_cn)
+        << "Regression in the condition number for:\n"
+        << m << "\nExpected it to be smaller than " << expected_max_cn
+        << " but is " << cn << "!";
+  }
+}
 TEST(FogTest, BasicAssertions) {
   auto points =
       torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
