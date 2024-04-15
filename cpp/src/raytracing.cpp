@@ -9,12 +9,12 @@ using Slice = torch::indexing::Slice;
 #define NF_SPLIT_FACTOR 32
 
 [[nodiscard]] torch::Tensor
-rt::trace(torch::Tensor point_cloud, torch::Tensor noise_filter,
-          torch::Tensor split_index,
+rt::trace(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
+          const torch::Tensor &split_index,
           std::optional<float> intensity_factor /*= 0.9*/) {
 
   const auto num_points = point_cloud.size(0);
-  constexpr auto num_rays = 11l;
+  constexpr auto num_rays = 11;
 
   auto intersections = torch::zeros({num_points, num_rays}, F32);
   auto distances = torch::zeros({num_points, num_rays}, F32);
@@ -72,9 +72,11 @@ rt::trace(torch::Tensor point_cloud, torch::Tensor noise_filter,
   return -1;
 }
 
-void rt::intersects(torch::Tensor point_cloud, torch::Tensor noise_filter,
-                    torch::Tensor split_index, torch::Tensor intersections,
-                    torch::Tensor distances, torch::Tensor distance_count,
+void rt::intersects(torch::Tensor point_cloud,
+                    const torch::Tensor &noise_filter,
+                    const torch::Tensor &split_index,
+                    torch::Tensor intersections, const torch::Tensor &distances,
+                    torch::Tensor distance_count,
                     torch::Tensor most_intersect_count,
                     torch::Tensor most_intersect_dist, tensor_size_t num_points,
                     float intensity_factor) {
