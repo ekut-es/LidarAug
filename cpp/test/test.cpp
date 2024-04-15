@@ -818,7 +818,7 @@ TEST(RNGTransformation, IntensityShiftTest) {
   }
 }
 
-TEST(LocalToWorldTest, BasicAssertions) {
+TEST(Transformation, LocalToWorldTest) {
   const auto lidar_pose = torch::tensor({1.0, 2.0, 3.0, 180.0, 10.0, 0.0}, F64);
 
   const auto expected = torch::tensor(
@@ -837,7 +837,7 @@ TEST(LocalToWorldTest, BasicAssertions) {
       << result;
 }
 
-TEST(LocalToWorldConditionTest, BasicAssertions) {
+TEST(Transformation, LocalToWorldConditionTest) {
   {
 
     const auto m = torch::tensor({1.0, 2.0, 3.0, 180.0, 10.0, 0.0}, F64);
