@@ -85,13 +85,14 @@ void rt::intersects(torch::Tensor point_cloud,
 
   for (auto i = 0; i < num_points; i++) {
 
-    auto original_point =
+    const auto original_point =
         (point_cloud[i][0], point_cloud[i][1], point_cloud[i][2]);
+    auto beam = original_point.clone();
+
     auto idx_count = 0;
 
     // original point intersection
-    auto intersection_dist =
-        rt::trace_beam(noise_filter, original_point, split_index);
+    auto intersection_dist = rt::trace_beam(noise_filter, beam, split_index);
     if (intersection_dist > 0) {
       intersections[i][idx_count] = intersection_dist;
       idx_count += 1;
@@ -103,20 +104,18 @@ void rt::intersects(torch::Tensor point_cloud,
     auto num_streaks = 5;
     auto num_points_per_streak = 2;
     auto z_axis = torch::tensor({0.0, 0.0, 1.0});
-    auto rot_vec = normalize(rt::cross(original_point, z_axis));
+    auto rot_vec = normalize(rt::cross(beam, z_axis));
     for (auto j = 0; j < num_streaks; j++) {
 
       for (auto k = 1; k < num_points_per_streak + 1; k++) {
         if (k <= num_points_per_streak / 2)
-          original_point =
-              rt::rotate(original_point, rot_vec, k * divergence_angle);
+          beam = rt::rotate(original_point, rot_vec, k * divergence_angle);
         else
-          original_point = rt::rotate(original_point, rot_vec,
-                                      (k - (num_points_per_streak / 2.0f)) *
-                                          (-divergence_angle));
+          beam = rt::rotate(original_point, rot_vec,
+                            (k - (num_points_per_streak / 2.0f)) *
+                                (-divergence_angle));
 
-        intersection_dist =
-            rt::trace_beam(noise_filter, original_point, split_index);
+        intersection_dist = rt::trace_beam(noise_filter, beam, split_index);
 
         if (intersection_dist > 0) {
           intersections[i][idx_count] = intersection_dist;
