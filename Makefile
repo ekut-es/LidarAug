@@ -16,6 +16,9 @@ release: configure
 ctest: build
 	cd ./cpp/build_files && ctest
 
+testc: build
+	cd ./cpp/build_files && ./transformations_test $(ARGS)
+
 testpy: ./pytest/test.py
 	pytest ./pytest/test.py -v
 

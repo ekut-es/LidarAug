@@ -9,7 +9,7 @@
 
 // NOLINTBEGIN
 
-TEST(TranslationTest, BasicAssertions) {
+TEST(Transformation, TranslationTest) {
   auto tensor = torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}});
   auto translation = torch::tensor({1.0, 2.0, 3.0});
 
@@ -20,7 +20,7 @@ TEST(TranslationTest, BasicAssertions) {
   EXPECT_TRUE(tensor.equal(expected));
 }
 
-TEST(ScalingTest, BasicAssertions) {
+TEST(Transformation, ScalingTest) {
   auto tensor = torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}});
   auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 2.5, M_PI},
                                 {2.0, 2.0, 2.0, 1.0, 1.0, 0.5, M_PI}}});
@@ -39,7 +39,7 @@ TEST(ScalingTest, BasicAssertions) {
   EXPECT_TRUE(labels.equal(expected_labels));
 }
 
-TEST(RotationTest, BasicAssertions) {
+TEST(Transformation, RotationTest) {
 
   {
 
@@ -135,7 +135,7 @@ TEST(RotationTest, BasicAssertions) {
   }
 }
 
-TEST(FlipTest, BasicAssertions) {
+TEST(Transformation, FlipTest) {
   {
     auto points = torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}});
     auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 4.0, 2.5},
@@ -182,7 +182,7 @@ TEST(FlipTest, BasicAssertions) {
   }
 }
 
-TEST(AngleConversionTest, BasicAssertions) {
+TEST(MathUtils, AngleConversionTest) {
   constexpr static float three_sixty_deg = 360;
   constexpr static float zero_deg = 0;
   constexpr static float one_eighty_deg = 180;
@@ -201,7 +201,7 @@ TEST(AngleConversionTest, BasicAssertions) {
             static_cast<float>((-math_utils::PI_RAD) / 2));
 }
 
-TEST(DrawUniformValuesTest, BasicAssertions) {
+TEST(Stats, DrawUniformValuesTest) {
   constexpr static auto size = 10;
   constexpr static auto num_values = 3;
 
@@ -215,7 +215,7 @@ TEST(DrawUniformValuesTest, BasicAssertions) {
   }
 }
 
-TEST(RandomNoiseTest, BasicAssertions) {
+TEST(Transformation, RandomNoiseTest) {
   const auto points =
       torch::tensor({{{1.0, 2.0, 3.0, 10.9}, {4.0, 5.0, 6.0, -10.0}}});
 
@@ -230,7 +230,7 @@ TEST(RandomNoiseTest, BasicAssertions) {
   EXPECT_GT(new_points.size(1), points.size(1)) << "No noise has been added...";
 }
 
-TEST(DeleteLabelsByMinPointsHelperTest, BasicAssertions) {
+TEST(Transformation, DeleteLabelsByMinPointsHelperTest) {
   const auto points = torch::tensor({{10.4966, 10.1144, 10.2182, -8.4158},
                                      {7.0241, 7.6908, -2.1535, 1.3416},
                                      {10.0, 10.0, 10.0, 10.0}});
@@ -268,7 +268,7 @@ TEST(DeleteLabelsByMinPointsHelperTest, BasicAssertions) {
       << result_names;
 }
 
-TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {
+TEST(Transformation, DeleteLabelsByMinPointsTest) {
 
   {
 
@@ -324,7 +324,7 @@ TEST(DeleteLabelsByMinPointsTest, BasicAssertions) {
   }
 }
 
-TEST(ChangeSparseRepresentationTest, BasicAssertions) {
+TEST(Tensor, ChangeSparseRepresentationTest) {
 
   // clang-format off
   const auto in = torch::tensor({
@@ -361,7 +361,7 @@ TEST(ChangeSparseRepresentationTest, BasicAssertions) {
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
-TEST(DrawValuesTest, BasicAssertions) {
+TEST(StatsRNG, DrawValuesTest) {
   std::uniform_int_distribution<int> ud(0, 100);
   std::normal_distribution<float> nd(0, 5);
   {
@@ -423,7 +423,7 @@ TEST(DrawValuesTest, BasicAssertions) {
   }
 }
 
-TEST(TranslateRandomTest, BasicAssertions) {
+TEST(RNGTransformation, TranslateRandomTest) {
 
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
                               torch::kF32);
@@ -445,7 +445,7 @@ TEST(TranslateRandomTest, BasicAssertions) {
   EXPECT_TRUE(labels.equal(expected_labels));
 }
 
-TEST(ScaleRandomTest, BasicAssertions) {
+TEST(RNGTransformation, ScaleRandomTest) {
 
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
                               torch::kF32);
@@ -473,7 +473,7 @@ TEST(ScaleRandomTest, BasicAssertions) {
   EXPECT_TRUE(labels.equal(expected_labels));
 }
 
-TEST(ScaleLocalTest, BasicAssertions) {
+TEST(RNGTransformation, ScaleLocalTest) {
 
   {
     auto points = torch::tensor(
@@ -529,7 +529,7 @@ TEST(ScaleLocalTest, BasicAssertions) {
   }
 }
 
-TEST(FlipRandomTest, BasicAssertions) {
+TEST(RNGTransformation, FlipRandomTest) {
   {
     auto points = torch::tensor({{{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}}});
     auto labels = torch::tensor({{{1.0, 1.0, 1.0, 2.0, 3.0, 4.0, 2.5},
@@ -576,7 +576,7 @@ TEST(FlipRandomTest, BasicAssertions) {
   }
 }
 
-TEST(RotateRandomTest, BasicAssertions) {
+TEST(RNGTransformation, RotateRandomTest) {
 
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0}, {4.0, 5.0, 6.0, -10.0}}},
                               torch::kF32);
@@ -649,7 +649,7 @@ TEST(RotateRandomTest, BasicAssertions) {
       << expected_labels;
 }
 
-TEST(ThinOutTest, BasicAssertions) {
+TEST(RNGTransformation, ThinOutTest) {
   constexpr tensor_size_t BATCHES = 2;
   constexpr tensor_size_t ITEMS = 10;
 
@@ -679,7 +679,7 @@ TEST(ThinOutTest, BasicAssertions) {
       << new_points;
 }
 
-TEST(RandomPointNoiseTest, BasicAssertions) {
+TEST(RNGTransformation, RandomPointNoiseTest) {
   constexpr float sigma = 1;
 
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 4.0}, {-1.0, -2.0, -3.0, -4.0}},
@@ -707,7 +707,7 @@ TEST(RandomPointNoiseTest, BasicAssertions) {
       << points;
 }
 
-TEST(TransformAlongRayTest, BasicAssertions) {
+TEST(RNGTransformation, TransformAlongRayTest) {
   constexpr float sigma = 1;
 
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 4.0}, {-1.0, -2.0, -3.0, -4.0}},
@@ -729,7 +729,7 @@ TEST(TransformAlongRayTest, BasicAssertions) {
       << points;
 }
 
-TEST(IntensityNoiseTest, BasicAssertions) {
+TEST(RNGTransformation, IntensityNoiseTest) {
   {
     auto points =
         torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
@@ -774,7 +774,7 @@ TEST(IntensityNoiseTest, BasicAssertions) {
   }
 }
 
-TEST(IntensityShiftTest, BasicAssertions) {
+TEST(RNGTransformation, IntensityShiftTest) {
   {
     auto points =
         torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
@@ -817,7 +817,7 @@ TEST(IntensityShiftTest, BasicAssertions) {
   }
 }
 
-TEST(FogTest, BasicAssertions) {
+TEST(Simulation, FogTest) {
   auto points =
       torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
                      {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
