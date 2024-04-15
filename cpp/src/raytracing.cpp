@@ -99,12 +99,13 @@ void rt::intersects(torch::Tensor point_cloud,
     }
 
     // ----------- rotated points ----------------
-    auto divergence_angle = 2e-4;
-    auto vector_rotation_angle = M_PI / 5;
-    auto num_streaks = 5;
-    auto num_points_per_streak = 2;
-    auto z_axis = torch::tensor({0.0, 0.0, 1.0});
+    constexpr auto divergence_angle = 2e-4;
+    constexpr auto vector_rotation_angle = M_PI / 5;
+    constexpr auto num_streaks = 5;
+    constexpr auto num_points_per_streak = 2;
+    const auto z_axis = torch::tensor({0.0, 0.0, 1.0});
     auto rot_vec = normalize(rt::cross(beam, z_axis));
+
     for (auto j = 0; j < num_streaks; j++) {
 
       for (auto k = 1; k < num_points_per_streak + 1; k++) {
@@ -130,7 +131,7 @@ void rt::intersects(torch::Tensor point_cloud,
     auto n_intersects = 0;
 
     for (auto j = 0; j < intersections.size(1); j++) {
-      auto intersect = intersections[i][j].item<float>();
+      const auto intersect = intersections[i][j].item<float>();
       if (intersect != 0)
         n_intersects += 1;
       for (auto k = 0; k < NUM_RAYS; k++) {
@@ -147,12 +148,13 @@ void rt::intersects(torch::Tensor point_cloud,
       }
     }
 
-    auto r_all = n_intersects / NUM_RAYS;
+    const auto r_all = n_intersects / NUM_RAYS;
 
     // --------- find most intersected drop -------
 
     auto max_count = 0;
     auto max_intersection_dist = 0.0;
+
     for (auto j = 0; j < distance_count.size(1); j++) {
       auto count = distance_count[i][j].item<tensor_size_t>();
       if (count > max_count) {
@@ -162,10 +164,13 @@ void rt::intersects(torch::Tensor point_cloud,
       most_intersect_count[i] = max_count;
       most_intersect_dist[i] = max_intersection_dist;
 
-      auto r_most = max_count / n_intersects;
+      const auto r_most = max_count / n_intersects;
+
       if (r_all > 0.15) {
         if (r_most > 0.8) { // set point towards sensor
-          auto dist = rt::vector_length(point_cloud[i]);
+                            //
+          const auto dist = rt::vector_length(point_cloud[i]);
+
           point_cloud[i][0] *= max_intersection_dist / dist;
           point_cloud[i][1] *= max_intersection_dist / dist;
           point_cloud[i][2] *= max_intersection_dist / dist;
