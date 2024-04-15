@@ -76,9 +76,9 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
              mul(k, scalar(k, v) * (1 - cos(angle))));
 }
 
-[[nodiscard]] float trace(const torch::Tensor &noise_filter,
-                          const torch::Tensor &beam,
-                          const torch::Tensor &split_index);
+[[nodiscard]] float trace_beam(const torch::Tensor &noise_filter,
+                               const torch::Tensor &beam,
+                               const torch::Tensor &split_index);
 } // namespace rt
 
 #endif // !RAYTRACING_HPP

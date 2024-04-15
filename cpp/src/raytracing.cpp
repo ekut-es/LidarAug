@@ -38,9 +38,9 @@ rt::trace(torch::Tensor point_cloud, torch::Tensor noise_filter,
   return result;
 }
 
-[[nodiscard]] float rt::trace(const torch::Tensor &noise_filter,
-                              const torch::Tensor &beam,
-                              const torch::Tensor &split_index) {
+[[nodiscard]] float rt::trace_beam(const torch::Tensor &noise_filter,
+                                   const torch::Tensor &beam,
+                                   const torch::Tensor &split_index) {
 
   // TODO(tom): this is very messy and needs revisiting
 
