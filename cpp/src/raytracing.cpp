@@ -83,107 +83,132 @@ void rt::intersects(torch::Tensor point_cloud,
 
   constexpr auto NUM_RAYS = 11;
 
-  for (auto i = 0; i < num_points; i++) {
+  const auto get_original_intersection = [intersections, noise_filter](
+                                             const torch::Tensor &beam,
+                                             const torch::Tensor &split_index,
+                                             tensor_size_t index) {
+    tensor_size_t idx_count = 0;
 
-    const auto original_point =
-        (point_cloud[i][0], point_cloud[i][1], point_cloud[i][2]);
-    auto beam = original_point.clone();
-
-    auto idx_count = 0;
-
-    // original point intersection
     auto intersection_dist = rt::trace_beam(noise_filter, beam, split_index);
     if (intersection_dist > 0) {
-      intersections[i][idx_count] = intersection_dist;
+      intersections[index][idx_count] = intersection_dist;
       idx_count += 1;
     }
 
-    // ----------- rotated points ----------------
+    return std::make_pair(intersection_dist, idx_count);
+  };
+
+  const auto rotate_points = [noise_filter, intersections,
+                              split_index](const torch::Tensor &original_point,
+                                           float &intersection_dist,
+                                           tensor_size_t &idx_count,
+                                           tensor_size_t index) {
     constexpr auto divergence_angle = 2e-4;
     constexpr auto vector_rotation_angle = M_PI / 5;
     constexpr auto num_streaks = 5;
     constexpr auto num_points_per_streak = 2;
     const auto z_axis = torch::tensor({0.0, 0.0, 1.0});
-    auto rot_vec = normalize(rt::cross(beam, z_axis));
+
+    auto rot_vec = normalize(rt::cross(original_point, z_axis));
 
     for (auto j = 0; j < num_streaks; j++) {
-
       for (auto k = 1; k < num_points_per_streak + 1; k++) {
-        if (k <= num_points_per_streak / 2)
-          beam = rt::rotate(original_point, rot_vec, k * divergence_angle);
-        else
-          beam = rt::rotate(original_point, rot_vec,
-                            (k - (num_points_per_streak / 2.0f)) *
-                                (-divergence_angle));
+
+        auto beam = rt::rotate(original_point, rot_vec,
+                               (k <= num_points_per_streak / 2)
+                                   ? k * divergence_angle
+                                   : (k - (num_points_per_streak / 2.0f)) *
+                                         (-divergence_angle));
 
         intersection_dist = rt::trace_beam(noise_filter, beam, split_index);
 
         if (intersection_dist > 0) {
-          intersections[i][idx_count] = intersection_dist;
+          intersections[index][idx_count] = intersection_dist;
           idx_count += 1;
         }
         rot_vec = rt::rotate(rot_vec, rt::normalize(original_point),
                              vector_rotation_angle);
       }
     }
+  };
 
-    // ------------ count intersections ------------
-    auto n_intersects = 0;
+  const auto count_intersections = [intersections, distances,
+                                    distance_count](tensor_size_t index) {
+    uint32_t n_intersects = 0;
 
-    for (auto j = 0; j < intersections.size(1); j++) {
-      const auto intersect = intersections[i][j].item<float>();
+    for (auto i = 0; i < intersections.size(1); i++) {
+      const auto intersect = intersections[index][i].item<float>();
       if (intersect != 0)
         n_intersects += 1;
-      for (auto k = 0; k < NUM_RAYS; k++) {
+      for (auto j = 0; j < NUM_RAYS; j++) {
         if (intersect != 0) {
-          if (distances[i][k].item<float>() == 0) {
-            distance_count[i][k] = 1;
-            distances[i][k] = intersect;
+          if (distances[index][j].item<float>() == 0) {
+            distance_count[index][j] = 1;
+            distances[index][j] = intersect;
             break;
-          } else if (intersect == distances[i][k].item<float>()) {
-            distance_count[i][k] += 1;
+          } else if (intersect == distances[index][j].item<float>()) {
+            distance_count[index][j] += 1;
             break;
           }
         }
       }
     }
 
-    const auto r_all = n_intersects / NUM_RAYS;
+    return n_intersects;
+  };
 
-    // --------- find most intersected drop -------
+  const auto find_most_intersected_drop =
+      [most_intersect_count, most_intersect_dist, distances, point_cloud,
+       intensity_factor](const torch::Tensor &distance_count,
+                         uint32_t n_intersects, tensor_size_t index) {
+        const auto r_all = n_intersects / NUM_RAYS;
 
-    auto max_count = 0;
-    auto max_intersection_dist = 0.0;
+        tensor_size_t max_count = 0;
+        auto max_intersection_dist = 0.0;
 
-    for (auto j = 0; j < distance_count.size(1); j++) {
-      auto count = distance_count[i][j].item<tensor_size_t>();
-      if (count > max_count) {
-        max_count = count;
-        max_intersection_dist = distances[i][j].item<float>();
-      }
-      most_intersect_count[i] = max_count;
-      most_intersect_dist[i] = max_intersection_dist;
+        for (auto i = 0; i < distance_count.size(1); i++) {
+          auto count = distance_count[index][i].item<tensor_size_t>();
+          if (count > max_count) {
+            max_count = count;
+            max_intersection_dist = distances[index][i].item<float>();
+          }
+          most_intersect_count[index] = max_count;
+          most_intersect_dist[index] = max_intersection_dist;
 
-      const auto r_most = max_count / n_intersects;
+          const auto r_most = max_count / n_intersects;
 
-      if (r_all > 0.15) {
-        if (r_most > 0.8) { // set point towards sensor
-                            //
-          const auto dist = rt::vector_length(point_cloud[i]);
+          if (r_all > 0.15) {
+            if (r_most > 0.8) { // set point towards sensor
+              const auto dist = rt::vector_length(point_cloud[index]);
 
-          point_cloud[i][0] *= max_intersection_dist / dist;
-          point_cloud[i][1] *= max_intersection_dist / dist;
-          point_cloud[i][2] *= max_intersection_dist / dist;
-          point_cloud[i][3] *= 0.005;
-        } else { // delete point (filtered out later)
-          point_cloud[i][0] = 0;
-          point_cloud[i][1] = 0;
-          point_cloud[i][2] = 0;
-          point_cloud[i][3] = 0;
+              point_cloud[index][0] *= max_intersection_dist / dist;
+              point_cloud[index][1] *= max_intersection_dist / dist;
+              point_cloud[index][2] *= max_intersection_dist / dist;
+              point_cloud[index][3] *= 0.005;
+            } else { // delete point (filtered out later)
+              point_cloud[index][0] = 0;
+              point_cloud[index][1] = 0;
+              point_cloud[index][2] = 0;
+              point_cloud[index][3] = 0;
+            }
+          } else { // modify intensity of unaltered point
+            point_cloud[index][3] *= intensity_factor;
+          }
         }
-      } else { // modify intensity of unaltered point
-        point_cloud[i][3] *= intensity_factor;
-      }
-    }
+      };
+
+  for (tensor_size_t i = 0; i < num_points; i++) {
+
+    const auto original_point =
+        (point_cloud[i][0], point_cloud[i][1], point_cloud[i][2]);
+
+    auto [intersection_dist, idx_count] =
+        get_original_intersection(original_point, split_index, i);
+
+    rotate_points(original_point, intersection_dist, idx_count, i);
+
+    const auto n_intersects = count_intersections(i);
+
+    find_most_intersected_drop(distance_count, n_intersects, i);
   }
 }
