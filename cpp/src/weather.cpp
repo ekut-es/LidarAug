@@ -2,6 +2,7 @@
 #include "../include/weather.hpp"
 #include "../include/stats.hpp"
 #include "../include/tensor.hpp"
+#include "../include/utils.hpp"
 #include <ATen/ops/from_blob.h>
 #include <ATen/ops/pow.h>
 #include <cstddef>
@@ -9,6 +10,7 @@
 #include <torch/csrc/autograd/generated/variable_factories.h>
 
 using namespace torch::indexing;
+using namespace torch_utils;
 
 [[nodiscard]] inline torch::Tensor
 select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
@@ -27,7 +29,7 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
       torch::from_blob(std::get<VECTOR>(draw_values<float>(percentage_distrib,
                                                            threshold_data_size))
                            .data(),
-                       {threshold_data_size}, torch::kF32);
+                       {threshold_data_size}, F32);
 
   const auto selected = modify_threshold < modify_probability;
 
@@ -36,7 +38,7 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
   const auto delete_threshold = torch::from_blob(
       std::get<VECTOR>(draw_values<float>(percentage_distrib, num_items))
           .data(),
-      {num_items}, torch::kF32);
+      {num_items}, F32);
 
   const auto deleted =
       selected.logical_and(delete_threshold < delete_probability);
@@ -55,7 +57,7 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
         torch::from_blob(
             std::get<VECTOR>(draw_values<float>(exp_d, num_altered_points))
                 .data(),
-            {num_altered_points}, torch::kF32) +
+            {num_altered_points}, F32) +
         1.3;
     point_cloud.index({altered_points, Slice(None, 3)}) *=
         (new_dist / dist.index({altered_points})).reshape({-1, 1});
@@ -68,7 +70,7 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
       std::get<VECTOR>(
           draw_values<float>(d, static_cast<std::size_t>(num_altered_points)))
           .data(),
-      {num_altered_points}, torch::kF32);
+      {num_altered_points}, F32);
 
   return point_cloud.index({deleted.logical_not(), Slice()});
 }

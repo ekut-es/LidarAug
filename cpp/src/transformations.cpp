@@ -10,6 +10,7 @@
 #include <torch/types.h>
 
 using Slice = torch::indexing::Slice;
+using namespace torch_utils;
 
 void translate(at::Tensor points, const at::Tensor &translation) {
   points.index({Slice(), Slice(), Slice(0, 3)}) += translation;
@@ -213,8 +214,7 @@ random_noise(const at::Tensor &points, float sigma,
     }();
 
     auto noise_tensor = torch::empty(
-        {static_cast<tensor_size_t>(num_points), dims.num_features},
-        torch::kF32);
+        {static_cast<tensor_size_t>(num_points), dims.num_features}, F32);
 
     // NOTE(tom): maybe this can be done more efficiently using masks or by
     // having x, y, z and noise_intensity as tensors from the beginning, but I'd
