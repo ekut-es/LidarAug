@@ -478,9 +478,21 @@ TEST(RNGTransformation, ScaleRandomTest) {
 TEST(RNGTransformation, ScaleLocalTest) {
 
   {
-    auto points = torch::tensor(
-        {{{1.0, 2.0, 3.0, 10.0}, {100.0, 100.0, 100.0, -10.0}}}, F32);
-    auto labels = torch::tensor({{{1.0, 1.0, 1.0, 9.0, 9.0, 9.0, 0.0}}}, F32);
+    auto points = torch::tensor({{{1.0, 2.0, 3.0, 10.0},
+                                  {100.0, 100.0, 100.0, -10.0},
+                                  {100.0, 100.0, 100.0, -10.0},
+                                  {100.0, 100.0, 100.0, -10.0}},
+                                 {{100.0, 100.0, 100.0, -10.0},
+                                  {1.0, 2.0, 3.0, 10.0},
+                                  {100.0, 100.0, 100.0, -10.0},
+                                  {1.0, 2.0, 3.0, 10.0}}},
+                                F32);
+    auto labels = torch::tensor(
+        {
+            {{1.0, 1.0, 1.0, 9.0, 9.0, 9.0, 0.0}},
+            {{1.0, 1.0, 1.0, 9.0, 9.0, 9.0, 0.0}},
+        },
+        F32);
 
     constexpr float sigma = 10;
     constexpr float max_scale = 11;
@@ -491,10 +503,20 @@ TEST(RNGTransformation, ScaleLocalTest) {
 
     const auto expected_points = torch::tensor(
         {{{scale_factor * 1.0, scale_factor * 2.0, scale_factor * 3.0, 10.0},
-          {100.0, 100.0, 100.0, -10.0}}},
+          {100.0, 100.0, 100.0, -10.0},
+          {100.0, 100.0, 100.0, -10.0},
+          {100.0, 100.0, 100.0, -10.0}},
+         {{100.0, 100.0, 100.0, -10.0},
+          {scale_factor * 1.0, scale_factor * 2.0, scale_factor * 3.0, 10.0},
+          {100.0, 100.0, 100.0, -10.0},
+          {scale_factor * 1.0, scale_factor * 2.0, scale_factor * 3.0, 10.0}}
+
+        },
         F32);
     const auto expected_labels =
         torch::tensor({{{1.0, 1.0, 1.0, scale_factor * 9.0, scale_factor * 9.0,
+                         scale_factor * 9.0, 0.0}},
+                       {{1.0, 1.0, 1.0, scale_factor * 9.0, scale_factor * 9.0,
                          scale_factor * 9.0, 0.0}}},
                       F32);
 
