@@ -9,53 +9,19 @@
 #include <torch/csrc/autograd/generated/variable_factories.h>
 #include <torch/types.h>
 
-void translate(at::Tensor points, const at::Tensor &translation) {
-  const dimensions dims = {points.size(0), points.size(1), points.size(2)};
-  const float *const translation_ptr = translation.data_ptr<float>();
-  const float x_translation =
-      translation_ptr[0]; // NOLINT: Allow pointer arithmetic to access contents
-  const float y_translation =
-      translation_ptr[1]; // NOLINT: Allow pointer arithmetic to access contents
-  const float z_translation =
-      translation_ptr[2]; // NOLINT: Allow pointer arithmetic to access contents
+using Slice = torch::indexing::Slice;
+using namespace torch_utils;
 
-  // translate all point clouds in a batch by the same amount
-  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    for (tensor_size_t j = 0; j < dims.num_items; j++) {
-      points.index({i, j, POINT_CLOUD_X_IDX}) += x_translation;
-      points.index({i, j, POINT_CLOUD_Y_IDX}) += y_translation;
-      points.index({i, j, POINT_CLOUD_Z_IDX}) += z_translation;
-    }
-  }
+void translate(at::Tensor points, const at::Tensor &translation) {
+  points.index({Slice(), Slice(), Slice(0, 3)}) += translation;
 }
 
 void scale_points(at::Tensor points, float factor) {
-  const dimensions dims = {points.size(0), points.size(1), points.size(2)};
-
-  // scale all point clouds by the same amount
-  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    for (tensor_size_t j = 0; j < dims.num_items; j++) {
-      points.index({i, j, POINT_CLOUD_X_IDX}) *= factor;
-      points.index({i, j, POINT_CLOUD_Y_IDX}) *= factor;
-      points.index({i, j, POINT_CLOUD_Z_IDX}) *= factor;
-    }
-  }
+  points.index({Slice(), Slice(), Slice(0, 3)}) *= factor;
 }
 
 void scale_labels(at::Tensor labels, float factor) {
-  const dimensions dims = {labels.size(0), labels.size(1), labels.size(2)};
-
-  // scale all the labels by the same amount
-  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    for (tensor_size_t j = 0; j < dims.num_items; j++) {
-      labels.index({i, j, LABEL_X_IDX}) *= factor;
-      labels.index({i, j, LABEL_Y_IDX}) *= factor;
-      labels.index({i, j, LABEL_Z_IDX}) *= factor;
-      labels.index({i, j, LABEL_W_IDX}) *= factor;
-      labels.index({i, j, LABEL_H_IDX}) *= factor;
-      labels.index({i, j, LABEL_L_IDX}) *= factor;
-    }
-  }
+  labels.index({Slice(), Slice(), Slice(0, 6)}) *= factor;
 }
 
 /**
@@ -67,16 +33,7 @@ void scale_labels(at::Tensor labels, float factor) {
  * @param factor is the constant factor to scale the box dimensions by.
  */
 inline void scale_box_dimensions(at::Tensor labels, float factor) {
-  const dimensions dims = {labels.size(0), labels.size(1), labels.size(2)};
-
-  // scale all the boxes by the same amount
-  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    for (tensor_size_t j = 0; j < dims.num_items; j++) {
-      labels.index({i, j, LABEL_W_IDX}) *= factor;
-      labels.index({i, j, LABEL_H_IDX}) *= factor;
-      labels.index({i, j, LABEL_L_IDX}) *= factor;
-    }
-  }
+  labels.index({Slice(), Slice(), Slice(3, 6)}) *= factor;
 }
 
 void translate_random(at::Tensor points, at::Tensor labels, float sigma) {
@@ -126,9 +83,7 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
 
     points_in_boxes_cpu(
         labels[i].contiguous(),
-        point_cloud[i]
-            .index({torch::indexing::Slice(), torch::indexing::Slice(0, 3)})
-            .contiguous(),
+        point_cloud[i].index({Slice(), Slice(0, 3)}).contiguous(),
         point_indeces);
 
     assert(point_indeces.size(0) == label_dims.num_items);
@@ -143,8 +98,7 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
 
       for (int k = 0; k < points.size(0); k++) {
         if (points[k].item<bool>()) {
-          point_cloud.index(
-              {i, k, torch::indexing::Slice(torch::indexing::None, 3)}) *=
+          point_cloud.index({i, k, Slice(torch::indexing::None, 3)}) *=
               scale_factor;
         }
       }
@@ -260,8 +214,7 @@ random_noise(const at::Tensor &points, float sigma,
     }();
 
     auto noise_tensor = torch::empty(
-        {static_cast<tensor_size_t>(num_points), dims.num_features},
-        torch::kF32);
+        {static_cast<tensor_size_t>(num_points), dims.num_features}, F32);
 
     // NOTE(tom): maybe this can be done more efficiently using masks or by
     // having x, y, z and noise_intensity as tensors from the beginning, but I'd
@@ -296,11 +249,9 @@ random_noise(const at::Tensor &points, float sigma,
 inline void rotate(at::Tensor points, at::Tensor rotation) {
 
   const auto points_vec =
-      points.index({torch::indexing::Slice(), torch::indexing::Slice(),
-                    torch::indexing::Slice(torch::indexing::None, 3)});
+      points.index({Slice(), Slice(), Slice(torch::indexing::None, 3)});
 
-  points.index_put_({torch::indexing::Slice(), torch::indexing::Slice(),
-                     torch::indexing::Slice(torch::indexing::None, 3)},
+  points.index_put_({Slice(), Slice(), Slice(torch::indexing::None, 3)},
                     torch::matmul(points_vec, rotation));
 }
 
@@ -330,12 +281,10 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
   for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < point_dims.num_items; j++) {
 
-      auto points_vec = points.index(
-          {i, j, torch::indexing::Slice(torch::indexing::None, 3)});
+      auto points_vec = points.index({i, j, Slice(torch::indexing::None, 3)});
 
-      points.index_put_(
-          {i, j, torch::indexing::Slice(torch::indexing::None, 3)},
-          torch::matmul(points_vec, rotation));
+      points.index_put_({i, j, Slice(torch::indexing::None, 3)},
+                        torch::matmul(points_vec, rotation));
     }
   }
 
@@ -343,12 +292,10 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
                                  labels.size(2)};
   for (tensor_size_t i = 0; i < label_dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < label_dims.num_items; j++) {
-      auto label_vec = labels.index(
-          {i, j, torch::indexing::Slice(torch::indexing::None, 3)});
+      auto label_vec = labels.index({i, j, Slice(torch::indexing::None, 3)});
 
-      labels.index_put_(
-          {i, j, torch::indexing::Slice(torch::indexing::None, 3)},
-          torch::matmul(label_vec, rotation));
+      labels.index_put_({i, j, Slice(torch::indexing::None, 3)},
+                        torch::matmul(label_vec, rotation));
 
       labels[i][j][LABEL_ANGLE_IDX] =
           (labels[i][j][LABEL_ANGLE_IDX] + angle_rad) %
@@ -532,7 +479,7 @@ local_to_local_transform(const torch::Tensor &from_pose,
   auto local_to_world = local_to_world_transform(from_pose);
   auto world_to_local = torch::linalg_inv(local_to_world_transform(to_pose));
 
-  return local_to_world.dot(world_to_local);
+  return local_to_world.mm(world_to_local);
 }
 
 void apply_transformation(torch::Tensor points,
@@ -547,8 +494,7 @@ void apply_transformation(torch::Tensor points,
   points.dot(transformation_matrix.permute({1, 0}));
 
   // write back intensity
-  points.index({torch::indexing::Slice(), torch::indexing::Slice(),
-                POINT_CLOUD_I_IDX}) = intensity;
+  points.index({Slice(), Slice(), POINT_CLOUD_I_IDX}) = intensity;
 }
 
 #ifdef BUILD_MODULE
