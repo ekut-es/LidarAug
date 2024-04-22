@@ -12,8 +12,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "LidarAug"
 version = "0.0.1"
+requires-python = "<3.12"
 dependencies = [
     "torch",
+    "matplotlib",
+    "numpy",
+    "open3d"
 ]
 
 # target-version = "py37"
