@@ -20,7 +20,7 @@ testc: build
 	cd ./cpp/build_files && ./transformations_test $(ARGS)
 
 testpy: ./pytest/test.py
-	pytest ./pytest/test.py -v
+	python3.11 -m pytest ./pytest/test.py -v
 
 rerun: ./cpp/build_files
 	cd ./cpp/build_files && ctest --rerun-failed --output-on-failure
