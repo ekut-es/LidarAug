@@ -55,4 +55,8 @@ constexpr auto F32 = torch::kF32;
 constexpr auto F64 = torch::kF64;
 } // namespace torch_utils
 
+namespace evaluation_utils {
+
+} // namespace evaluation_utils
+
 #endif // !UTILS_HPP
