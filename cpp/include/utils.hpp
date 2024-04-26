@@ -1,11 +1,18 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include <algorithm>
 #include <boost/geometry.hpp>
+#include <boost/geometry/algorithms/area.hpp>
+#include <boost/geometry/algorithms/detail/intersection/interface.hpp>
+#include <boost/geometry/algorithms/union.hpp>
+#include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <cmath>
+#include <execution>
 #include <torch/serialize/tensor.h>
+#include <vector>
 
 namespace math_utils {
 
@@ -64,6 +71,40 @@ typedef boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>
     point_t;
 typedef boost::geometry::model::polygon<point_t> polygon_t;
 typedef boost::geometry::model::multi_polygon<polygon_t> multi_polygon_t;
+
+/**
+ * Computes intersection over union between `box` and `boxes`.
+ *
+ * @param box   is a polygon representing a bounding box.
+ * @param boxes is a vector of polygons representing boxes.
+ *
+ * @returns a vector of floats containing the ious of each box in `boxes` with
+ * `box`.
+ */
+template <typename T>
+inline std::vector<T> iou(const polygon_t &box,
+                          const std::vector<polygon_t> &boxes) {
+  std::vector<T> ious(boxes.size());
+
+  // NOTE(tom): I have parallelized this, but this might only be worth it for
+  //            larger sizes `boxes`. Should be perf tested.
+  std::transform(
+      std::execution::par_unseq, boxes.begin(), boxes.end(), ious.begin(),
+
+      [box](const polygon_t &b) -> T {
+        multi_polygon_t mpi;
+        multi_polygon_t mpu;
+
+        boost::geometry::intersection(box, b, mpi);
+        boost::geometry::union_(box, b, mpu);
+
+        return boost::geometry::area(mpi) / boost::geometry::area(mpu);
+      }
+
+  );
+
+  return ious;
+}
 
 } // namespace evaluation_utils
 
