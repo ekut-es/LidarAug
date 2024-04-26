@@ -1,6 +1,9 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
 #include <cmath>
 #include <torch/serialize/tensor.h>
 
@@ -56,6 +59,11 @@ constexpr auto F64 = torch::kF64;
 } // namespace torch_utils
 
 namespace evaluation_utils {
+
+typedef boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>
+    point_t;
+typedef boost::geometry::model::polygon<point_t> polygon_t;
+typedef boost::geometry::model::multi_polygon<polygon_t> multi_polygon_t;
 
 } // namespace evaluation_utils
 
