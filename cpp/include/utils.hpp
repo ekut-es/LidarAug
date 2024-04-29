@@ -5,6 +5,7 @@
 #include <boost/geometry.hpp>
 #include <boost/geometry/algorithms/area.hpp>
 #include <boost/geometry/algorithms/detail/intersection/interface.hpp>
+#include <boost/geometry/algorithms/detail/intersects/interface.hpp>
 #include <boost/geometry/algorithms/union.hpp>
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/geometries/point.hpp>
@@ -95,10 +96,15 @@ inline std::vector<T> iou(const polygon_t &box,
         multi_polygon_t mpi;
         multi_polygon_t mpu;
 
-        boost::geometry::intersection(box, b, mpi);
-        boost::geometry::union_(box, b, mpu);
+        if (boost::geometry::intersects(box, b)) {
+          boost::geometry::intersection(box, b, mpi);
+          boost::geometry::union_(box, b, mpu);
 
-        return boost::geometry::area(mpi) / boost::geometry::area(mpu);
+          return boost::geometry::area(mpi) / boost::geometry::area(mpu);
+
+        } else {
+          return 0;
+        }
       }
 
   );
