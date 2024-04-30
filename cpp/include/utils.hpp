@@ -1,6 +1,7 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include "tensor.hpp"
 #include <algorithm>
 #include <boost/geometry.hpp>
 #include <boost/geometry/algorithms/area.hpp>
@@ -73,7 +74,27 @@ typedef boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>
 typedef boost::geometry::model::polygon<point_t> polygon_t;
 typedef boost::geometry::model::multi_polygon<polygon_t> multi_polygon_t;
 
-[[nodiscard]] std::vector<polygon_t> convert_format(const torch::Tensor &boxes);
+[[nodiscard]] inline std::vector<polygon_t>
+convert_format(const torch::Tensor &boxes) {
+
+  std::vector<polygon_t> ps;
+
+  ps.resize(static_cast<std::size_t>(boxes.size(0)));
+  for (tensor_size_t i = 0; i < boxes.size(0); i++) {
+    auto box = boxes[i];
+
+    point_t p1{box[0][0].item<float>(), box[0][1].item<float>()};
+    point_t p2{box[1][0].item<float>(), box[1][1].item<float>()};
+    point_t p3{box[2][0].item<float>(), box[2][1].item<float>()};
+    point_t p4{box[3][0].item<float>(), box[3][1].item<float>()};
+
+    polygon_t p{{p1, p2, p3, p4}};
+
+    ps.emplace_back(p);
+  }
+
+  return ps;
+}
 
 /**
  * Computes intersection over union between `box` and `boxes`.
