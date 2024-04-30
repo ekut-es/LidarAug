@@ -73,6 +73,8 @@ typedef boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>
 typedef boost::geometry::model::polygon<point_t> polygon_t;
 typedef boost::geometry::model::multi_polygon<polygon_t> multi_polygon_t;
 
+[[nodiscard]] std::vector<polygon_t> convert_format(const torch::Tensor &boxes);
+
 /**
  * Computes intersection over union between `box` and `boxes`.
  *
@@ -83,8 +85,8 @@ typedef boost::geometry::model::multi_polygon<polygon_t> multi_polygon_t;
  * `box`.
  */
 template <typename T>
-inline std::vector<T> iou(const polygon_t &box,
-                          const std::vector<polygon_t> &boxes) {
+[[nodiscard]] inline std::vector<T> iou(const polygon_t &box,
+                                        const std::vector<polygon_t> &boxes) {
   std::vector<T> ious(boxes.size());
 
   // NOTE(tom): I have parallelized this, but this might only be worth it for
