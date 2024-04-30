@@ -116,4 +116,24 @@ template <typename T>
 
 } // namespace evaluation_utils
 
+namespace cpp_utils {
+/**
+ * Returns the indices that sort a stl Container in ascending order by value.
+ *
+ * @tparam T is the type of the contents of the container that needs to be
+ *           sorted, needs to be comparable.
+ *
+ * @param c             is the input container with the unsorted items.
+ * @param descending    determines whether it is supposed to be sorted in
+ *                      ascending or descending order.
+ *                      Optional and defaults to false.
+ *
+ * @return              a `Container` with the indices sorted by value.
+ */
+template <template <typename...> class Container, typename T>
+[[nodiscard]] Container<std::size_t> argsort(const Container<T> &c,
+                                             bool descending = false);
+
+} // namespace cpp_utils
+
 #endif // !UTILS_HPP
