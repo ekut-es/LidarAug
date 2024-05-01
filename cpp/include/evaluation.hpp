@@ -2,6 +2,9 @@
 #ifndef EVALUATION_HPP
 #define EVALUATION_HPP
 
+#include <algorithm>
+#include <cstddef>
+#include <execution>
 #include <map>
 #include <string>
 #include <torch/torch.h>
@@ -33,4 +36,58 @@ template <typename T>
 [[nodiscard]] T
 calculate_average_precision(float iou_threshold, bool global_sort_detections,
                             typename result_dict<T>::type results);
+
+/**
+ * Calculates the Visual Object Classes (VOC) Challenge 2010 average precision.
+ *
+ * TODO(tom): This needs performance testing.
+ *
+ * @tparam T        is the (numeric) type of the average precision.
+ * @param recall    TODO
+ * @param precision TODO
+ * @return          the average precision.
+ */
+template <typename T>
+[[nodiscard]] inline T
+calculate_voc_average_precision(const std::vector<T> &recall,
+                                const std::vector<T> &precision) {
+  std::vector<T> mean_recall(recall.size() + 2);
+  mean_recall[0] = 0;
+  mean_recall[mean_recall.size() - 1] = 1;
+
+  std::transform(std::execution::par_unseq, recall.begin(), recall.end(),
+                 mean_recall.begin() + 1, [](const T val) { return val; });
+
+  std::vector<T> mean_precision(precision.size() + 2);
+  mean_precision[0] = 0;
+  mean_precision[mean_precision.size() - 1] = 0;
+
+  std::transform(std::execution::par_unseq, precision.begin(), precision.end(),
+                 mean_precision.begin() + 1, [](const T val) { return val; });
+
+  // TOOD(tom): I want to do this with std::generate but I don't think I can
+  //            because I'd need access to the iterator
+  for (std::size_t i = mean_precision.size() - 2; i >= 0; i--) {
+    mean_precision[i] = std::max(mean_precision[i], mean_precision[i + 1]);
+  }
+
+  std::vector<std::size_t> indices;
+  indices.reserve(mean_recall.size());
+
+  for (std::size_t i = 1; i < mean_recall.size(); i++) {
+    if (mean_recall[i] != mean_recall[i - 1]) {
+      indices.emplace_back(i);
+    }
+  }
+
+  T average_precision = 0;
+
+  for (auto i : indices) {
+    average_precision +=
+        (mean_recall[i] - mean_recall[i - 1]) * mean_precision[i];
+  }
+
+  return average_precision;
+}
+
 #endif // !EVALUATION_HPP
