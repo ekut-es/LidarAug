@@ -28,4 +28,9 @@ void calculate_false_and_true_positive(
     const torch::Tensor &detection_boxes, const torch::Tensor &detection_score,
     const torch::Tensor &ground_truth_box, float iou_threshold,
     typename result_dict<float>::type results);
+
+template <typename T>
+[[nodiscard]] T
+calculate_average_precision(float iou_threshold, bool global_sort_detections,
+                            typename result_dict<T>::type results);
 #endif // !EVALUATION_HPP
