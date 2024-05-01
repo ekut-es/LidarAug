@@ -53,6 +53,8 @@ add_executable(
   src/tensor.cpp
   test/test.cpp
   include/utils.hpp
+  include/evaluation.hpp
+  src/evaluation.cpp
 )
 target_link_libraries(
   transformations_test
