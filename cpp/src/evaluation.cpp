@@ -2,6 +2,61 @@
 #include "../include/tensor.hpp"
 #include "../include/utils.hpp"
 
+template <typename T>
+T calculate_average_precision(float iou_threshold, bool global_sort_detections,
+                              typename result_dict<T>::type results) {
+
+  auto iou = results[iou_threshold];
+
+  auto false_positive = iou["FALSE_POSITIVE"];
+  auto true_positive = iou["TRUE_POSITIVE"];
+  if (global_sort_detections) {
+
+    auto score = iou["SCORE"];
+
+    assert(false_positive.size() == true_positive.size() &&
+           true_positive.size() == score.size());
+
+    auto sorted_index = cpp_utils::argsort(score, true);
+
+    false_positive = false_positive[sorted_index];
+    true_positive = true_positive[sorted_index];
+  } else {
+    assert(false_positive.size() == true_positive.size());
+  }
+
+  auto ground_truth = iou["GROUND_TRUTH"];
+
+  auto sum = 0;
+
+  for (std::size_t i = 0; i < false_positive.size(); i++) {
+    sum += false_positive[i];
+    false_positive[i] += sum;
+  }
+
+  sum = 0;
+
+  for (std::size_t i = 0; i < true_positive.size(); i++) {
+    sum += true_positive[i];
+    true_positive[i] += sum;
+  }
+
+  auto recall = true_positive;
+
+  for (std::size_t i = 0; i < true_positive.size(); i++) {
+    recall[i] = static_cast<float>(true_positive[i]) / ground_truth;
+  }
+
+  auto precision = true_positive;
+
+  for (std::size_t i = 0; i < true_positive.size(); i++) {
+    precision[i] = static_cast<float>(true_positive[i]) /
+                   (false_positive[i] + true_positive[i]);
+  }
+
+  return calculate_voc_average_precision<T>(recall, precision);
+}
+
 void calculate_false_and_true_positive(
     const torch::Tensor &detection_boxes, torch::Tensor detection_score,
     const torch::Tensor &ground_truth_box, float iou_threshold,
