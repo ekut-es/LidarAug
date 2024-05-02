@@ -29,7 +29,7 @@ To test the python functions/wrappers, install [pytest](https://docs.pytest.org/
 
 #### Modules
 
-The library contains 3 modules:
+The library contains 4 modules:
 
 1. **transformations:**
 
@@ -42,3 +42,7 @@ The library contains 3 modules:
 3. **augmentations:**
 
 `augmentations` contains the Python wrappers for any C++ function (weather simulation or transformation).
+
+4. **evaluation:**
+
+`evaluation` contains (C++) function to evaluate the accuracy of bounding boxes.
