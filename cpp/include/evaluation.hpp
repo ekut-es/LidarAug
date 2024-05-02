@@ -90,4 +90,19 @@ calculate_voc_average_precision(const std::vector<T> &recall,
   return average_precision;
 }
 
+/**
+ * Calculates the average precision for different iou thresholds and writes the
+ * result to a yaml file.
+ *
+ * @tparam T is the type of the average precision.
+ *
+ * @param results                a map with the results.
+ * @param path                   the directory where the yaml file with the
+ *                               results should be stored.
+ * @param global_sort_detections ?
+ */
+template <typename T>
+void evaluate_results(typename result_dict<T>::type results, std::string dir,
+                      bool global_sort_detections);
+
 #endif // !EVALUATION_HPP
