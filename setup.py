@@ -14,6 +14,10 @@ ext_modules = [
         sources=["cpp/src/weather.cpp"],
         define_macros=[("BUILD_MODULE", None)],
     ),
+    CppExtension(name=f"{MODULE_NAME}.evaluation",
+                 sources=["cpp/src/evaluation.cpp"],
+                 define_macros=[("BUILD_MODULE", None)],
+                 extra_compile_args=['-std=c++20']),
 ]
 
 setup(
