@@ -1,8 +1,8 @@
 
-#include "../include/weather.hpp"
-#include "../include/stats.hpp"
-#include "../include/tensor.hpp"
-#include "../include/utils.hpp"
+#include "../../include/weather_simulations/weather.hpp"
+#include "../../include/stats.hpp"
+#include "../../include/tensor.hpp"
+#include "../../include/utils.hpp"
 #include <ATen/ops/from_blob.h>
 #include <ATen/ops/pow.h>
 #include <cstddef>

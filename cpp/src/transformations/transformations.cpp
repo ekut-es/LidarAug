@@ -1,8 +1,8 @@
-#include "../include/transformations.hpp"
-#include "../include/label.hpp"
-#include "../include/name.hpp"
-#include "../include/stats.hpp"
-#include "../include/utils.hpp"
+#include "../../include/transformations/transformations.hpp"
+#include "../../include/label.hpp"
+#include "../../include/name.hpp"
+#include "../../include/stats.hpp"
+#include "../../include/utils.hpp"
 #include <ATen/ops/index_select.h>
 #include <algorithm>
 #include <cmath>

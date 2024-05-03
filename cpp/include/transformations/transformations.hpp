@@ -2,9 +2,9 @@
 #ifndef TRANSFORMATIONS_HPP
 #define TRANSFORMATIONS_HPP
 
-#include "../include/point_cloud.hpp"
-#include "../include/roiware_utils.h"
-#include "../include/tensor.hpp"
+#include "../point_cloud.hpp"
+#include "../roiware_utils.h"
+#include "../tensor.hpp"
 #include <torch/serialize/tensor.h>
 
 template <typename T> struct range {

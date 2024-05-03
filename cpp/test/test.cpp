@@ -1,9 +1,9 @@
 
 #include "../include/stats.hpp"
 #include "../include/tensor.hpp"
-#include "../include/transformations.hpp"
+#include "../include/transformations/transformations.hpp"
 #include "../include/utils.hpp"
-#include "../include/weather.hpp"
+#include "../include/weather_simulations/weather.hpp"
 #include <gtest/gtest.h>
 #include <torch/types.h>
 

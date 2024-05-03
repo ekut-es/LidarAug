@@ -1,5 +1,5 @@
 
-#include "../include/weather.hpp"
+#include "./weather.hpp"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 

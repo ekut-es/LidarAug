@@ -1,6 +1,6 @@
 
-#include "../include/tensor.hpp"
-#include "../include/transformations.hpp"
+#include "../tensor.hpp"
+#include "./transformations.hpp"
 #include <pybind11/pybind11.h>
 #include <torch/extension.h>
 
