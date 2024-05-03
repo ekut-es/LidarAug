@@ -11,7 +11,7 @@ build: configure_test
 	cmake --build ./cpp/build_files -j 4
 
 release: configure
-	cmake --build ./cpp/build_files -j 4 --config
+	cmake --build ./cpp/build_files -j 4
 
 ctest: build
 	cd ./cpp/build_files && ctest
