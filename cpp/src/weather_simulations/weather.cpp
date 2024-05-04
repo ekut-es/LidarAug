@@ -134,5 +134,5 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
 
 #ifdef BUILD_MODULE
 #undef TEST_RNG
-#include "../include/weather_bindings.hpp"
+#include "../../include/weather_simulations/weather_bindings.hpp"
 #endif

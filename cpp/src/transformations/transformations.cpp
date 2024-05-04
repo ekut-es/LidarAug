@@ -499,7 +499,7 @@ void apply_transformation(torch::Tensor points,
 
 #ifdef BUILD_MODULE
 #undef TEST_RNG
-#include "../include/transformation_bindings.hpp"
+#include "../../include/transformations/transformation_bindings.hpp"
 #else
 #include "gtest/gtest.h"
 
