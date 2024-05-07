@@ -163,3 +163,8 @@ void evaluate_results(typename result_dict<T>::type results, std::string dir,
   std::ofstream fout(dir);
   fout << o.c_str();
 }
+
+#ifdef BUILD_MODULE
+#undef TEST_RNG
+#include "../include/evaluation_bindings.hpp"
+#endif
