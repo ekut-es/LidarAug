@@ -27,7 +27,8 @@ T calculate_average_precision(float iou_threshold, bool global_sort_detections,
     assert(false_positive.size() == true_positive.size());
   }
 
-  auto ground_truth = iou["GROUND_TRUTH"];
+  // NOTE(tom): Is this a single value or are there more values?
+  auto ground_truth = iou["GROUND_TRUTH"][0];
 
   auto sum = 0;
 
