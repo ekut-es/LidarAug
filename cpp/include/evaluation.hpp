@@ -101,8 +101,8 @@ calculate_voc_average_precision(const std::vector<T> &recall,
  *                               results should be stored.
  * @param global_sort_detections ?
  */
-template <typename T>
-void evaluate_results(typename result_dict<T>::type results, std::string dir,
-                      bool global_sort_detections);
+void evaluate_results(
+    std::map<float, std::map<std::string, std::vector<float>>> results,
+    std::string dir, bool global_sort_detections);
 
 #endif // !EVALUATION_HPP

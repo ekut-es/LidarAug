@@ -130,9 +130,8 @@ void calculate_false_and_true_positive(
   gt.emplace_back(ground_truth);
 }
 
-// template <typename T>
 void evaluate_results(
-    typename result_dict<T>::type results,
+    std::map<float, std::map<std::string, std::vector<float>>> results,
     bool global_sort_detections) {
 
   std::array<float, 3> iou_thresholds{.3, .5, .7};
