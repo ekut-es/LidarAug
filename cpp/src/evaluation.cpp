@@ -6,8 +6,9 @@
 #include <yaml-cpp/yaml.h>
 
 template <typename T>
-T calculate_average_precision(float iou_threshold, bool global_sort_detections,
-                              typename result_dict<T>::type results) {
+T calculate_average_precision(
+    float iou_threshold, bool global_sort_detections,
+    std::map<float, std::map<std::string, std::vector<T>>> results) {
 
   auto iou = results[iou_threshold];
 
@@ -63,7 +64,7 @@ T calculate_average_precision(float iou_threshold, bool global_sort_detections,
 void calculate_false_and_true_positive(
     const torch::Tensor &detection_boxes, torch::Tensor detection_score,
     const torch::Tensor &ground_truth_box, float iou_threshold,
-    typename result_dict<float>::type results) {
+    std::map<float, std::map<std::string, std::vector<float>>> results) {
 
   assert(detection_score.is_contiguous());
 

@@ -8,12 +8,7 @@
 #include <map>
 #include <string>
 #include <torch/torch.h>
-#include <unordered_map>
 #include <vector>
-
-template <typename T> struct result_dict {
-  typedef std::map<float, std::unordered_map<std::string, std::vector<T>>> type;
-};
 
 /**
  * Calculates the false and true positive numbers of the current frames.
@@ -28,14 +23,14 @@ template <typename T> struct result_dict {
  *                         positive numbers as well as the ground truth.
  */
 void calculate_false_and_true_positive(
-    const torch::Tensor &detection_boxes, const torch::Tensor &detection_score,
+    const torch::Tensor &detection_boxes, torch::Tensor detection_score,
     const torch::Tensor &ground_truth_box, float iou_threshold,
-    typename result_dict<float>::type results);
+    std::map<float, std::map<std::string, std::vector<float>>> results);
 
 template <typename T>
-[[nodiscard]] T
-calculate_average_precision(float iou_threshold, bool global_sort_detections,
-                            typename result_dict<T>::type results);
+[[nodiscard]] T calculate_average_precision(
+    float iou_threshold, bool global_sort_detections,
+    std::map<float, std::map<std::string, std::vector<T>>> results);
 
 /**
  * Calculates the Visual Object Classes (VOC) Challenge 2010 average precision.
