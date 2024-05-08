@@ -44,20 +44,6 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 
-FetchContent_Declare(
-  yaml-cpp
-  GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-  GIT_TAG f7320141120f720aecc4c32be25586e7da9eb978
-)
-
-FetchContent_GetProperties(yaml-cpp)
-
-if(NOT yaml-cpp_POPULATED)
-  message(STATUS "Fetching yaml-cpp...")
-  FetchContent_Populate(yaml-cpp)
-  add_subdirectory(${yaml-cpp_SOURCE_DIR} ${yaml-cpp_BINARY_DIR})
-endif()
-
 find_package(Boost REQUIRED)
 
 find_package(Torch REQUIRED)
@@ -83,7 +69,6 @@ target_link_libraries(
   transformations_test
   "${TORCH_LIBRARIES}"
   "${Boost_LIBRARIES}"
-  yaml-cpp::yaml-cpp
   GTest::gtest_main
   # GTest::gtest
 )
