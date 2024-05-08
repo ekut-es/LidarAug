@@ -1,7 +1,7 @@
 from torch import Tensor
 
 
-def evaluate(results: dict[float, dict[str, list]], dir: str,
+def evaluate(results: dict[float, dict[str, list]],
              global_sort_detections: bool):
     ...
 

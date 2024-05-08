@@ -2,9 +2,7 @@
 #include "../include/tensor.hpp"
 #include "../include/utils.hpp"
 #include <algorithm>
-#include <format>
-#include <fstream>
-#include <iostream>
+#include <cstdio>
 #include <yaml-cpp/yaml.h>
 
 template <typename T>
@@ -132,36 +130,20 @@ void calculate_false_and_true_positive(
   gt.emplace_back(ground_truth);
 }
 
-template <typename T>
-void evaluate_results(typename result_dict<T>::type results, std::string dir,
-                      bool global_sort_detections) {
+// template <typename T>
+void evaluate_results(
+    typename result_dict<T>::type results,
+    bool global_sort_detections) {
 
   std::array<float, 3> iou_thresholds{.3, .5, .7};
 
-  YAML::Emitter o;
-  o << YAML::BeginMap;
-
-  std::ranges::for_each(iou_thresholds, [&o, global_sort_detections,
+  std::ranges::for_each(iou_thresholds, [global_sort_detections,
                                          results](auto threshold) {
     auto ap =
         calculate_average_precision(threshold, global_sort_detections, results);
 
-    o << YAML::Key << std::format("ap_%f", threshold);
-    o << YAML::Value << ap;
+    std::printf("ap_%f: %f", threshold, ap);
   });
-
-  o << YAML::EndMap;
-
-  std::cout << o.c_str();
-
-  // writing yaml to file
-  if (!dir.ends_with('/'))
-    dir.append("/");
-
-  dir.append(global_sort_detections ? "eval_global_sort.yaml" : "eval.yaml");
-
-  std::ofstream fout(dir);
-  fout << o.c_str();
 }
 
 #ifdef BUILD_MODULE
