@@ -20,10 +20,9 @@ T calculate_average_precision(float iou_threshold, bool global_sort_detections,
     assert(false_positive.size() == true_positive.size() &&
            true_positive.size() == score.size());
 
-    auto sorted_index = cpp_utils::argsort(score, true);
+    std::ranges::sort(false_positive);
+    std::ranges::sort(true_positive);
 
-    false_positive = false_positive[sorted_index];
-    true_positive = true_positive[sorted_index];
   } else {
     assert(false_positive.size() == true_positive.size());
   }
