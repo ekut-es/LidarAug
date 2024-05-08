@@ -103,6 +103,6 @@ calculate_voc_average_precision(const std::vector<T> &recall,
  */
 void evaluate_results(
     std::map<float, std::map<std::string, std::vector<float>>> results,
-    std::string dir, bool global_sort_detections);
+    bool global_sort_detections);
 
 #endif // !EVALUATION_HPP
