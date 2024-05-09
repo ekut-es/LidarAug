@@ -31,7 +31,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("delete_labels_by_min_points", &delete_labels_by_min_points,
         "function to delete bounding boxes and their names that don't meet a "
         "minimum point threshold in C++",
-        py::return_value_policy::reference_internal);
+        pybind11::return_value_policy::reference_internal);
   m.def("random_point_noise", &random_point_noise,
         "Function to add random noise to point coordinates");
   m.def("transform_along_ray", &transform_along_ray,
