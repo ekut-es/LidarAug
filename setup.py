@@ -1,24 +1,30 @@
-from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CppExtension
+import os
 from setuptools import setup
+from setuptools.command.install import install
 
 MODULE_NAME = "LidarAug"
 
-ext_modules = [
-    CppExtension(
-        name=f"{MODULE_NAME}.transformations",
-        sources=[
-            "cpp/src/transformations/transformations.cpp", "cpp/src/tensor.cpp"
-        ],
-        define_macros=[("BUILD_MODULE", None)],
-    ),
-    CppExtension(
-        name=f"{MODULE_NAME}.weather_simulations",
-        sources=["cpp/src/weather_simulations/weather.cpp"],
-        define_macros=[("BUILD_MODULE", None)],
-    ),
+SO_FILES = [
+    "./cpp/build_files/src/transformations/transformations.cpython-312-x86_64-linux-gnu.so",
+    "./cpp/build_files/src/weather_simulations/weather_simulations.cpython-312-x86_64-linux-gnu.so",
 ]
 
-setup(
-    ext_modules=ext_modules,
-    cmdclass={"build_ext": BuildExtension},
-)
+
+class CustomInstall(install):
+
+    def run(self):
+        install.run(self)
+        self.copy_so_files()
+
+    def copy_so_files(self):
+        print("Starting to copy shared object files...")
+        for so_file in SO_FILES:
+
+            dest_dir = os.path.join(self.install_lib, MODULE_NAME)
+            os.makedirs(dest_dir, exist_ok=True)
+
+            print(f"copying {so_file} -> {dest_dir}")
+            self.copy_file(so_file, dest_dir)
+
+
+setup(cmdclass={"install": CustomInstall}, )
