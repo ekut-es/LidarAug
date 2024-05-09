@@ -5,7 +5,7 @@ configure:
 	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$(TORCH_PATH)" -S ./cpp/ -B ./cpp/build_files
 
 configure_test:
-	cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="$(TORCH_PATH)" -S ./cpp/ -B ./cpp/build_files
+	cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCONTROLLED_RNG=ON -DCMAKE_PREFIX_PATH="$(TORCH_PATH)" -S ./cpp/ -B ./cpp/build_files
 
 build: configure_test
 	cmake --build ./cpp/build_files -j 4
@@ -25,7 +25,7 @@ testpy: ./pytest/test.py
 rerun: ./cpp/build_files
 	cd ./cpp/build_files && ctest --rerun-failed --output-on-failure
 
-install:
+install: release
 	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.12 -m pip install . && rm -rf ./tmp
 
 clean: ./cpp/build_files
