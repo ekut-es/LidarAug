@@ -28,8 +28,8 @@ T calculate_average_precision(
     assert(false_positive.size() == true_positive.size());
   }
 
-  // NOTE(tom): Is this a single value or are there more values?
-  auto ground_truth = iou["GROUND_TRUTH"][0];
+  // NOTE(tom): This is a single value but it has to be in vector form because
+  //            of type constraints
   auto ground_truth = iou["gt"][0];
 
   auto sum = 0;
