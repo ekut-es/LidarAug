@@ -12,11 +12,11 @@ T calculate_average_precision(
 
   auto iou = results[iou_threshold];
 
-  auto false_positive = iou["FALSE_POSITIVE"];
-  auto true_positive = iou["TRUE_POSITIVE"];
+  auto false_positive = iou["fp"];
+  auto true_positive = iou["tp"];
   if (global_sort_detections) {
 
-    auto score = iou["SCORE"];
+    auto score = iou["score"];
 
     assert(false_positive.size() == true_positive.size() &&
            true_positive.size() == score.size());
@@ -30,6 +30,7 @@ T calculate_average_precision(
 
   // NOTE(tom): Is this a single value or are there more values?
   auto ground_truth = iou["GROUND_TRUTH"][0];
+  auto ground_truth = iou["gt"][0];
 
   auto sum = 0;
 
@@ -120,10 +121,10 @@ void calculate_false_and_true_positive(
   }
 
   auto iout = results[iou_threshold];
-  auto sc = iout["SCORE"];
-  auto fp = iout["FALSE_POSITIVE"];
-  auto tp = iout["TRUE_POSITIVE"];
-  auto gt = iout["GROUND_TRUTH"];
+  auto sc = iout["score"];
+  auto fp = iout["fp"];
+  auto tp = iout["tp"];
+  auto gt = iout["gt"];
 
   sc.insert(sc.end(), l_detection_score.begin(), l_detection_score.end());
   fp.insert(fp.end(), false_positive.begin(), false_positive.end());
