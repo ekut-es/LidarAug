@@ -61,8 +61,11 @@ calculate_voc_average_precision(const std::vector<T> &recall,
                  mean_precision.begin() + 1, [](const T val) { return val; });
 
   // TOOD(tom): I want to do this with std::generate but I don't think I can
-  //            because I'd need access to the iterator
-  for (std::size_t i = mean_precision.size() - 2; i >= 0; i--) {
+  //            because I'd need access to the iterator.
+  //            Also I assume for this, that a i64 is enough (to avoid `i`
+  //            wrapping around). If that turns out not to be the case, the
+  //            termination of this for will have to be handled differently.
+  for (std::int64_t i = mean_precision.size() - 2; i >= 0; i--) {
     mean_precision[i] = std::max(mean_precision[i], mean_precision[i + 1]);
   }
 
