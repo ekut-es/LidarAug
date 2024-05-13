@@ -143,7 +143,7 @@ void evaluate_results(
     auto ap =
         calculate_average_precision(threshold, global_sort_detections, results);
 
-    std::printf("ap_%f: %f", threshold, ap);
+    std::printf("ap_%f: %f\n", threshold, ap);
   });
 }
 
