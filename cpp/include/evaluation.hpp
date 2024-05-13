@@ -99,7 +99,7 @@ calculate_voc_average_precision(const std::vector<T> &recall,
  *                               results should be stored.
  * @param global_sort_detections ?
  */
-void evaluate_results(
+std::array<float, 3> evaluate_results(
     std::map<float, std::map<std::string, std::vector<float>>> results,
     bool global_sort_detections);
 

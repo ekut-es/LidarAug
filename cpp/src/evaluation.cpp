@@ -132,19 +132,24 @@ void calculate_false_and_true_positive(
   gt.emplace_back(ground_truth);
 }
 
-void evaluate_results(
+std::array<float, 3> evaluate_results(
     std::map<float, std::map<std::string, std::vector<float>>> results,
     bool global_sort_detections) {
 
   std::array<float, 3> iou_thresholds{.3, .5, .7};
+  std::array<float, 3> aps;
 
-  std::ranges::for_each(iou_thresholds, [global_sort_detections,
-                                         results](auto threshold) {
-    auto ap =
-        calculate_average_precision(threshold, global_sort_detections, results);
+  std::transform(iou_thresholds.begin(), iou_thresholds.end(), aps.begin(),
+                 [global_sort_detections, results](auto threshold) {
+                   auto ap = calculate_average_precision(
+                       threshold, global_sort_detections, results);
 
-    std::printf("ap_%f: %f\n", threshold, ap);
-  });
+                   std::printf("ap_%f: %f\n", threshold, ap);
+
+                   return ap;
+                 });
+
+  return aps;
 }
 
 #ifdef BUILD_MODULE
