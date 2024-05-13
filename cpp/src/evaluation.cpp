@@ -3,7 +3,6 @@
 #include "../include/utils.hpp"
 #include <algorithm>
 #include <cstdio>
-#include <yaml-cpp/yaml.h>
 
 template <typename T>
 T calculate_average_precision(
@@ -14,6 +13,7 @@ T calculate_average_precision(
 
   auto false_positive = iou["fp"];
   auto true_positive = iou["tp"];
+
   if (global_sort_detections) {
 
     auto score = iou["score"];
