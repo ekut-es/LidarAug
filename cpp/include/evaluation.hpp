@@ -4,11 +4,15 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <execution>
 #include <map>
 #include <string>
 #include <torch/torch.h>
 #include <vector>
+
+typedef std::map<std::uint8_t, std::map<std::string, std::vector<float>>>
+    result_dict;
 
 /**
  * Calculates the false and true positive numbers of the current frames.
