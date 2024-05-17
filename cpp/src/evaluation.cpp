@@ -121,16 +121,28 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
     }
   }
 
-  auto iout = results[iou_threshold];
-  auto sc = iout["score"];
-  auto fp = iout["fp"];
-  auto tp = iout["tp"];
-  auto gt = iout["gt"];
+  auto insert_list = [iou_threshold, &results](const std::string &key,
+                                               const std::vector<float> &list) {
+    // NOTE(tom): this is necessary for some reason because pybind
+    results[static_cast<std::uint8_t>(iou_threshold * 10)][key].insert(
+        results[static_cast<std::uint8_t>(iou_threshold * 10)][key].end(),
+        list.begin(), list.end());
+  };
 
-  sc.insert(sc.end(), l_detection_score.begin(), l_detection_score.end());
-  fp.insert(fp.end(), false_positive.begin(), false_positive.end());
-  tp.insert(tp.end(), true_positive.begin(), true_positive.end());
-  gt.emplace_back(ground_truth);
+  insert_list("score", l_detection_score);
+  insert_list("fp", false_positive);
+  insert_list("tp", true_positive);
+
+  // set ground truth
+  if (results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"].size() ==
+      0) {
+    results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"].emplace_back(
+        ground_truth);
+  } else {
+
+    results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"][0] =
+        ground_truth;
+  }
 }
 
 std::array<float, 3> evaluate_results(
