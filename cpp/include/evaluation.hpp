@@ -26,10 +26,11 @@ typedef std::map<std::uint8_t, std::map<std::string, std::vector<float>>>
  * @param results          is an unordered map containing the false- & true
  *                         positive numbers as well as the ground truth.
  */
-void calculate_false_and_true_positive(
-    const torch::Tensor &detection_boxes, torch::Tensor detection_score,
-    const torch::Tensor &ground_truth_box, float iou_threshold,
-    std::map<float, std::map<std::string, std::vector<float>>> results);
+void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
+                                       torch::Tensor detection_score,
+                                       const torch::Tensor &ground_truth_box,
+                                       float iou_threshold,
+                                       result_dict &results);
 
 template <typename T>
 [[nodiscard]] T calculate_average_precision(
