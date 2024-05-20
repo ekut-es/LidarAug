@@ -160,3 +160,17 @@ def test_delete_labels_by_min_points():
     assert labels.equal(expected_labels)
 
     assert names.equal(expected_names)
+
+
+def check_precision(val1: float, val2: float, precision: int) -> None:
+    """
+    Asserts that two floating point values are equal up a certain amount of digits after the comma.
+
+    :param val1:       First comparison value.
+    :param val2:       Second comparison value.
+    :param precision:  The number of significant digits after the comma.
+    """
+
+    multiplier = 10**precision
+
+    assert int(val1 * multiplier) == int(val2 * multiplier)
