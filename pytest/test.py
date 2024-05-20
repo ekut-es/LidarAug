@@ -1,8 +1,11 @@
 from contextlib import nullcontext as does_not_raise
+import os
+import pickle
 import pytest
 
 import torch
 from LidarAug import augmentations as aug
+from LidarAug import evaluation
 from LidarAug.transformations import NoiseType, DistributionRange, DistributionRanges, IntensityRange
 
 import re
@@ -174,3 +177,33 @@ def check_precision(val1: float, val2: float, precision: int) -> None:
     multiplier = 10**precision
 
     assert int(val1 * multiplier) == int(val2 * multiplier)
+
+
+@pytest.mark.evaltest
+def test_evaluate():
+    data_path = "./pytest/data/"
+
+    files = os.listdir(data_path)
+
+    for file in files:
+        path = data_path + file
+        with open(path, 'rb') as f:
+            dump_dict: dict = pickle.load(f)
+
+            results = dump_dict["result_stat"]
+            aps = evaluation.evaluate(results, False)
+
+            expected_aps = dump_dict["ap_dict"]
+            ap_keys = list(expected_aps.keys())
+
+            ap_30_key = ap_keys[0]
+            ap_50_key = ap_keys[1]
+            ap_70_key = ap_keys[2]
+
+            ap_30 = expected_aps[ap_30_key]
+            ap_50 = expected_aps[ap_50_key]
+            ap_70 = expected_aps[ap_70_key]
+
+            check_precision(aps[0], ap_30, 4)
+            check_precision(aps[1], ap_50, 4)
+            check_precision(aps[2], ap_70, 4)
