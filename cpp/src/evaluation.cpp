@@ -51,12 +51,12 @@ T calculate_average_precision(
       true_positive.begin(), true_positive.end(), recall.begin(),
       [ground_truth](const T tp_val) { return tp_val / ground_truth; });
 
+  std::vector<T> precision;
+  precision.resize(true_positive.size());
 
-  auto precision = true_positive;
-
-  for (std::size_t i = 0; i < true_positive.size(); i++) {
-    precision[i] = static_cast<float>(true_positive[i]) /
-                   (false_positive[i] + true_positive[i]);
+  for (std::size_t i = 0; i < precision.capacity(); i++) {
+    precision.emplace_back(static_cast<T>(true_positive[i]) /
+                           (false_positive[i] + true_positive[i]));
   }
 
   return calculate_voc_average_precision<T>(recall, precision);
