@@ -46,11 +46,11 @@ T calculate_average_precision(
     true_positive[i] += sum;
   }
 
-  auto recall = true_positive;
+  std::vector<T> recall(true_positive.size());
+  std::transform(
+      true_positive.begin(), true_positive.end(), recall.begin(),
+      [ground_truth](const T tp_val) { return tp_val / ground_truth; });
 
-  for (std::size_t i = 0; i < true_positive.size(); i++) {
-    recall[i] = static_cast<float>(true_positive[i]) / ground_truth;
-  }
 
   auto precision = true_positive;
 
