@@ -35,15 +35,17 @@ T calculate_average_precision(
   auto sum = 0;
 
   for (std::size_t i = 0; i < false_positive.size(); i++) {
-    sum += false_positive[i];
+    auto val = false_positive[i];
     false_positive[i] += sum;
+    sum += val;
   }
 
   sum = 0;
 
   for (std::size_t i = 0; i < true_positive.size(); i++) {
-    sum += true_positive[i];
+    auto val = true_positive[i];
     true_positive[i] += sum;
+    sum += val;
   }
 
   std::vector<T> recall(true_positive.size());
