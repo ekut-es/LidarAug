@@ -17,7 +17,7 @@ ext_modules = [
         extra_compile_args=['-std=c++20'],
     ),
     CppExtension(name=f"{MODULE_NAME}.evaluation",
-                 sources=["cpp/src/evaluation.cpp"],
+                 sources=["cpp/src/evaluation.cpp", "cpp/src/utils.cpp"],
                  define_macros=[("BUILD_MODULE", None)],
                  extra_compile_args=['-std=c++20']),
 ]
