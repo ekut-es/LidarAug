@@ -66,6 +66,32 @@ compute_condition_number(const torch::Tensor &matrix) {
 namespace torch_utils {
 constexpr auto F32 = torch::kF32;
 constexpr auto F64 = torch::kF64;
+
+[[nodiscard]] torch::Tensor rotate_yaw_t(torch::Tensor points,
+                                         torch::Tensor angle);
+
+/**
+ * Converts bounding boxes tensor with shape (N, 7) to a different tensor with
+ * shape (N, 8, 3) where the boxes are represented using their 8 corners and
+ * their coordinates in space.
+ *
+ *      7 -------- 4
+ *     /|         /|
+ *    6 -------- 5 .
+ *    | |        | |
+ *    . 3 -------- 0
+ *    |/         |/
+ *    2 -------- 1
+ *
+ *  @param boxes: is the input: (N, 7) with
+ *                [x, y, z, dx, dy, dz, heading],
+ *                and (x, y, z) as the box center
+ *
+ *  @returns: a new tensor (shape: (N, 8, 3)).
+ *
+ */
+[[nodiscard]] torch::Tensor boxes_to_corners(torch::Tensor boxes);
+
 } // namespace torch_utils
 
 namespace evaluation_utils {
