@@ -54,7 +54,7 @@ T calculate_average_precision(
       [ground_truth](const T tp_val) { return tp_val / ground_truth; });
 
   std::vector<T> precision;
-  precision.resize(true_positive.size());
+  precision.reserve(true_positive.size());
 
   for (std::size_t i = 0; i < precision.capacity(); i++) {
     precision.emplace_back(static_cast<T>(true_positive[i]) /
