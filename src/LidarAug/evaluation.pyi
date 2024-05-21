@@ -7,6 +7,13 @@ def evaluate(results: dict[float, dict[str, list[float]]],
 
 
 class result_dict:
+    """
+    Wrapping type around a
+    C++ `std::map<std::uint8_t, std::map<std::string, std::vector<float>>>`
+
+    converts into a
+    Python `dict[int, dict[str, list[float]]]`
+    """
 
     def __init__(self):
         ...
@@ -16,6 +23,12 @@ class result_dict:
 
 
 def make_result_dict(input: dict[int, dict[str, list[float]]]) -> result_dict:
+    """
+    Create a `result_dict` aka `std::map<std::uint8_t, std::map<std::string, std::vector<float>>>` from a `dict[int, dict[str, list[float]]]`.
+
+    :param input: A Python `dict[int, dict[str, list[float]]]`.
+    :return: A `result_dict` (C++ `std::map<std::uint8_t, std::map<std::string, std::vector<float>>>`).
+    """
     ...
 
 
