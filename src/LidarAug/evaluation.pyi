@@ -7,7 +7,12 @@ def evaluate(results: dict[float, dict[str, list[float]]],
 
 
 class result_dict:
-    ...
+
+    def __init__(self):
+        ...
+
+    def __iter__(self):
+        ...
 
 
 def calculate_false_and_true_positive(detection_boxes: Tensor,
