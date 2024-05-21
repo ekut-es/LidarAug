@@ -180,6 +180,34 @@ def check_precision(val1: float, val2: float, precision: int) -> None:
 
 
 @pytest.mark.evaltest
+def test_result_dict_factory():
+    expected = {
+        3: {
+            'tp': [],
+            'fp': [],
+            'gt': [0],
+            'score': []
+        },
+        5: {
+            'tp': [],
+            'fp': [],
+            'gt': [0],
+            'score': []
+        },
+        7: {
+            'tp': [],
+            'fp': [],
+            'gt': [0],
+            'score': []
+        }
+    }
+
+    r = evaluation.make_result_dict(expected)
+
+    assert dict(r) == expected
+
+
+@pytest.mark.evaltest
 def test_evaluate():
     data_path = "./pytest/data/"
 
