@@ -104,11 +104,13 @@ typedef boost::geometry::model::multi_polygon<polygon_t> multi_polygon_t;
 [[nodiscard]] inline std::vector<polygon_t>
 convert_format(const torch::Tensor &boxes) {
 
+  const auto corners = torch_utils::boxes_to_corners(boxes);
+
   std::vector<polygon_t> ps;
 
-  ps.resize(static_cast<std::size_t>(boxes.size(0)));
-  for (tensor_size_t i = 0; i < boxes.size(0); i++) {
-    auto box = boxes[i];
+  ps.resize(static_cast<std::size_t>(corners.size(0)));
+  for (tensor_size_t i = 0; i < corners.size(0); i++) {
+    auto box = corners[i];
 
     point_t p1{box[0][0].item<float>(), box[0][1].item<float>()};
     point_t p2{box[1][0].item<float>(), box[1][1].item<float>()};
