@@ -106,12 +106,12 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
         *std::max_element(std::execution::par_unseq, ious.begin(), ious.end()) <
             iou_threshold) {
 
-      false_positive.push_back(1);
-      true_positive.push_back(0);
+      false_positive.emplace_back(1);
+      true_positive.emplace_back(0);
 
     } else {
-      false_positive.push_back(0);
-      true_positive.push_back(1);
+      false_positive.emplace_back(0);
+      true_positive.emplace_back(1);
 
       auto gt_indices = torch::argmax(torch::from_blob(
           ious.data(), static_cast<tensor_size_t>(ious.size())));
