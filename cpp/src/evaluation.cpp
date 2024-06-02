@@ -142,7 +142,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
         ground_truth);
   } else {
 
-    results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"][0] =
+    results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"][0] +=
         ground_truth;
   }
 }
