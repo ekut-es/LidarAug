@@ -218,7 +218,8 @@ def test_evaluate():
         with open(path, 'rb') as f:
             dump_dict: dict = pickle.load(f)
 
-            results = dump_dict["result_stat_tp_fp"]
+            results = evaluation.make_result_dict(
+                dump_dict["result_stat_tp_fp"])
             aps = evaluation.evaluate(results, False)
 
             expected_aps = dump_dict["ap_dict"]
@@ -297,7 +298,7 @@ def test_false_and_true_positive():
                     evaluation.calculate_false_and_true_positive(
                         boxes_lidar, score, gt, threshold, result_stat)
 
-                expected = dump_dict["result_stat_tp_fp"][threshold]
+                expected = dump_dict["result_stat_tp_fp"][int(threshold * 10)]
 
                 result = result_stat[int(threshold * 10)]
 

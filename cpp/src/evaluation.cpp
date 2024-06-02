@@ -7,9 +7,9 @@
 template <typename T>
 T calculate_average_precision(
     float iou_threshold, bool global_sort_detections,
-    std::map<float, std::map<std::string, std::vector<T>>> results) {
+    std::map<std::uint8_t, std::map<std::string, std::vector<T>>> results) {
 
-  auto iou = results[iou_threshold];
+  auto iou = results[static_cast<std::uint8_t>(iou_threshold * 10)];
 
   auto false_positive = iou["fp"];
   auto true_positive = iou["tp"];
@@ -146,9 +146,8 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
   }
 }
 
-std::array<float, 3> evaluate_results(
-    std::map<float, std::map<std::string, std::vector<float>>> results,
-    bool global_sort_detections) {
+std::array<float, 3> evaluate_results(result_dict results,
+                                      bool global_sort_detections) {
 
   std::array<float, 3> iou_thresholds{.3, .5, .7};
   std::array<float, 3> aps;
