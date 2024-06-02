@@ -209,7 +209,7 @@ def test_result_dict_factory():
 
 @pytest.mark.evaltest
 def test_evaluate():
-    data_path = "./pytest/all_frames/"
+    data_path = "./pytest/data/"
 
     files = os.listdir(data_path)
 
@@ -264,7 +264,7 @@ def test_false_and_true_positive():
 
     thresholds = [.3, .5, .7]
 
-    data_path = "./pytest/all_frames/"
+    data_path = "./pytest/data/"
 
     files = os.listdir(data_path)
 
