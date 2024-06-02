@@ -107,8 +107,8 @@ convert_format(const torch::Tensor &boxes) {
   const auto corners = torch_utils::boxes_to_corners(boxes);
 
   std::vector<polygon_t> ps;
+  ps.reserve(static_cast<std::size_t>(corners.size(0)));
 
-  ps.resize(static_cast<std::size_t>(corners.size(0)));
   for (tensor_size_t i = 0; i < corners.size(0); i++) {
     auto box = corners[i];
 
