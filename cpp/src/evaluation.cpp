@@ -113,13 +113,14 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
       false_positive.emplace_back(0);
       true_positive.emplace_back(1);
 
-      auto gt_indices = torch::argmax(torch::from_blob(
-          ious.data(), static_cast<tensor_size_t>(ious.size())));
+      auto gt_index =
+          torch::argmax(
+              torch::from_blob(ious.data(),
+                               static_cast<tensor_size_t>(ious.size())))
+              .item<tensor_size_t>();
 
-      for (tensor_size_t j = 0; j < gt_indices.size(0); j++) {
-        ground_truth_polygon_list.erase(ground_truth_polygon_list.begin() +
-                                        gt_indices[j].item<tensor_size_t>());
-      }
+      ground_truth_polygon_list.erase(ground_truth_polygon_list.begin() +
+                                      gt_index);
     }
   }
 
