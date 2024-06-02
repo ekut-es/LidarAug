@@ -11,16 +11,17 @@ namespace torch_utils {
 [[nodiscard]] torch::Tensor boxes_to_corners(torch::Tensor boxes) {
 
   auto t = torch::tensor({
-               {1, 1, -1},
                {1, -1, -1},
-               {-1, -1, -1},
+               {1, 1, -1},
                {-1, 1, -1},
-               {1, 1, 1},
+               {-1, -1, -1},
                {1, -1, 1},
-               {-1, -1, 1},
+               {1, 1, 1},
                {-1, 1, 1},
+               {-1, -1, 1},
            }) /
            2;
+
   auto corners = boxes.index({Slice(), None, Slice(3, 6)}).repeat({1, 8, 1}) *
                  t.index({None, Slice(), Slice()});
 
