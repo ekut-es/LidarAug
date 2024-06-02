@@ -209,7 +209,7 @@ def test_result_dict_factory():
 
 @pytest.mark.evaltest
 def test_evaluate():
-    data_path = "./pytest/data/"
+    data_path = "./pytest/all_frames/"
 
     files = os.listdir(data_path)
 
