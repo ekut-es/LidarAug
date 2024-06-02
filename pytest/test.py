@@ -218,7 +218,7 @@ def test_evaluate():
         with open(path, 'rb') as f:
             dump_dict: dict = pickle.load(f)
 
-            results = dump_dict["result_stat"]
+            results = dump_dict["result_stat_tp_fp"]
             aps = evaluation.evaluate(results, False)
 
             expected_aps = dump_dict["ap_dict"]
