@@ -35,7 +35,8 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 template <typename T>
 [[nodiscard]] T calculate_average_precision(
     float iou_threshold, bool global_sort_detections,
-    const std::map<std::uint8_t, std::map<std::string, std::vector<T>>> &results);
+    const std::map<std::uint8_t, std::map<std::string, std::vector<T>>>
+        &results);
 
 /**
  * Calculates the Visual Object Classes (VOC) Challenge 2010 average precision.
