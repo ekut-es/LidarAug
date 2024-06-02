@@ -100,11 +100,9 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
     auto ious = evaluation_utils::iou<float>(detection_polygon,
                                              ground_truth_polygon_list);
 
+    // NOTE(tom): This depends on the left condition being evaluated first!
     if (ground_truth_polygon_list.empty() ||
-        // NOTE(tom): I have parallelized this, but this might only be worth it
-        //            for larger sizes `boxes`. Should be perf tested.
-        *std::max_element(std::execution::par_unseq, ious.begin(), ious.end()) <
-            iou_threshold) {
+        *std::max_element(ious.begin(), ious.end()) < iou_threshold) {
 
       false_positive.emplace_back(1);
       true_positive.emplace_back(0);
