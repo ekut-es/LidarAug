@@ -98,7 +98,7 @@ namespace evaluation_utils {
 
 typedef boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>
     point_t;
-typedef boost::geometry::model::polygon<point_t> polygon_t;
+typedef boost::geometry::model::polygon<point_t, false> polygon_t;
 typedef boost::geometry::model::multi_polygon<polygon_t> multi_polygon_t;
 
 [[nodiscard]] inline std::vector<polygon_t>
@@ -117,7 +117,7 @@ convert_format(const torch::Tensor &boxes) {
     point_t p3{box[2][0].item<float>(), box[2][1].item<float>()};
     point_t p4{box[3][0].item<float>(), box[3][1].item<float>()};
 
-    polygon_t p{{p1, p2, p3, p4}};
+    polygon_t p{{p1, p2, p3, p4, p1}};
 
     ps.emplace_back(p);
   }
