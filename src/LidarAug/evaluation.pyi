@@ -21,6 +21,9 @@ class result_dict:
     def __iter__(self):
         ...
 
+    def __getitem__(self, key):
+        ...
+
 
 def make_result_dict(input: dict[int, dict[str, list[float]]]) -> result_dict:
     """
