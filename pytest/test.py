@@ -302,12 +302,12 @@ def test_false_and_true_positive():
 
                 result = result_stat[int(threshold * 10)]
 
-                assert result['fp'] == expected['fp']
-                assert result['tp'] == expected['tp']
-                assert result['gt'][0] == expected['gt'][0]
                 assert len(result['fp']) == len(expected['fp'])
                 assert len(result['tp']) == len(expected['tp'])
                 assert len(result['score']) == len(expected['score'])
+                assert result['gt'][0] == expected['gt'][0]
+                assert result['fp'] == expected['fp']
+                assert result['tp'] == expected['tp']
 
                 for result_score, expected_score in zip(
                         result['score'], expected['score']):
