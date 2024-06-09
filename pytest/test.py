@@ -1,8 +1,11 @@
 from contextlib import nullcontext as does_not_raise
+import os
+import pickle
 import pytest
 
 import torch
 from LidarAug import augmentations as aug
+from LidarAug import evaluation
 from LidarAug.transformations import NoiseType, DistributionRange, DistributionRanges, IntensityRange
 
 import re
@@ -160,3 +163,152 @@ def test_delete_labels_by_min_points():
     assert labels.equal(expected_labels)
 
     assert names.equal(expected_names)
+
+
+def check_precision(val1: float, val2: float, precision: int) -> None:
+    """
+    Asserts that two floating point values are equal up a certain amount of digits after the comma.
+
+    :param val1:       First comparison value.
+    :param val2:       Second comparison value.
+    :param precision:  The number of significant digits after the comma.
+    """
+
+    multiplier = 10**precision
+
+    assert int(val1 * multiplier) == int(val2 * multiplier)
+
+
+@pytest.mark.evaltest
+def test_result_dict_factory():
+    expected = {
+        3: {
+            'tp': [],
+            'fp': [],
+            'gt': [0],
+            'score': []
+        },
+        5: {
+            'tp': [],
+            'fp': [],
+            'gt': [0],
+            'score': []
+        },
+        7: {
+            'tp': [],
+            'fp': [],
+            'gt': [0],
+            'score': []
+        }
+    }
+
+    r = evaluation.make_result_dict(expected)
+
+    assert dict(r) == expected
+
+
+@pytest.mark.evaltest
+def test_evaluate():
+    data_path = "./pytest/data/"
+
+    files = os.listdir(data_path)
+
+    for file in files:
+        path = data_path + file
+        with open(path, 'rb') as f:
+            dump_dict: dict = pickle.load(f)
+
+            results = evaluation.make_result_dict(
+                dump_dict["result_stat_tp_fp"])
+            aps = evaluation.evaluate(results, False)
+
+            expected_aps = dump_dict["ap_dict"]
+            ap_keys = list(expected_aps.keys())
+
+            ap_30_key = ap_keys[0]
+            ap_50_key = ap_keys[1]
+            ap_70_key = ap_keys[2]
+
+            ap_30 = expected_aps[ap_30_key]
+            ap_50 = expected_aps[ap_50_key]
+            ap_70 = expected_aps[ap_70_key]
+
+            check_precision(aps[0], ap_30, 4)
+            check_precision(aps[1], ap_50, 4)
+            check_precision(aps[2], ap_70, 4)
+
+
+@pytest.mark.evaltest
+def test_false_and_true_positive():
+
+    result_stat_template = {
+        3: {
+            'tp': [],
+            'fp': [],
+            'gt': [0],
+            'score': []
+        },
+        5: {
+            'tp': [],
+            'fp': [],
+            'gt': [0],
+            'score': []
+        },
+        7: {
+            'tp': [],
+            'fp': [],
+            'gt': [0],
+            'score': []
+        }
+    }
+
+    thresholds = [.3, .5, .7]
+
+    data_path = "./pytest/data/"
+
+    files = os.listdir(data_path)
+
+    for file in files:
+
+        print(f"file: {file}")
+
+        path = data_path + file
+        with open(path, 'rb') as f:
+
+            print(f"\n----- file: {file} -----\n")
+
+            dump_dict: dict = pickle.load(f)
+
+            result_stat = evaluation.make_result_dict(result_stat_template)
+
+            for threshold in thresholds:
+
+                print(f"\n------ threshold: {threshold} -----\n")
+
+                for i, gt_anno in enumerate(dump_dict["gt_anno"]):
+
+                    boxes_lidar = torch.from_numpy(
+                        dump_dict["det_anno"][i]['boxes_lidar'])
+                    score = torch.from_numpy(dump_dict["det_anno"][i]['score'])
+                    gt = torch.from_numpy(gt_anno)
+
+                    if len(gt) == 0 or len(boxes_lidar) == 0:
+                        continue
+
+                    evaluation.calculate_false_and_true_positive(
+                        boxes_lidar, score, gt, threshold, result_stat)
+
+                expected = dump_dict["result_stat_tp_fp"][int(threshold * 10)]
+
+                result = result_stat[int(threshold * 10)]
+
+                assert len(result['fp']) == len(expected['fp'])
+                assert len(result['tp']) == len(expected['tp'])
+                assert len(result['score']) == len(expected['score'])
+                assert result['gt'][0] == expected['gt'][0]
+                assert result['fp'] == expected['fp']
+                assert result['tp'] == expected['tp']
+
+                for result_score, expected_score in zip(
+                        result['score'], expected['score']):
+                    check_precision(result_score, expected_score, 2)
