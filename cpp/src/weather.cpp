@@ -50,7 +50,7 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
 
   const auto altered_points = selected.logical_and(deleted.logical_not());
   const auto num_altered_points =
-      point_cloud.index({altered_points, Slice(None, 3)}).item<tensor_size_t>();
+      point_cloud.index({altered_points, Slice(None, 3)}).size(0);
 
   if (num_altered_points > 0) {
     std::exponential_distribution<float> exp_d(beta);
