@@ -18,7 +18,8 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
               float delete_probability, float beta,
               std::uniform_real_distribution<float> &percentage_distrib) {
 
-  const auto dist = point_cloud.index({Slice(), Slice(None, 3)}).pow(2).sqrt();
+  const auto dist =
+      point_cloud.index({Slice(), Slice(None, 3)}).pow(2).sum(1).sqrt();
   const auto modify_probability = 1 - exp(-extinction_factor * dist);
 
   const auto threshold_data_size = modify_probability.size(0);
