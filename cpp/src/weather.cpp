@@ -60,7 +60,7 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
   return point_cloud.index({deleted.logical_not(), Slice()});
 }
 
-[[nodiscard]] std::optional<torch::List<torch::Tensor>>
+[[nodiscard]] std::optional<std::vector<torch::Tensor>>
 fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
     float sigma, int mean) {
 
@@ -100,7 +100,7 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
     const dimensions pc_dims = {point_cloud.size(0), point_cloud.size(1),
                                 point_cloud.size(2)};
 
-    torch::List<torch::Tensor> batch;
+    std::vector<torch::Tensor> batch;
     batch.reserve(static_cast<std::size_t>(pc_dims.batch_size));
     for (tensor_size_t i = 0; i < pc_dims.batch_size; i++) {
       auto new_pc =
