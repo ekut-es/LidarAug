@@ -37,7 +37,7 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
 
   // changing intensity of unaltered points according to beer lambert law
   point_cloud.index({selected.logical_not(), 3}) *=
-      exp(-(2.99573 / viewing_dist) * 2 * dist[selected.logical_not()]);
+      exp(-(2.99573 / viewing_dist) * 2 * dist.index({selected.logical_not()}));
 
   const auto altered_points = selected.logical_and(deleted.logical_not());
   const auto num_altered_points =
