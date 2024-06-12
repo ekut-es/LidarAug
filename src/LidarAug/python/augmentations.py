@@ -374,13 +374,3 @@ def apply_transformation(points: Tensor,
     _check_points(points)
 
     transformations.apply_transformation(points, transformations_matrix)
-
-
-def fog(point_cloud: Tensor, prob: float,
-        metric: weather_simulations.FogParameter, sigma: float,
-        mean: int) -> None:
-    result = weather_simulations.fog(point_cloud, prob, metric, sigma, mean)
-
-    if result:
-        # NOTE(tom): It is necessary to call `value()` here, since this is a C++ optional
-        point_cloud = result.value()  # pyright: ignore
