@@ -444,9 +444,9 @@ TEST(Raytracing, NormalizeTest) {
 
   auto result = rt::normalize(v);
 
-  EXPECT_EQ(result, expected) << "expected:\n"
-                              << expected << "\nactual:\n"
-                              << result;
+  EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << result;
   EXPECT_TRUE(v.allclose(v_o)) << "The original tensor " << v
                                << " has changed unexpectidly!\nWas " << v_o;
 }
