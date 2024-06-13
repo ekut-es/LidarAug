@@ -372,8 +372,8 @@ TEST(Raytracing, MulTest) {
   EXPECT_TRUE(result.equal(expected)) << "expected:\n"
                                       << expected << "\nactual:\n"
                                       << result;
-  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v
-                            << " has changed unexpectidly!\nWas " << v_o;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
 }
 
 TEST(Raytracing, AddTest) {
@@ -393,12 +393,12 @@ TEST(Raytracing, AddTest) {
                                       << expected << "\nactual:\n"
                                       << result;
 
-  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v
-                            << " has changed unexpectidly!\nWas " << v_o;
-  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k
-                            << " has changed unexpectidly!\nWas " << k_o;
-  EXPECT_TRUE(l.equal(l_o)) << "The original tensor " << l
-                            << " has changed unexpectidly!\nWas " << l_o;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k_o
+                            << " has changed unexpectidly!\nWas " << k;
+  EXPECT_TRUE(l.equal(l_o)) << "The original tensor " << l_o
+                            << " has changed unexpectidly!\nWas " << l;
 }
 
 TEST(Raytracing, ScalarTest) {
@@ -415,10 +415,10 @@ TEST(Raytracing, ScalarTest) {
   EXPECT_EQ(result, expected) << "expected:\n"
                               << expected << "\nactual:\n"
                               << result;
-  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v
-                            << " has changed unexpectidly!\nWas " << v_o;
-  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k
-                            << " has changed unexpectidly!\nWas " << k_o;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k_o
+                            << " has changed unexpectidly!\nWas " << k;
 }
 
 TEST(Raytracing, VectorLengthTest) {
@@ -432,8 +432,8 @@ TEST(Raytracing, VectorLengthTest) {
   EXPECT_EQ(result, expected) << "expected:\n"
                               << expected << "\nactual:\n"
                               << result;
-  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v
-                            << " has changed unexpectidly!\nWas " << v_o;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
 }
 
 TEST(Raytracing, NormalizeTest) {
@@ -447,8 +447,8 @@ TEST(Raytracing, NormalizeTest) {
   EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
                                          << expected << "\nactual:\n"
                                          << result;
-  EXPECT_TRUE(v.allclose(v_o)) << "The original tensor " << v
-                               << " has changed unexpectidly!\nWas " << v_o;
+  EXPECT_TRUE(v.allclose(v_o)) << "The original tensor " << v_o
+                               << " has changed unexpectidly!\nWas " << v;
 }
 
 // doing tests with controlled random number generation (no random seed)
