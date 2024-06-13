@@ -377,15 +377,15 @@ TEST(Raytracing, MulTest) {
 }
 
 TEST(Raytracing, AddTest) {
-  auto v = torch::tensor({1, 2, 3});
-  auto k = torch::tensor({1, 2, 3});
-  auto l = torch::tensor({1, 2, 3});
+  auto v = torch::tensor({1, 2, 3}, F32);
+  auto k = torch::tensor({1, 2, 3}, F32);
+  auto l = torch::tensor({1, 2, 3}, F32);
 
-  auto v_o = torch::tensor({1, 2, 3});
-  auto k_o = torch::tensor({1, 2, 3});
-  auto l_o = torch::tensor({1, 2, 3});
+  auto v_o = torch::tensor({1, 2, 3}, F32);
+  auto k_o = torch::tensor({1, 2, 3}, F32);
+  auto l_o = torch::tensor({1, 2, 3}, F32);
 
-  auto expected = torch::tensor({3, 6, 9});
+  auto expected = torch::tensor({3, 6, 9}, F32);
 
   auto result = rt::add(v, k, l);
 
@@ -402,11 +402,11 @@ TEST(Raytracing, AddTest) {
 }
 
 TEST(Raytracing, ScalarTest) {
-  auto v = torch::tensor({1, 2, 3});
-  auto k = torch::tensor({1, 2, 3});
+  auto v = torch::tensor({1, 2, 3}, F32);
+  auto k = torch::tensor({1, 2, 3}, F32);
 
-  auto v_o = torch::tensor({1, 2, 3});
-  auto k_o = torch::tensor({1, 2, 3});
+  auto v_o = torch::tensor({1, 2, 3}, F32);
+  auto k_o = torch::tensor({1, 2, 3}, F32);
 
   auto expected = 14.0f;
 
@@ -422,8 +422,8 @@ TEST(Raytracing, ScalarTest) {
 }
 
 TEST(Raytracing, VectorLengthTest) {
-  auto v = torch::tensor({6, 2, 3});
-  auto v_o = torch::tensor({6, 2, 3});
+  auto v = torch::tensor({6, 2, 3}, F32);
+  auto v_o = torch::tensor({6, 2, 3}, F32);
 
   auto expected = 7.0f;
 
@@ -437,10 +437,10 @@ TEST(Raytracing, VectorLengthTest) {
 }
 
 TEST(Raytracing, NormalizeTest) {
-  auto v = torch::tensor({6, 2, 3});
-  auto v_o = torch::tensor({6, 2, 3});
+  auto v = torch::tensor({6, 2, 3}, F32);
+  auto v_o = torch::tensor({6, 2, 3}, F32);
 
-  auto expected = torch::tensor({6 / 7, 2 / 7, 3 / 7});
+  auto expected = torch::tensor({6 / 7.0f, 2 / 7.0f, 3 / 7.0f}, F32);
 
   auto result = rt::normalize(v);
 
