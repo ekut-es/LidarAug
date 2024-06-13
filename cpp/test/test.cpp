@@ -401,6 +401,26 @@ TEST(Raytracing, AddTest) {
                             << " has changed unexpectidly!\nWas " << l_o;
 }
 
+TEST(Raytracing, ScalarTest) {
+  auto v = torch::tensor({1, 2, 3});
+  auto k = torch::tensor({1, 2, 3});
+
+  auto v_o = torch::tensor({1, 2, 3});
+  auto k_o = torch::tensor({1, 2, 3});
+
+  auto expected = 14.0f;
+
+  auto result = rt::scalar(v, k);
+
+  EXPECT_EQ(result, expected) << "expected:\n"
+                              << expected << "\nactual:\n"
+                              << result;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v
+                            << " has changed unexpectidly!\nWas " << v_o;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k
+                            << " has changed unexpectidly!\nWas " << k_o;
+}
+
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
