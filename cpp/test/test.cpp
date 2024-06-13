@@ -436,6 +436,21 @@ TEST(Raytracing, VectorLengthTest) {
                             << " has changed unexpectidly!\nWas " << v_o;
 }
 
+TEST(Raytracing, NormalizeTest) {
+  auto v = torch::tensor({6, 2, 3});
+  auto v_o = torch::tensor({6, 2, 3});
+
+  auto expected = torch::tensor({6 / 7, 2 / 7, 3 / 7});
+
+  auto result = rt::normalize(v);
+
+  EXPECT_EQ(result, expected) << "expected:\n"
+                              << expected << "\nactual:\n"
+                              << result;
+  EXPECT_TRUE(v.allclose(v_o)) << "The original tensor " << v
+                               << " has changed unexpectidly!\nWas " << v_o;
+}
+
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
