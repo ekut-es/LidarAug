@@ -421,6 +421,21 @@ TEST(Raytracing, ScalarTest) {
                             << " has changed unexpectidly!\nWas " << k_o;
 }
 
+TEST(Raytracing, VectorLengthTest) {
+  auto v = torch::tensor({6, 2, 3});
+  auto v_o = torch::tensor({6, 2, 3});
+
+  auto expected = 7;
+
+  auto result = rt::vector_length(v);
+
+  EXPECT_EQ(result, expected) << "expected:\n"
+                              << expected << "\nactual:\n"
+                              << result;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v
+                            << " has changed unexpectidly!\nWas " << v_o;
+}
+
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
