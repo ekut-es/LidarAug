@@ -1,4 +1,5 @@
 
+#include "../include/raytracing.hpp"
 #include "../include/stats.hpp"
 #include "../include/tensor.hpp"
 #include "../include/transformations.hpp"
@@ -358,6 +359,21 @@ TEST(Tensor, ChangeSparseRepresentationTest) {
   EXPECT_TRUE(result.equal(expected)) << "expected:\n"
                                       << expected << "\nactual:\n"
                                       << result;
+}
+
+TEST(Raytracing, MulTest) {
+  auto v = torch::tensor({{1, 2, 3}, {-1, -2, -3}});
+  auto v_o = torch::tensor({{1, 2, 3}, {-1, -2, -3}});
+  float c = 5;
+  auto expected = torch::tensor({{5, 10, 15}, {-5, -10, -15}});
+
+  auto result = rt::mul(v, c);
+
+  EXPECT_TRUE(result.equal(expected)) << "expected:\n"
+                                      << expected << "\nactual:\n"
+                                      << result;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v
+                            << " has changed unexpectidly!\nWas " << v_o;
 }
 
 // doing tests with controlled random number generation (no random seed)
