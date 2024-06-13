@@ -376,6 +376,31 @@ TEST(Raytracing, MulTest) {
                             << " has changed unexpectidly!\nWas " << v_o;
 }
 
+TEST(Raytracing, AddTest) {
+  auto v = torch::tensor({1, 2, 3});
+  auto k = torch::tensor({1, 2, 3});
+  auto l = torch::tensor({1, 2, 3});
+
+  auto v_o = torch::tensor({1, 2, 3});
+  auto k_o = torch::tensor({1, 2, 3});
+  auto l_o = torch::tensor({1, 2, 3});
+
+  auto expected = torch::tensor({3, 6, 9});
+
+  auto result = rt::add(v, k, l);
+
+  EXPECT_TRUE(result.equal(expected)) << "expected:\n"
+                                      << expected << "\nactual:\n"
+                                      << result;
+
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v
+                            << " has changed unexpectidly!\nWas " << v_o;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k
+                            << " has changed unexpectidly!\nWas " << k_o;
+  EXPECT_TRUE(l.equal(l_o)) << "The original tensor " << l
+                            << " has changed unexpectidly!\nWas " << l_o;
+}
+
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
