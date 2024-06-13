@@ -425,7 +425,7 @@ TEST(Raytracing, VectorLengthTest) {
   auto v = torch::tensor({6, 2, 3});
   auto v_o = torch::tensor({6, 2, 3});
 
-  auto expected = 7;
+  auto expected = 7.0f;
 
   auto result = rt::vector_length(v);
 
