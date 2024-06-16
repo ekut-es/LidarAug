@@ -1,5 +1,6 @@
 
 #include "../include/raytracing.hpp"
+#include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
 
@@ -211,4 +212,24 @@ void rt::intersects(torch::Tensor point_cloud,
 
     find_most_intersected_drop(distance_count, n_intersects, i);
   }
+}
+
+[[nodiscard]] torch::Tensor rt::sample_particles(int64_t num_particles,
+                                                 float precipitation,
+                                                 distribution d) {
+  torch::Tensor (*f)(torch::Tensor, float);
+
+  switch (d) {
+  case LOG_NORMAL:
+    f = inverted_lognormal_cdf;
+    break;
+  case EXPONENTIAL:
+    f = inverted_exponential_cdf;
+    break;
+  case GM:
+    f = inverted_exponential_gm;
+    break;
+  }
+
+  return f(torch::rand({num_particles}), precipitation) * (1 / 2000);
 }

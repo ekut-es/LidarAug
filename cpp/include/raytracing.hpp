@@ -88,7 +88,7 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
                                const torch::Tensor &beam,
                                const torch::Tensor &split_index);
 
-[[nodiscard]] torch::Tensor sample_particles(uint64_t num_particles,
+[[nodiscard]] torch::Tensor sample_particles(int64_t num_particles,
                                              float precipitation,
                                              distribution d = EXPONENTIAL);
 
