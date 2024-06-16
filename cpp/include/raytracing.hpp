@@ -6,6 +6,12 @@
 #ifndef RAYTRACING_HPP
 #define RAYTRACING_HPP
 
+typedef enum {
+  EXPONENTIAL,
+  LOG_NORMAL,
+  GM,
+} distribution;
+
 namespace rt {
 
 [[nodiscard]] torch::Tensor trace(torch::Tensor point_cloud,
