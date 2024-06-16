@@ -112,6 +112,8 @@ draw_values(D &dist, tensor_size_t number_of_values = 1) {
   for (tensor_size_t i = 0; i < number_of_values; i++) {
     data[i] = dist(rng);
   }
+
+  return result;
 }
 
 [[nodiscard]] inline float get_truncated_normal_value(
