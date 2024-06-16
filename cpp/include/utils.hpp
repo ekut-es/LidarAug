@@ -66,6 +66,7 @@ compute_condition_number(const torch::Tensor &matrix) {
 namespace torch_utils {
 constexpr auto F32 = torch::kF32;
 constexpr auto F64 = torch::kF64;
+constexpr auto I32 = torch::kI32;
 
 [[nodiscard]] torch::Tensor rotate_yaw_t(torch::Tensor points,
                                          torch::Tensor angle);
