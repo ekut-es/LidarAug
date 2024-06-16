@@ -5,9 +5,13 @@
 #ifndef STATS_HPP
 #define STATS_HPP
 
+#include "tensor.hpp"
+#include <ATen/ops/empty.h>
 #include <boost/math/distributions/normal.hpp>
+#include <c10/core/ScalarType.h>
 #include <optional>
 #include <random>
+#include <torch/torch.h>
 #include <variant>
 
 #define HUNDRED_PERCENT 100
@@ -75,6 +79,38 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
     return std::vector<T>{dist(rng)};
   } else {
     return dist(rng);
+  }
+}
+
+/**
+ * Function to draw a number of values from a provided distribution.
+ *
+ * @param dist              A reference to one of the following distributions:
+ *                            - uniform_int_distribution
+ *                            - uniform_real_distribution
+ *                            - normal_distribution
+ *                            - exponential_distribution
+ * @param number_of_values  Optional argument to draw more than one value.
+ *
+ * @returns A `torch::Tensor` containing all the drawn values.
+ */
+template <typename T, c10::ScalarType type, typename D>
+[[nodiscard]] static inline torch::Tensor
+draw_values(D &dist, tensor_size_t number_of_values = 1) {
+
+  static_assert(std::is_base_of<std::uniform_int_distribution<T>, D>::value ||
+                std::is_base_of<std::uniform_real_distribution<T>, D>::value ||
+                std::is_base_of<std::normal_distribution<T>, D>::value ||
+                std::is_base_of<std::exponential_distribution<T>, D>::value ||
+                "'dist' does not satisfy the type constaints!");
+
+  auto rng = get_rng();
+
+  auto result = torch::empty({number_of_values}, type);
+  auto data = result.data_ptr<T>();
+
+  for (tensor_size_t i = 0; i < number_of_values; i++) {
+    data[i] = dist(rng);
   }
 }
 
