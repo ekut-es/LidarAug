@@ -23,22 +23,13 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
 
   const auto threshold_data_size = modify_probability.size(0);
 
-  // NOTE(tom): `from_blob` only provides a view into the vector, so the
-  //            vector has to outlive the tensor
   const auto modify_threshold =
-      torch::from_blob(std::get<VECTOR>(draw_values<float>(percentage_distrib,
-                                                           threshold_data_size))
-                           .data(),
-                       {threshold_data_size}, F32);
+      draw_values<float, F32>(percentage_distrib, threshold_data_size);
 
   const auto selected = modify_threshold < modify_probability;
 
-  // NOTE(tom): `from_blob` only provides a view into the vector, so the
-  //            vector has to outlive the tensor
-  const auto delete_threshold = torch::from_blob(
-      std::get<VECTOR>(draw_values<float>(percentage_distrib, num_items))
-          .data(),
-      {num_items}, F32);
+  const auto delete_threshold =
+      draw_values<float, F32>(percentage_distrib, num_items);
 
   const auto deleted =
       selected.logical_and(delete_threshold < delete_probability);
@@ -54,23 +45,16 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
   if (num_altered_points > 0) {
     std::exponential_distribution<float> exp_d(beta);
     const auto new_dist =
-        torch::from_blob(
-            std::get<VECTOR>(draw_values<float>(exp_d, num_altered_points))
-                .data(),
-            {num_altered_points}, F32) +
-        1.3;
+        draw_values<float, F32>(exp_d, num_altered_points) + 1.3;
+
     point_cloud.index({altered_points, Slice(None, 3)}) *=
         (new_dist / dist.index({altered_points})).reshape({-1, 1});
   }
 
   std::uniform_real_distribution<float> d(0, 82);
 
-  // TODO(tom): This needs review!
-  point_cloud.index({altered_points, 3}) = torch::from_blob(
-      std::get<VECTOR>(
-          draw_values<float>(d, static_cast<std::size_t>(num_altered_points)))
-          .data(),
-      {num_altered_points}, F32);
+  point_cloud.index({altered_points, 3}) =
+      draw_values<float, F32>(d, num_altered_points);
 
   return point_cloud.index({deleted.logical_not(), Slice()});
 }

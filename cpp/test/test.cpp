@@ -537,6 +537,50 @@ TEST(StatsRNG, DrawValuesTest) {
   }
 }
 
+TEST(StatsRNG, DrawValuesTensorTest) {
+  std::uniform_int_distribution<int> ud(0, 100);
+  std::normal_distribution<float> nd(0, 5);
+  {
+    auto ud_result = draw_values<int, I32>(ud, 10);
+    auto ud_expected_values =
+        torch::tensor({70, 72, 28, 43, 22, 69, 55, 72, 72, 49}, I32);
+
+    auto nd_result = draw_values<float, F32>(nd, 10);
+    auto nd_expected_values = torch::tensor(
+        {5.42903471, 5.00874138, -2.83043623, -8.46256065, 3.64878798,
+         -5.22126913, 8.69870472, 2.03683066, -0.366712242, 9.06219864},
+        F32);
+
+    EXPECT_TRUE(ud_result.equal(ud_expected_values))
+        << "Tensors are not equal: expected\n"
+        << ud_expected_values << "\nactual:\n"
+        << ud_result;
+
+    EXPECT_TRUE(nd_result.equal(nd_expected_values))
+        << "Tensors are not equal: expected\n"
+        << nd_expected_values << "\nactual:\n"
+        << nd_result;
+  }
+
+  {
+    auto ud_result = draw_values<int, I32>(ud);
+    auto expected_value = torch::tensor({70}, I32);
+
+    auto nd_result = draw_values<float, F32>(nd);
+    auto nd_expected_value = torch::tensor({5.42903471}, F32);
+
+    EXPECT_TRUE(ud_result.equal(expected_value))
+        << "Tensors are not equal: expected\n"
+        << expected_value << "\nactual:\n"
+        << ud_result;
+
+    EXPECT_TRUE(nd_result.equal(nd_expected_value))
+        << "Tensors are not equal: expected\n"
+        << nd_expected_value << "\nactual:\n"
+        << nd_result;
+  }
+}
+
 TEST(RNGTransformation, TranslateRandomTest) {
 
   auto points =
