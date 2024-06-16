@@ -1,7 +1,9 @@
 
 #include "tensor.hpp"
+#include <cstdint>
 #include <optional>
 #include <torch/serialize/tensor.h>
+#include <utility>
 
 #ifndef RAYTRACING_HPP
 #define RAYTRACING_HPP
@@ -85,6 +87,19 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
 [[nodiscard]] float trace_beam(const torch::Tensor &noise_filter,
                                const torch::Tensor &beam,
                                const torch::Tensor &split_index);
+
+[[nodiscard]] torch::Tensor sample_particles(uint64_t num_particles,
+                                             float precipitation,
+                                             distribution d = EXPONENTIAL);
+
+[[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
+generate_noise_filter(std::array<float, 6> dim, uint32_t dropsPerM3,
+                      float precipitation = 5.0, int32_t scale = 1,
+                      distribution d = EXPONENTIAL);
+
+[[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
+sort_noise_filter(torch::Tensor nf);
+
 } // namespace rt
 
 #endif // !RAYTRACING_HPP
