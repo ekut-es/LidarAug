@@ -62,6 +62,7 @@ add_executable(
   src/tensor.cpp
   test/test.cpp
   include/utils.hpp
+  src/utils.cpp
   include/evaluation.hpp
   src/evaluation.cpp
 )
