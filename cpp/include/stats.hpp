@@ -67,8 +67,8 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
   if (n > 1) {
     std::vector<T> numbers(n);
 
-    auto draw_values = [&dist, &rng]() { return dist(rng); };
-    std::generate(numbers.begin(), numbers.end(), draw_values);
+    auto draw = [&dist, &rng]() { return dist(rng); };
+    std::generate(numbers.begin(), numbers.end(), draw);
 
     return numbers;
   } else if (force.value_or(false)) {
