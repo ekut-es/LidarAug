@@ -3,6 +3,7 @@
 #include "../include/stats.hpp"
 #include "../include/tensor.hpp"
 #include "../include/utils.hpp"
+#include <ATen/TensorIndexing.h>
 #include <ATen/ops/from_blob.h>
 #include <ATen/ops/pow.h>
 #include <cstddef>
@@ -114,6 +115,15 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
     // NOTE(tom): prob <= rand
     return std::nullopt;
   }
+}
+
+[[nodiscard]] torch::Tensor rain(torch::Tensor point_cloud,
+                                 std::array<float, 6> dims, uint32_t num_drops,
+                                 float precipitation, distribution d) {
+
+  auto [nf, si] =
+      rt::generate_noise_filter(dims, num_drops, precipitation, 1, d);
+  return rt::trace(point_cloud, nf, si, 0.9);
 }
 
 #ifdef BUILD_MODULE
