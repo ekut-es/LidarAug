@@ -267,3 +267,22 @@ rt::generate_noise_filter(std::array<float, 6> dim, uint32_t dropsPerM3,
 
   return sort_noise_filter(nf);
 }
+
+[[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
+sort_noise_filter(torch::Tensor nf) {
+
+  auto split_index = torch::zeros(360 * NF_SPLIT_FACTOR + 1);
+
+  nf = nf.index({nf.index({Slice(), 3}).argsort()});
+  nf = nf.index({nf.index({Slice(), 5}).argsort()});
+
+  for (tensor_size_t i = 0; i < nf.size(0) - 1; i++) {
+    if (!nf.index({i, 5}).equal(nf.index({i + 1, 5}))) {
+
+      split_index[nf.index({i + 1, 5}).item<tensor_size_t>()] = i + 1;
+    }
+  }
+  split_index[split_index.size(0) - 1] = nf.size(0) - 1;
+
+  return std::make_pair(nf, split_index);
+}
