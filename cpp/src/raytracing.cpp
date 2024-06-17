@@ -3,6 +3,7 @@
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
+#include <utility>
 
 using namespace torch_utils;
 using Slice = torch::indexing::Slice;
@@ -232,4 +233,37 @@ void rt::intersects(torch::Tensor point_cloud,
   }
 
   return f(torch::rand({num_particles}), precipitation) * (1 / 2000);
+}
+
+// TODO(tom): Make dim a 'distribution_ranges' (found in transformations.hpp,
+// needs to go in utils or something)
+[[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
+rt::generate_noise_filter(std::array<float, 6> dim, uint32_t dropsPerM3,
+                          float precipitation, int32_t scale, distribution d) {
+
+  const auto total_drops =
+      static_cast<int>(std::abs(dim[0] - dim[1]) * std::abs(dim[2] - dim[3]) *
+                       std::abs(dim[4] - dim[5]) * dropsPerM3);
+  // random.seed(42)
+
+  std::uniform_real_distribution<float> x_ud(dim[0], dim[1]);
+  std::uniform_real_distribution<float> y_ud(dim[2], dim[3]);
+  std::uniform_real_distribution<float> z_ud(dim[4], dim[5]);
+
+  const auto x = draw_values<float, F32>(x_ud, total_drops);
+  const auto y = draw_values<float, F32>(y_ud, total_drops);
+  const auto z = draw_values<float, F32>(z_ud, total_drops);
+
+  const auto dist =
+      torch::sqrt(torch::pow(x, 2) + torch::pow(y, 2) + torch::pow(z, 2));
+  const auto size = sample_particles(total_drops, precipitation, d) * scale;
+
+  const auto index =
+      (((torch::arctan2(y, x) * 180 / math_utils::PI_RAD) + 360) *
+       NF_SPLIT_FACTOR)
+          .toType(I32) %
+      (360 * NF_SPLIT_FACTOR);
+  auto nf = torch::stack({x, y, z, dist, size, index}, -1);
+
+  return sort_noise_filter(nf);
 }
