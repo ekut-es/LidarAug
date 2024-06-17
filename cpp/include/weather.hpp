@@ -19,4 +19,9 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
                                  std::array<float, 6> dims, uint32_t num_drops,
                                  float precipitation, distribution d);
 
+[[nodiscard]] torch::Tensor snow(torch::Tensor point_cloud,
+                                 std::array<float, 6> dims, uint32_t num_drops,
+                                 float precipitation, int32_t scale,
+                                 float max_intensity);
+
 #endif // !WEATHER_HPP

@@ -126,6 +126,19 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
   return rt::trace(point_cloud, nf, si, 0.9);
 }
 
+[[nodiscard]] torch::Tensor snow(torch::Tensor point_cloud,
+                                 std::array<float, 6> dims, uint32_t num_drops,
+                                 float precipitation, int32_t scale,
+                                 float max_intensity) {
+
+  auto [nf, si] =
+      rt::generate_noise_filter(dims, num_drops, precipitation, scale, GM);
+  point_cloud = rt::trace(point_cloud, nf, si, 1.25);
+  point_cloud.index({point_cloud.index({Slice(), 3}) > max_intensity, 3}) =
+      max_intensity;
+  return point_cloud;
+}
+
 #ifdef BUILD_MODULE
 #undef TEST_RNG
 #include "../include/weather_bindings.hpp"
