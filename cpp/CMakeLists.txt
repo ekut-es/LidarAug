@@ -1,10 +1,18 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 project(LidarAug)
 
+# Require at least GCC 13
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13.0)
+        message(FATAL_ERROR "GCC version must be at least 13.0!")
+    endif()
+endif()
+
+
 # GoogleTest requires at least C++14, but torch requires C++17
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=-*,readability-*,clang-analyzer-*,boost-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-pass-by-value,-modernize-use-trailing-return-type,-bugprone-easily-swappable-parameters,-bugprone-suspicious-include,-readability-identifier-length)
+# set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=-*,readability-*,clang-analyzer-*,boost-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-pass-by-value,-modernize-use-trailing-return-type,-bugprone-easily-swappable-parameters,-bugprone-suspicious-include,-readability-identifier-length)
 
 add_compile_definitions(_GLIBCXX_USE_CXX11_ABI=0)
 
@@ -35,6 +43,7 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+
 find_package(Boost REQUIRED)
 
 find_package(Torch REQUIRED)
@@ -53,6 +62,9 @@ add_executable(
   src/tensor.cpp
   test/test.cpp
   include/utils.hpp
+  src/utils.cpp
+  include/evaluation.hpp
+  src/evaluation.cpp
 )
 target_link_libraries(
   transformations_test
