@@ -5,6 +5,7 @@ import pytest
 
 import torch
 from LidarAug import augmentations as aug
+from LidarAug import weather_simulations
 from LidarAug import evaluation
 from LidarAug.transformations import NoiseType, DistributionRange, DistributionRanges, IntensityRange
 
@@ -312,3 +313,31 @@ def test_false_and_true_positive():
                 for result_score, expected_score in zip(
                         result['score'], expected['score']):
                     check_precision(result_score, expected_score, 2)
+
+
+@pytest.mark.weathertest
+def test_fog_100():
+    points = torch.randn([1, 100, 4])
+    prob = 100.0
+    metric = weather_simulations.FogParameter.DIST
+    sigma = 1.0
+    mean = 5
+
+    result = weather_simulations.fog(points, prob, metric, sigma, mean)
+
+    assert result is not None
+
+    for i, tensor in enumerate(result):
+        assert not tensor.equal(points[i])
+
+
+def test_fog_0():
+    points = torch.randn([1, 100, 4])
+    prob = 0
+    metric = weather_simulations.FogParameter.DIST
+    sigma = 1.0
+    mean = 5
+
+    result = weather_simulations.fog(points, prob, metric, sigma, mean)
+
+    assert result == None
