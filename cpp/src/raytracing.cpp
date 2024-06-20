@@ -269,7 +269,7 @@ rt::generate_noise_filter(std::array<float, 6> dim, uint32_t dropsPerM3,
 }
 
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
-sort_noise_filter(torch::Tensor nf) {
+rt::sort_noise_filter(torch::Tensor nf) {
 
   auto split_index = torch::zeros(360 * NF_SPLIT_FACTOR + 1);
 
