@@ -316,6 +316,17 @@ def test_false_and_true_positive():
 
 
 @pytest.mark.weathertest
+def test_fog():
+    points = torch.randn([100, 4])
+    metric = weather_simulations.FogParameter.DIST
+    viewing_dist = 100
+
+    result = weather_simulations.fog(points, metric, viewing_dist, 1)
+
+    assert not result.equal(points)
+
+
+@pytest.mark.weathertest
 def test_fog_100():
     points = torch.randn([1, 100, 4])
     prob = 100.0

@@ -3,6 +3,7 @@
 #include "../include/stats.hpp"
 #include "../include/tensor.hpp"
 #include "../include/utils.hpp"
+#include <ATen/TensorIndexing.h>
 #include <ATen/ops/from_blob.h>
 #include <ATen/ops/pow.h>
 #include <cstddef>
@@ -118,6 +119,67 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
     // NOTE(tom): prob <= rand
     return std::nullopt;
   }
+}
+
+[[nodiscard]] torch::Tensor fog(torch::Tensor point_cloud, fog_parameter metric,
+                                float viewing_dist, float max_intensity) {
+
+  const auto [extinction_factor, beta, delete_probability] =
+      calculate_factors(metric, viewing_dist);
+
+  // selecting points for modification and deletion
+  const auto dist = torch::sqrt(torch::sum(
+      torch::pow(point_cloud.index({Slice(), Slice(None, 3)}), 2), 1));
+  const auto modify_probability = 1 - torch::exp(-extinction_factor * dist);
+  const auto modify_threshold = torch::rand(modify_probability.size(0));
+  const auto selected = modify_threshold < modify_probability;
+  const auto delete_threshold = torch::rand(point_cloud.size(0));
+  const auto deleted =
+      torch::logical_and(delete_threshold < delete_probability, selected);
+
+  // changing intensity of unaltered points according to beer lambert law
+  point_cloud.index({torch::logical_not(selected), 3}) *=
+      torch::exp(-(2.99573 / viewing_dist) * 2 *
+                 dist.index({torch::logical_not(selected)}));
+
+  // changing position and intensity of selected points
+  const auto altered_points =
+      torch::logical_and(selected, torch::logical_not(deleted));
+  const tensor_size_t num_altered_points =
+      point_cloud.index({altered_points, Slice(None, 3)}).size(0);
+  if (num_altered_points > 0) {
+    auto newdist =
+        torch::empty(num_altered_points).exponential_(1 / beta) + 1.3;
+    point_cloud.index({altered_points, Slice(None, 3)}) *=
+        torch::reshape(newdist / dist.index({altered_points}), {-1, 1});
+    point_cloud.index({altered_points, 3}) =
+        torch::empty({num_altered_points}).uniform_(0, max_intensity * 0.3);
+  }
+
+  // delete points
+  return point_cloud.index({torch::logical_not(deleted), Slice()});
+}
+
+[[nodiscard]] torch::Tensor rain(torch::Tensor point_cloud,
+                                 std::array<float, 6> dims, uint32_t num_drops,
+                                 float precipitation, distribution d) {
+
+  auto [nf, si] =
+      rt::generate_noise_filter(dims, num_drops, precipitation, 1, d);
+  return rt::trace(point_cloud, nf, si, 0.9);
+}
+
+[[nodiscard]] torch::Tensor snow(torch::Tensor point_cloud,
+                                 std::array<float, 6> dims, uint32_t num_drops,
+                                 float precipitation, int32_t scale,
+                                 float max_intensity) {
+
+  auto [nf, si] =
+      rt::generate_noise_filter(dims, num_drops, precipitation, scale, GM);
+  point_cloud = rt::trace(point_cloud, nf, si, 1.25);
+  point_cloud.index({point_cloud.index({Slice(), 3}) > max_intensity, 3}) =
+      max_intensity;
+  return point_cloud;
 }
 
 #ifdef BUILD_MODULE

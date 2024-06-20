@@ -1,4 +1,5 @@
 
+#include "../include/raytracing.hpp"
 #include "../include/stats.hpp"
 #include "../include/tensor.hpp"
 #include "../include/transformations.hpp"
@@ -358,6 +359,117 @@ TEST(Tensor, ChangeSparseRepresentationTest) {
   EXPECT_TRUE(result.equal(expected)) << "expected:\n"
                                       << expected << "\nactual:\n"
                                       << result;
+}
+
+TEST(Raytracing, MulTest) {
+  auto v = torch::tensor({{1, 2, 3}, {-1, -2, -3}});
+  auto v_o = torch::tensor({{1, 2, 3}, {-1, -2, -3}});
+  float c = 5;
+  auto expected = torch::tensor({{5, 10, 15}, {-5, -10, -15}});
+
+  auto result = rt::mul(v, c);
+
+  EXPECT_TRUE(result.equal(expected)) << "expected:\n"
+                                      << expected << "\nactual:\n"
+                                      << result;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+}
+
+TEST(Raytracing, AddTest) {
+  auto v = torch::tensor({1, 2, 3}, F32);
+  auto k = torch::tensor({1, 2, 3}, F32);
+  auto l = torch::tensor({1, 2, 3}, F32);
+
+  auto v_o = torch::tensor({1, 2, 3}, F32);
+  auto k_o = torch::tensor({1, 2, 3}, F32);
+  auto l_o = torch::tensor({1, 2, 3}, F32);
+
+  auto expected = torch::tensor({3, 6, 9}, F32);
+
+  auto result = rt::add(v, k, l);
+
+  EXPECT_TRUE(result.equal(expected)) << "expected:\n"
+                                      << expected << "\nactual:\n"
+                                      << result;
+
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k_o
+                            << " has changed unexpectidly!\nWas " << k;
+  EXPECT_TRUE(l.equal(l_o)) << "The original tensor " << l_o
+                            << " has changed unexpectidly!\nWas " << l;
+}
+
+TEST(Raytracing, ScalarTest) {
+  auto v = torch::tensor({1, 2, 3}, F32);
+  auto k = torch::tensor({1, 2, 3}, F32);
+
+  auto v_o = torch::tensor({1, 2, 3}, F32);
+  auto k_o = torch::tensor({1, 2, 3}, F32);
+
+  auto expected = 14.0f;
+
+  auto result = rt::scalar(v, k);
+
+  EXPECT_EQ(result, expected) << "expected:\n"
+                              << expected << "\nactual:\n"
+                              << result;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k_o
+                            << " has changed unexpectidly!\nWas " << k;
+}
+
+TEST(Raytracing, VectorLengthTest) {
+  auto v = torch::tensor({6, 2, 3}, F32);
+  auto v_o = torch::tensor({6, 2, 3}, F32);
+
+  auto expected = 7.0f;
+
+  auto result = rt::vector_length(v);
+
+  EXPECT_EQ(result, expected) << "expected:\n"
+                              << expected << "\nactual:\n"
+                              << result;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+}
+
+TEST(Raytracing, NormalizeTest) {
+  auto v = torch::tensor({6, 2, 3}, F32);
+  auto v_o = torch::tensor({6, 2, 3}, F32);
+
+  auto expected = torch::tensor({6 / 7.0f, 2 / 7.0f, 3 / 7.0f}, F32);
+
+  auto result = rt::normalize(v);
+
+  EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << result;
+  EXPECT_TRUE(v.allclose(v_o)) << "The original tensor " << v_o
+                               << " has changed unexpectidly!\nWas " << v;
+}
+
+TEST(Raytracing, CrossTest) {
+  auto v = torch::tensor({1, 2, 3}, F32);
+  auto k = torch::tensor({4, 5, 6}, F32);
+
+  auto v_o = torch::tensor({1, 2, 3}, F32);
+  auto k_o = torch::tensor({4, 5, 6}, F32);
+
+  auto expected = torch::tensor(
+      {(2 * 6) - (3 * 5), (3 * 4) - (1 * 6), (1 * 5) - (2 * 4)}, F32);
+  auto result = rt::cross(v, k);
+
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k_o
+                            << " has changed unexpectidly!\nWas " << k;
+
+  EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << result;
 }
 
 // doing tests with controlled random number generation (no random seed)
