@@ -16,6 +16,9 @@ typedef enum { DIST, CHAMFER } fog_parameter;
 fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
     float sigma, int mean);
 
+[[nodiscard]] torch::Tensor fog(torch::Tensor point_cloud, fog_parameter metric,
+                                float viewing_dist, float max_intensity = 1);
+
 [[nodiscard]] torch::Tensor rain(torch::Tensor point_cloud,
                                  std::array<float, 6> dims, uint32_t num_drops,
                                  float precipitation, distribution d);
