@@ -8,9 +8,34 @@
 #include <cstddef>
 #include <random>
 #include <torch/csrc/autograd/generated/variable_factories.h>
+#include <tuple>
 
 using namespace torch::indexing;
 using namespace torch_utils;
+
+[[nodiscard]] inline std::tuple<float, float, float>
+calculate_factors(fog_parameter metric, float viewing_dist) {
+  switch (metric) {
+  case DIST: {
+    const float extinction_factor = 0.32 * exp(-0.022 * viewing_dist);
+    const float beta = (-0.00846 * viewing_dist) + 2.29;
+    const float delete_probability = -0.63 * exp(-0.02 * viewing_dist) + 1;
+
+    return std::make_tuple(extinction_factor, beta, delete_probability);
+  }
+  case CHAMFER: {
+    const float extinction_factor = 0.23 * exp(-0.0082 * viewing_dist);
+    const float beta = (-0.006 * viewing_dist) + 2.31;
+    const float delete_probability = -0.7 * exp(-0.024 * viewing_dist) + 1;
+
+    return std::make_tuple(extinction_factor, beta, delete_probability);
+  }
+  default:
+    // NOTE(tom): The switch case should be exhaustive, so this statement
+    //            should never be reached!
+    assert(false);
+  }
+}
 
 [[nodiscard]] inline torch::Tensor
 select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
@@ -72,30 +97,8 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
 
     const auto viewing_dist = get_truncated_normal_value(mean, sigma, 10, mean);
 
-    const auto calculate_factors =
-        [metric, viewing_dist]() -> std::tuple<float, float, float> {
-      switch (metric) {
-      case DIST: {
-        const float extinction_factor = 0.32 * exp(-0.022 * viewing_dist);
-        const float beta = (-0.00846 * viewing_dist) + 2.29;
-        const float delete_probability = -0.63 * exp(-0.02 * viewing_dist) + 1;
-        return {extinction_factor, beta, delete_probability};
-      }
-      case CHAMFER: {
-        const float extinction_factor = 0.23 * exp(-0.0082 * viewing_dist);
-        const float beta = (-0.006 * viewing_dist) + 2.31;
-        const float delete_probability = -0.7 * exp(-0.024 * viewing_dist) + 1;
-        return {extinction_factor, beta, delete_probability};
-      }
-      default:
-        // NOTE(tom): The switch case should be exhaustive, so this statement
-        //            should never be reached!
-        assert(false);
-      }
-    };
-
     const auto [extinction_factor, beta, delete_probability] =
-        calculate_factors();
+        calculate_factors(metric, viewing_dist);
 
     const dimensions pc_dims = {point_cloud.size(0), point_cloud.size(1),
                                 point_cloud.size(2)};
