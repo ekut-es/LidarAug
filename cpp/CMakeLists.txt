@@ -65,6 +65,8 @@ add_executable(
   src/utils.cpp
   include/evaluation.hpp
   src/evaluation.cpp
+  include/raytracing.hpp
+  src/raytracing.cpp
 )
 target_link_libraries(
   transformations_test
