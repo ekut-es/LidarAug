@@ -130,9 +130,12 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
   // selecting points for modification and deletion
   const auto dist = torch::sqrt(torch::sum(
       torch::pow(point_cloud.index({Slice(), Slice(None, 3)}), 2), 1));
+
   const auto modify_probability = 1 - torch::exp(-extinction_factor * dist);
   const auto modify_threshold = torch::rand(modify_probability.size(0));
+
   const auto selected = modify_threshold < modify_probability;
+
   const auto delete_threshold = torch::rand(point_cloud.size(0));
   const auto deleted =
       torch::logical_and(delete_threshold < delete_probability, selected);
@@ -147,13 +150,19 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
       torch::logical_and(selected, torch::logical_not(deleted));
   const tensor_size_t num_altered_points =
       point_cloud.index({altered_points, Slice(None, 3)}).size(0);
+
   if (num_altered_points > 0) {
     auto newdist =
         torch::empty(num_altered_points).exponential_(1 / beta) + 1.3;
-    point_cloud.index({altered_points, Slice(None, 3)}) *=
-        torch::reshape(newdist / dist.index({altered_points}), {-1, 1});
-    point_cloud.index({altered_points, 3}) =
-        torch::empty({num_altered_points}).uniform_(0, max_intensity * 0.3);
+
+    point_cloud.index_put_(
+        {altered_points, Slice(None, 3)},
+        point_cloud.index({altered_points, Slice(None, 3)}) *
+            torch::reshape(newdist / dist.index({altered_points}), {-1, 1}));
+
+    point_cloud.index_put_(
+        {altered_points, 3},
+        torch::empty({num_altered_points}).uniform_(0, max_intensity * 0.3));
   }
 
   // delete points
