@@ -12,7 +12,7 @@ ext_modules = [
     ),
     CppExtension(
         name=f"{MODULE_NAME}.weather_simulations",
-        sources=["cpp/src/weather.cpp"],
+        sources=["cpp/src/weather.cpp", "cpp/src/raytracing.cpp"],
         define_macros=[("BUILD_MODULE", None)],
         extra_compile_args=['-std=c++20', '-O3'],
     ),
