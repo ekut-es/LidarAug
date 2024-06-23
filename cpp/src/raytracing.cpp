@@ -10,10 +10,10 @@ using Slice = torch::indexing::Slice;
 
 #define NF_SPLIT_FACTOR 32
 
-[[nodiscard]] torch::Tensor
-rt::trace(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
-          const torch::Tensor &split_index,
-          std::optional<float> intensity_factor /*= 0.9*/) {
+[[nodiscard]] torch::Tensor rt::trace(torch::Tensor point_cloud,
+                                      const torch::Tensor &noise_filter,
+                                      const torch::Tensor &split_index,
+                                      float intensity_factor /*= 0.9*/) {
 
   const auto num_points = point_cloud.size(0);
   constexpr auto num_rays = 11;
@@ -28,8 +28,7 @@ rt::trace(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
   //            nobrainer to make it multithreaded on the CPU as well
   rt::intersects(point_cloud, noise_filter, split_index, intersections,
                  distances, distance_count, most_intersect_count,
-                 most_intersect_dist, num_points,
-                 intensity_factor.value_or(0.9));
+                 most_intersect_dist, num_points, intensity_factor);
 
   // select all points where x & y & z != 0
   const auto indices =
