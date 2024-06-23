@@ -1,7 +1,6 @@
 
 #include "tensor.hpp"
 #include <cstdint>
-#include <optional>
 #include <torch/serialize/tensor.h>
 #include <utility>
 
@@ -18,8 +17,8 @@ namespace rt {
 
 [[nodiscard]] torch::Tensor trace(torch::Tensor point_cloud,
                                   const torch::Tensor &noise_filter,
-                                  const torch::Tensor &split_index,
-                                  std::optional<float> intensity_factor = 0.9);
+                                  const torch::Tensor &sort_index,
+                                  float intensity_factor = 0.9);
 
 void intersects(torch::Tensor point_cloud, const torch::Tensor &oise_filter,
                 const torch::Tensor &split_index, torch::Tensor intersections,
