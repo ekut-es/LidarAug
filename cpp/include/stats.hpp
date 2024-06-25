@@ -9,7 +9,6 @@
 #include <ATen/ops/empty.h>
 #include <boost/math/distributions/normal.hpp>
 #include <c10/core/ScalarType.h>
-#include <optional>
 #include <random>
 #include <torch/torch.h>
 #include <variant>
@@ -55,8 +54,8 @@
  */
 template <typename T, typename D>
 [[nodiscard]] static inline std::variant<std::vector<T>, T>
-draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
-            std::optional<bool> force = false) noexcept {
+draw_values(D &dist, std::size_t number_of_values = 1,
+            bool force = false) noexcept {
 
   static_assert(std::is_base_of<std::uniform_int_distribution<T>, D>::value ||
                 std::is_base_of<std::uniform_real_distribution<T>, D>::value ||
@@ -66,7 +65,7 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
 
   auto rng = get_rng();
 
-  std::size_t n = number_of_values.value_or(1);
+  std::size_t n = number_of_values;
 
   if (n > 1) {
     std::vector<T> numbers(n);
@@ -75,7 +74,7 @@ draw_values(D &dist, std::optional<std::size_t> number_of_values = 1,
     std::generate(numbers.begin(), numbers.end(), draw);
 
     return numbers;
-  } else if (force.value_or(false)) {
+  } else if (force) {
     return std::vector<T>{dist(rng)};
   } else {
     return dist(rng);
@@ -116,19 +115,20 @@ draw_values(D &dist, tensor_size_t number_of_values = 1) {
   return result;
 }
 
-[[nodiscard]] inline float get_truncated_normal_value(
-    std::optional<float> mean = 0, std::optional<float> sd = 1,
-    std::optional<float> low = 0, std::optional<float> up = 10) {
+[[nodiscard]] inline float get_truncated_normal_value(float mean = 0,
+                                                      float sd = 1,
+                                                      float low = 0,
+                                                      float up = 10) {
 
   auto rng = get_rng();
 
   // create normal distribution
-  boost::math::normal_distribution<float> nd(mean.value(), sd.value());
+  boost::math::normal_distribution<float> nd(mean, sd);
 
   // get upper and lower bounds using the cdf, which are the probabilities for
   // the values being within those bounds
-  auto lower_cdf = boost::math::cdf(nd, low.value());
-  auto upper_cdf = boost::math::cdf(nd, up.value());
+  auto lower_cdf = boost::math::cdf(nd, low);
+  auto upper_cdf = boost::math::cdf(nd, up);
 
   // create uniform distribution based on those bounds, plotting the
   // probabilities
