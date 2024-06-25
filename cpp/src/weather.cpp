@@ -38,54 +38,6 @@ calculate_factors(fog_parameter metric, float viewing_dist) {
   }
 }
 
-[[nodiscard]] inline torch::Tensor
-select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
-              float viewing_dist, float extinction_factor,
-              float delete_probability, float beta,
-              std::uniform_real_distribution<float> &percentage_distrib) {
-
-  const auto dist =
-      point_cloud.index({Slice(), Slice(None, 3)}).pow(2).sum(1).sqrt();
-  const auto modify_probability = 1 - exp(-extinction_factor * dist);
-
-  const auto threshold_data_size = modify_probability.size(0);
-
-  const auto modify_threshold =
-      draw_values<float, F32>(percentage_distrib, threshold_data_size);
-
-  const auto selected = modify_threshold < modify_probability;
-
-  const auto delete_threshold =
-      draw_values<float, F32>(percentage_distrib, num_items);
-
-  const auto deleted =
-      selected.logical_and(delete_threshold < delete_probability);
-
-  // changing intensity of unaltered points according to beer lambert law
-  point_cloud.index({selected.logical_not(), 3}) *=
-      exp(-(2.99573 / viewing_dist) * 2 * dist.index({selected.logical_not()}));
-
-  const auto altered_points = selected.logical_and(deleted.logical_not());
-  const auto num_altered_points =
-      point_cloud.index({altered_points, Slice(None, 3)}).size(0);
-
-  if (num_altered_points > 0) {
-    std::exponential_distribution<float> exp_d(beta);
-    const auto new_dist =
-        draw_values<float, F32>(exp_d, num_altered_points) + 1.3;
-
-    point_cloud.index({altered_points, Slice(None, 3)}) *=
-        (new_dist / dist.index({altered_points})).reshape({-1, 1});
-  }
-
-  std::uniform_real_distribution<float> d(0, 82);
-
-  point_cloud.index({altered_points, 3}) =
-      draw_values<float, F32>(d, num_altered_points);
-
-  return point_cloud.index({deleted.logical_not(), Slice()});
-}
-
 [[nodiscard]] std::optional<std::vector<torch::Tensor>>
 fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
     float sigma, int mean) {
@@ -98,18 +50,13 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
 
     const auto viewing_dist = get_truncated_normal_value(mean, sigma, 10, mean);
 
-    const auto [extinction_factor, beta, delete_probability] =
-        calculate_factors(metric, viewing_dist);
-
     const dimensions pc_dims = {point_cloud.size(0), point_cloud.size(1),
                                 point_cloud.size(2)};
 
     std::vector<torch::Tensor> batch;
     batch.reserve(static_cast<std::size_t>(pc_dims.batch_size));
     for (tensor_size_t i = 0; i < pc_dims.batch_size; i++) {
-      auto new_pc =
-          select_points(point_cloud.index({i}), pc_dims.num_items, viewing_dist,
-                        extinction_factor, delete_probability, beta, distrib);
+      auto new_pc = fog(point_cloud.index({i}), metric, viewing_dist);
 
       batch.emplace_back(new_pc);
     }
