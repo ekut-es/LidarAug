@@ -34,17 +34,17 @@ jobs:
 
     - name: Create build directory
       run: mkdir build
-      working-directory: ./LidarAug/cpp
+      working-directory: ./cpp
 
     - name: Configure and build
       run: |
         cd build
         cmake -DBOOST_ROOT=/usr/include/boost -DCMAKE_PREFIX_PATH=/opt/libtorch ..
         make
-      working-directory: ./LidarAug/cpp
+      working-directory: ./cpp
 
     - name: Run Google Test
       run: |
         cd build
         ctest --output-on-failure
-      working-directory: ./LidarAug/cpp
+      working-directory: ./cpp
