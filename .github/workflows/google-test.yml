@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
@@ -16,11 +16,6 @@ jobs:
     - name: setup google test
       uses: Bacondish2023/setup-googletest@v1
 
-    - name: Install GCC 12
-      run: |
-        sudo apt-get update && sudo apt-get install -y gcc-12 g++12
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 110 --slave /usr/bin/g++ g++ /usr/bin/g++-12 --slave /usr/bin/gcov gcov /usr/bin/gcov-12
-
     - name: Install CMake
       run: sudo apt-get update && sudo apt-get install -y cmake
 
@@ -29,22 +24,22 @@ jobs:
 
     - name: Install libtorch
       run: |
-        wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.1.2%2Bcpu.zip
-        unzip libtorch-cxx11-abi-shared-with-deps-2.1.2+cpu.zip -d /opt/
+        wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.3.0%2Bcpu.zip
+        unzip libtorch-cxx11-abi-shared-with-deps-2.3.0+cpu.zip -d /opt/
 
     - name: Create build directory
       run: mkdir build
-      working-directory: ./LidarAug/cpp
+      working-directory: ./cpp
 
     - name: Configure and build
       run: |
         cd build
         cmake -DBOOST_ROOT=/usr/include/boost -DCMAKE_PREFIX_PATH=/opt/libtorch ..
         make
-      working-directory: ./LidarAug/cpp
+      working-directory: ./cpp
 
     - name: Run Google Test
       run: |
         cd build
         ctest --output-on-failure
-      working-directory: ./LidarAug/cpp
+      working-directory: ./cpp
