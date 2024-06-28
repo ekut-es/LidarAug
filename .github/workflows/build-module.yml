@@ -1,10 +1,6 @@
 name: Build and test module
 
-on:
-  push:
-    branches: [ "main", "3.11" ]
-  pull_request:
-    branches: [ "main", "3.11" ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -13,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.12"]
 
     steps:
     - uses: actions/checkout@v4
