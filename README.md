@@ -31,6 +31,8 @@ To use the Python library, just run `make install` after cloning and entering th
 
 To test the python functions/wrappers, install [pytest](https://docs.pytest.org/en/8.0.x/) (`pip install pytest`) and run `make testpy`.
 
+This branch contains experimental Python 3.12 support, however some dependencies don't work on 3.12 yet.
+
 #### Modules
 
 The library contains 4 modules:
