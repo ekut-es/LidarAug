@@ -1,10 +1,7 @@
 name: Build and test module
 
 on:
-  push:
-    branches: [ "main", "3.11", "torch-2.1.0" ]
-  pull_request:
-    branches: [ "main", "3.11" ]
+  ["push", "pull_request"]
 
 jobs:
   build:
