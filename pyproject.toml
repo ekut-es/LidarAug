@@ -1,8 +1,9 @@
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools==69.5.1",
     "pybind11>=2.10.0",
-    "torch>=2.3.0",
+    "torch==2.1.0",
+    "numpy==1.24.0",
     "scipy",
     "matplotlib",
     "open3d"
@@ -14,9 +15,9 @@ name = "LidarAug"
 version = "0.0.1"
 requires-python = "<3.12"
 dependencies = [
-    "torch",
+    "torch==2.1.0",
     "matplotlib",
-    "numpy",
+    "numpy==1.24.0",
     "open3d"
 ]
 

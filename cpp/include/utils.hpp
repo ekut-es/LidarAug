@@ -12,7 +12,6 @@
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <cmath>
-#include <execution>
 #include <numeric>
 #include <torch/serialize/tensor.h>
 #include <vector>
@@ -142,23 +141,23 @@ template <typename T>
 
   // NOTE(tom): I have parallelized this, but this might only be worth it for
   //            larger sizes `boxes`. Should be perf tested.
-  std::transform(
-      std::execution::par_unseq, boxes.begin(), boxes.end(), ious.begin(),
+  std::transform(boxes.begin(), boxes.end(), ious.begin(),
 
-      [box](const polygon_t &b) -> T {
-        multi_polygon_t mpi;
-        multi_polygon_t mpu;
+                 [box](const polygon_t &b) -> T {
+                   multi_polygon_t mpi;
+                   multi_polygon_t mpu;
 
-        if (boost::geometry::intersects(box, b)) {
-          boost::geometry::intersection(box, b, mpi);
-          boost::geometry::union_(box, b, mpu);
+                   if (boost::geometry::intersects(box, b)) {
+                     boost::geometry::intersection(box, b, mpi);
+                     boost::geometry::union_(box, b, mpu);
 
-          return boost::geometry::area(mpi) / boost::geometry::area(mpu);
+                     return boost::geometry::area(mpi) /
+                            boost::geometry::area(mpu);
 
-        } else {
-          return 0;
-        }
-      }
+                   } else {
+                     return 0;
+                   }
+                 }
 
   );
 

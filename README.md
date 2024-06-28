@@ -35,6 +35,8 @@ On Linux at least TensorFlow 2.16.0-rc0 is available, but open3d is waiting for 
 
 To test the python functions/wrappers, install [pytest](https://docs.pytest.org/en/8.0.x/) (`pip install pytest`) and run `make testpy`.
 
+The required Python version is 3.11.
+
 #### Modules
 
 The library contains 4 modules:
