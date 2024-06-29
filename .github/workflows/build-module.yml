@@ -36,7 +36,7 @@ jobs:
         echo "TORCH_PATH=$(python -c 'import torch; import os; print(os.path.join(torch.__path__[0], "share", "cmake"))')" >> $GITHUB_ENV
     - name: Build and install C++ module
       run: |
-        python -m pip install .
+        python -m pip install . --no-cache-dir
     - name: Test with pytest
       run: |
         python -m pytest ./pytest/test.py -v
