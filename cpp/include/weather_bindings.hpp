@@ -6,6 +6,8 @@
 #include <pybind11/stl.h>
 #include <torch/extension.h>
 
+using arg = pybind11::arg;
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("fog",
         pybind11::overload_cast<const torch::Tensor &, float, fog_parameter,
