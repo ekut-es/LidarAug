@@ -14,9 +14,19 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def(
       "fog",
       pybind11::overload_cast<torch::Tensor, fog_parameter, float, float>(&fog),
-      "fog weather simulation");
+      pybind11::arg("max_intensity") = 1, "fog weather simulation");
+
+  m.def("snow", &snow, pybind11::arg("max_intensity") = 1,
+        "snow weather simulation");
+  m.def("rain", &rain, "rain weather simulation");
+
   pybind11::enum_<fog_parameter>(m, "FogParameter")
       .value("DIST", DIST)
       .value("CHAMFER", CHAMFER)
+      .export_values();
+  pybind11::enum_<distribution>(m, "Distribution")
+      .value("EXPONENTIAL", EXPONENTIAL)
+      .value("LOG_NORMAL", LOG_NORMAL)
+      .value("GM", GM)
       .export_values();
 }
