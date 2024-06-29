@@ -16,9 +16,11 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def(
       "fog",
       pybind11::overload_cast<torch::Tensor, fog_parameter, float, float>(&fog),
-      pybind11::arg("max_intensity") = 1, "fog weather simulation");
+      arg("point_cloud"), arg("metric"), arg("viewing_dist"),
+      arg("max_intensity") = 1, "fog weather simulation");
 
-  m.def("snow", &snow, pybind11::arg("max_intensity") = 1,
+  m.def("snow", &snow, arg("point_cloud"), arg("dims"), arg("num_drops"),
+        arg("precipitation"), arg("scale"), arg("max_intensity") = 1,
         "snow weather simulation");
   m.def("rain", &rain, "rain weather simulation");
 
