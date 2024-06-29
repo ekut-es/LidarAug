@@ -472,6 +472,26 @@ TEST(Raytracing, CrossTest) {
                                          << result;
 }
 
+TEST(Raytracing, RotateTest) {
+  auto v = torch::tensor({1, 2, 3}, F32);
+  auto k = torch::tensor({4, 5, 6}, F32);
+  float angle = 180;
+
+  auto v_o = torch::tensor({1, 2, 3}, F32);
+  auto k_o = torch::tensor({4, 5, 6}, F32);
+
+  auto expected = torch::tensor({206.40788, 249.74979, 307.5124}, F32);
+  auto result = rt::rotate(v, k, angle);
+
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k_o
+                            << " has changed unexpectidly!\nWas " << k;
+  EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << result;
+}
+
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
