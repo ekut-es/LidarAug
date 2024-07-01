@@ -16,11 +16,11 @@ void translate(at::Tensor points, const at::Tensor &translation) {
   points.index({Slice(), Slice(), Slice(0, 3)}) += translation;
 }
 
-void scale_points(at::Tensor points, float factor) {
+void scale_points(at::Tensor points, const float factor) {
   points.index({Slice(), Slice(), Slice(0, 3)}) *= factor;
 }
 
-void scale_labels(at::Tensor labels, float factor) {
+void scale_labels(at::Tensor labels, const float factor) {
   labels.index({Slice(), Slice(), Slice(0, 6)}) *= factor;
 }
 
@@ -32,11 +32,11 @@ void scale_labels(at::Tensor labels, float factor) {
  * @param labels are the labels with their bounding boxes.
  * @param factor is the constant factor to scale the box dimensions by.
  */
-inline void scale_box_dimensions(at::Tensor labels, float factor) {
+inline void scale_box_dimensions(at::Tensor labels, const float factor) {
   labels.index({Slice(), Slice(), Slice(3, 6)}) *= factor;
 }
 
-void translate_random(at::Tensor points, at::Tensor labels, float sigma) {
+void translate_random(at::Tensor points, at::Tensor labels, const float sigma) {
 
   std::normal_distribution<float> dist(sigma, 0);
 
@@ -53,8 +53,8 @@ void translate_random(at::Tensor points, at::Tensor labels, float sigma) {
   // NOTE(tom): coop boxes not implemented
 }
 
-void scale_random(at::Tensor points, at::Tensor labels, float sigma,
-                  float max_scale) {
+void scale_random(at::Tensor points, at::Tensor labels, const float sigma,
+                  const float max_scale) {
 
   const auto scale_factor =
       get_truncated_normal_value(1, sigma, (1 / max_scale), max_scale);
@@ -65,8 +65,8 @@ void scale_random(at::Tensor points, at::Tensor labels, float sigma,
   // NOTE(tom): coop boxes not implemented
 }
 
-void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
-                 float max_scale) {
+void scale_local(at::Tensor point_cloud, at::Tensor labels, const float sigma,
+                 const float max_scale) {
 
   const auto scale_factor =
       get_truncated_normal_value(1, sigma, (1 / max_scale), max_scale);
@@ -109,11 +109,11 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
   scale_box_dimensions(labels, scale_factor);
 }
 
-void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
+void flip_random(at::Tensor points, at::Tensor labels, const std::size_t prob) {
 
   auto rng = get_rng();
   std::uniform_int_distribution<std::size_t> distrib(0, HUNDRED_PERCENT - 1);
-  auto rand = distrib(rng);
+  const auto rand = distrib(rng);
 
   if (prob > rand) {
     const dimensions point_dims = {points.size(0), points.size(1),
@@ -139,7 +139,7 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob) {
 }
 
 [[nodiscard]] torch::Tensor
-random_noise(const at::Tensor &points, float sigma,
+random_noise(const at::Tensor &points, const float sigma,
              const distribution_ranges<float> &ranges, noise_type type,
              intensity_range max_intensity) {
 
@@ -246,7 +246,7 @@ random_noise(const at::Tensor &points, float sigma,
  * @param points   is the point cloud that is to be rotated.
  * @param rotation is rotation matrix that is used to apply the rotation.
  */
-inline void rotate(at::Tensor points, at::Tensor rotation) {
+inline void rotate(at::Tensor points, const at::Tensor &rotation) {
 
   const auto points_vec =
       points.index({Slice(), Slice(), Slice(torch::indexing::None, 3)});
@@ -255,20 +255,20 @@ inline void rotate(at::Tensor points, at::Tensor rotation) {
                     torch::matmul(points_vec, rotation));
 }
 
-void rotate_deg(at::Tensor points, float angle) {
+void rotate_deg(at::Tensor points, const float angle) {
 
   const auto angle_rad = math_utils::to_rad(angle);
   const auto rotation = math_utils::rotate_yaw(angle_rad);
   rotate(points, rotation);
 }
 
-void rotate_rad(at::Tensor points, float angle) {
+void rotate_rad(at::Tensor points, const float angle) {
 
   const auto rotation = math_utils::rotate_yaw(angle);
   rotate(points, rotation);
 }
 
-void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
+void rotate_random(at::Tensor points, at::Tensor labels, const float sigma) {
 
   const dimensions point_dims = {points.size(0), points.size(1),
                                  points.size(2)};
@@ -306,7 +306,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
   // NOTE(tom): coop boxes not implemented
 }
 
-[[nodiscard]] torch::Tensor thin_out(at::Tensor points, float sigma) {
+[[nodiscard]] torch::Tensor thin_out(at::Tensor points, const float sigma) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   const auto percent = get_truncated_normal_value(0, sigma, 0, 1);
@@ -360,7 +360,7 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
   return std::make_pair(batch_labels, batch_names);
 }
 
-void random_point_noise(torch::Tensor points, float sigma) {
+void random_point_noise(torch::Tensor points, const float sigma) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   std::normal_distribution<float> dist(0, sigma);
@@ -381,7 +381,7 @@ void random_point_noise(torch::Tensor points, float sigma) {
   }
 }
 
-void transform_along_ray(torch::Tensor points, float sigma) {
+void transform_along_ray(torch::Tensor points, const float sigma) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   std::normal_distribution<float> dist(0, sigma);
@@ -402,8 +402,8 @@ void transform_along_ray(torch::Tensor points, float sigma) {
   }
 }
 
-void intensity_noise(torch::Tensor points, float sigma,
-                     intensity_range max_intensity) {
+void intensity_noise(torch::Tensor points, const float sigma,
+                     const intensity_range max_intensity) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
@@ -420,8 +420,8 @@ void intensity_noise(torch::Tensor points, float sigma,
   }
 }
 
-void intensity_shift(torch::Tensor points, float sigma,
-                     intensity_range max_intensity) {
+void intensity_shift(torch::Tensor points, const float sigma,
+                     const intensity_range max_intensity) {
   const float intensity_shift = get_truncated_normal_value(
       0, sigma, 0, static_cast<float>(max_intensity));
 
@@ -432,8 +432,8 @@ void intensity_shift(torch::Tensor points, float sigma,
 
       const float current_intensity =
           points[i][j][POINT_CLOUD_I_IDX].item<float>();
-      float new_intensity = std::min(current_intensity + intensity_shift,
-                                     static_cast<float>(max_intensity));
+      const float new_intensity = std::min(current_intensity + intensity_shift,
+                                           static_cast<float>(max_intensity));
       points.index_put_({i, j, POINT_CLOUD_I_IDX}, new_intensity);
     }
   }

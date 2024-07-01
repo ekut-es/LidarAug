@@ -10,20 +10,20 @@ using size_t = std::size_t;
 
 [[nodiscard]] torch::Tensor
 change_sparse_representation(const torch::Tensor &input,
-                             tensor_size_t batch_idx) {
+                             const tensor_size_t batch_idx) {
 
   const auto num_tensors = input.size(0);
   const auto num_features = input.size(1);
 
   auto determine_shape =
       [num_tensors](const torch::TensorAccessor<tensor_size_t, 2> &in,
-                    tensor_size_t batch_idx_) {
+                    const tensor_size_t batch_idx_) {
         tensor_size_t num_batches = 0;
         size_t max_count = 0;
         size_t current_count = 0;
 
         for (tensor_size_t i = 0; i < num_tensors; i++) {
-          auto batch_num = in[i][batch_idx_];
+          const auto batch_num = in[i][batch_idx_];
 
           if (batch_num == num_batches) {
             current_count++;
@@ -49,8 +49,8 @@ change_sparse_representation(const torch::Tensor &input,
       };
 
   auto gather_tensors = [num_tensors, num_features](
-                            const torch::Tensor &in, tensor_size_t batch_idx_,
-                            size_t num_batches, tensor_size_t max_count) {
+                            const torch::Tensor &in, const tensor_size_t batch_idx_,
+                            const size_t num_batches, tensor_size_t max_count) {
     std::vector<torch::Tensor> batch;
     batch.reserve(num_batches);
 
@@ -58,8 +58,7 @@ change_sparse_representation(const torch::Tensor &input,
     tensor_size_t tensor_idx = 0;
 
     for (tensor_size_t i = 0; i < num_tensors; i++) {
-
-      auto batch_num =
+      const auto batch_num =
           static_cast<size_t>(in.accessor<tensor_size_t, 2>()[i][batch_idx_]);
 
       std::cout << "batch_num: " << batch_num << "\n";

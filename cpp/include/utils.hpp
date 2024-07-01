@@ -30,7 +30,7 @@ constexpr float TWO_PI_RAD = 2.0f * PI_RAD;
  *
  * @returns a 3x3 rotation matrix (in form of a torch::Tensor)
  */
-[[nodiscard]] inline torch::Tensor rotate_yaw(float angle) {
+[[nodiscard]] inline torch::Tensor rotate_yaw(const float angle) {
 
   float cos_angle = cos(angle);
   float sin_angle = sin(angle);
@@ -41,7 +41,7 @@ constexpr float TWO_PI_RAD = 2.0f * PI_RAD;
   return rotation;
 }
 
-[[nodiscard]] constexpr inline float to_rad(float angle) noexcept {
+[[nodiscard]] constexpr inline float to_rad(const float angle) noexcept {
   return angle * (PI_RAD / PI_DEG);
 }
 
@@ -182,7 +182,7 @@ namespace cpp_utils {
  */
 template <template <typename...> class Container, typename T>
 [[nodiscard]] Container<std::size_t> argsort(const Container<T> &c,
-                                             bool descending = false) {
+                                             const bool descending = false) {
 
   Container<size_t> idx(c.size());
   std::iota(idx.begin(), idx.end(), 0);

@@ -148,8 +148,8 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
  */
 [[nodiscard]] inline std::pair<torch::Tensor, torch::Tensor>
 _delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
-                             const at::Tensor &names, tensor_size_t min_points,
-                             tensor_size_t batch_idx) {
+                             const at::Tensor &names, const tensor_size_t min_points,
+                             const tensor_size_t batch_idx) {
 
   const tensor_size_t num_labels = labels.size(0);
   const tensor_size_t num_points = points.size(0);

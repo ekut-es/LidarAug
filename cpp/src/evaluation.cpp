@@ -6,7 +6,7 @@
 
 template <typename T>
 T calculate_average_precision(
-    float iou_threshold, bool global_sort_detections,
+    const float iou_threshold, const bool global_sort_detections,
     const std::map<std::uint8_t, std::map<std::string, std::vector<T>>>
         &results) {
 
