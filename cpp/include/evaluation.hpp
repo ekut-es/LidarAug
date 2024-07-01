@@ -101,8 +101,6 @@ calculate_voc_average_precision(const std::vector<T> &recall,
  * @tparam T is the type of the average precision.
  *
  * @param results                a map with the results.
- * @param path                   the directory where the yaml file with the
- *                               results should be stored.
  * @param global_sort_detections ?
  */
 std::array<float, 3> evaluate_results(const result_dict &results,
