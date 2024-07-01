@@ -224,10 +224,10 @@ random_noise(const at::Tensor &points, float sigma,
     // axis=-1))
     for (std::size_t j = 0; j < num_points; j++) {
 
-      noise_tensor[static_cast<tensor_size_t>(j)][POINT_CLOUD_X_IDX] = x[j];
-      noise_tensor[static_cast<tensor_size_t>(j)][POINT_CLOUD_Y_IDX] = y[j];
-      noise_tensor[static_cast<tensor_size_t>(j)][POINT_CLOUD_Z_IDX] = z[j];
-      noise_tensor[static_cast<tensor_size_t>(j)][POINT_CLOUD_I_IDX] = i[j];
+      noise_tensor.index_put_({static_cast<tensor_size_t>(j), POINT_CLOUD_X_IDX}, x[j]);
+      noise_tensor.index_put_({static_cast<tensor_size_t>(j), POINT_CLOUD_Y_IDX}, y[j]);
+      noise_tensor.index_put_({static_cast<tensor_size_t>(j), POINT_CLOUD_Z_IDX}, z[j]);
+      noise_tensor.index_put_({static_cast<tensor_size_t>(j), POINT_CLOUD_I_IDX}, i[j]);
     }
 
     // concatenate points
@@ -324,7 +324,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma) {
         static_cast<std::size_t>(num_values));
 
     for (tensor_size_t j = 0; j < num_values; j++) {
-      new_tensor[i][j] = points[i][indices[static_cast<std::size_t>(j)]];
+      new_tensor.index_put_({i, j}, points[i][indices[static_cast<std::size_t>(j)]]);
     }
   }
 
@@ -434,7 +434,7 @@ void intensity_shift(torch::Tensor points, float sigma,
           points[i][j][POINT_CLOUD_I_IDX].item<float>();
       float new_intensity = std::min(current_intensity + intensity_shift,
                                      static_cast<float>(max_intensity));
-      points[i][j][POINT_CLOUD_I_IDX] = new_intensity;
+      points.index_put_({i, j, POINT_CLOUD_I_IDX}, new_intensity);
     }
   }
 }
@@ -445,9 +445,9 @@ local_to_world_transform(const torch::Tensor &lidar_pose) {
   auto transformation = torch::eye(4);
 
   // translations
-  transformation[0][3] = lidar_pose[0];
-  transformation[1][3] = lidar_pose[1];
-  transformation[2][3] = lidar_pose[2];
+  transformation.index_put_({0, 3}, lidar_pose[0]);
+  transformation.index_put_({1, 3}, lidar_pose[1]);
+  transformation.index_put_({2, 3}, lidar_pose[2]);
 
   // rotations
   const auto cos_roll = lidar_pose[3].deg2rad().cos();
@@ -457,17 +457,17 @@ local_to_world_transform(const torch::Tensor &lidar_pose) {
   const auto cos_pitch = lidar_pose[5].deg2rad().cos();
   const auto sin_pitch = lidar_pose[5].deg2rad().sin();
 
-  transformation[2][0] = sin_pitch;
+  transformation.index_put_({2, 0}, sin_pitch);
 
-  transformation[0][0] = cos_pitch * cos_yaw;
-  transformation[1][0] = sin_yaw * cos_pitch;
-  transformation[2][1] = -cos_pitch * sin_roll;
-  transformation[2][2] = cos_pitch * cos_roll;
+  transformation.index_put_({0, 0}, cos_pitch * cos_yaw);
+  transformation.index_put_({1, 0}, sin_yaw * cos_pitch);
+  transformation.index_put_({2, 1}, -cos_pitch * sin_roll);
+  transformation.index_put_({2, 2}, cos_pitch * cos_roll);
 
-  transformation[0][1] = cos_yaw * sin_pitch * sin_roll - sin_yaw * cos_roll;
-  transformation[0][2] = -cos_yaw * sin_pitch * cos_roll - sin_yaw * sin_roll;
-  transformation[1][1] = sin_yaw * sin_pitch * sin_roll + cos_yaw * cos_roll;
-  transformation[1][2] = -sin_yaw * sin_pitch * cos_roll + cos_yaw * sin_roll;
+  transformation.index_put_({0, 1}, cos_yaw * sin_pitch * sin_roll - sin_yaw * cos_roll);
+  transformation.index_put_({0, 2}, -cos_yaw * sin_pitch * cos_roll - sin_yaw * sin_roll);
+  transformation.index_put_({1, 1}, sin_yaw * sin_pitch * sin_roll + cos_yaw * cos_roll);
+  transformation.index_put_({1, 2}, -sin_yaw * sin_pitch * cos_roll + cos_yaw * sin_roll);
 
   return transformation;
 }

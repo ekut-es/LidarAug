@@ -70,7 +70,7 @@ change_sparse_representation(const torch::Tensor &input,
         tensor.zero_();
       }
 
-      tensor[tensor_idx++] = in[i];
+      tensor.index_put_({tensor_idx++}, in[i]);
     }
 
     batch.emplace_back(tensor.clone(torch::get_contiguous_memory_format()));
