@@ -1,12 +1,11 @@
+#ifndef RAYTRACING_HPP
+#define RAYTRACING_HPP
 
 #include "tensor.hpp"
 #include <cstdint>
 #include <optional>
 #include <torch/serialize/tensor.h>
 #include <utility>
-
-#ifndef RAYTRACING_HPP
-#define RAYTRACING_HPP
 
 typedef enum {
   EXPONENTIAL,
