@@ -20,13 +20,13 @@ testc: build
 	cd ./cpp/build_files && ./transformations_test $(ARGS)
 
 testpy: ./pytest/test.py
-	python3.12 -m pytest ./pytest/test.py -v
+	python3.11 -m pytest ./pytest/test.py -v
 
 rerun: ./cpp/build_files
 	cd ./cpp/build_files && ctest --rerun-failed --output-on-failure
 
 install:
-	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.12 -m pip install . && rm -rf ./tmp
+	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.11 -m pip install . && rm -rf ./tmp
 
 clean: ./cpp/build_files
 	rm -rfv ./cpp/build_files

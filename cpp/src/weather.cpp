@@ -13,9 +13,9 @@ using namespace torch::indexing;
 using namespace torch_utils;
 
 [[nodiscard]] inline torch::Tensor
-select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
-              float viewing_dist, float extinction_factor,
-              float delete_probability, float beta,
+select_points(const torch::Tensor &point_cloud, const tensor_size_t num_items,
+              const float viewing_dist, const float extinction_factor,
+              const float delete_probability, const float beta,
               std::uniform_real_distribution<float> &percentage_distrib) {
 
   const auto dist = point_cloud.index({Slice(), Slice(None, 3)}).pow(2).sqrt();
@@ -60,8 +60,8 @@ select_points(const torch::Tensor &point_cloud, tensor_size_t num_items,
 }
 
 [[nodiscard]] std::optional<torch::List<torch::Tensor>>
-fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
-    float sigma, int mean) {
+fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
+    const float sigma, const int mean) {
 
   auto rng = get_rng();
   std::uniform_real_distribution<float> distrib(0, HUNDRED_PERCENT - 1);

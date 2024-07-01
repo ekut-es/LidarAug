@@ -12,7 +12,6 @@
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <cmath>
-#include <execution>
 #include <numeric>
 #include <torch/serialize/tensor.h>
 #include <vector>
@@ -31,7 +30,7 @@ constexpr float TWO_PI_RAD = 2.0f * PI_RAD;
  *
  * @returns a 3x3 rotation matrix (in form of a torch::Tensor)
  */
-[[nodiscard]] inline torch::Tensor rotate_yaw(float angle) {
+[[nodiscard]] inline torch::Tensor rotate_yaw(const float angle) {
 
   float cos_angle = cos(angle);
   float sin_angle = sin(angle);
@@ -42,7 +41,7 @@ constexpr float TWO_PI_RAD = 2.0f * PI_RAD;
   return rotation;
 }
 
-[[nodiscard]] constexpr inline float to_rad(float angle) noexcept {
+[[nodiscard]] constexpr inline float to_rad(const float angle) noexcept {
   return angle * (PI_RAD / PI_DEG);
 }
 
@@ -142,23 +141,23 @@ template <typename T>
 
   // NOTE(tom): I have parallelized this, but this might only be worth it for
   //            larger sizes `boxes`. Should be perf tested.
-  std::transform(
-      std::execution::par_unseq, boxes.begin(), boxes.end(), ious.begin(),
+  std::transform(boxes.begin(), boxes.end(), ious.begin(),
 
-      [box](const polygon_t &b) -> T {
-        multi_polygon_t mpi;
-        multi_polygon_t mpu;
+                 [box](const polygon_t &b) -> T {
+                   multi_polygon_t mpi;
+                   multi_polygon_t mpu;
 
-        if (boost::geometry::intersects(box, b)) {
-          boost::geometry::intersection(box, b, mpi);
-          boost::geometry::union_(box, b, mpu);
+                   if (boost::geometry::intersects(box, b)) {
+                     boost::geometry::intersection(box, b, mpi);
+                     boost::geometry::union_(box, b, mpu);
 
-          return boost::geometry::area(mpi) / boost::geometry::area(mpu);
+                     return boost::geometry::area(mpi) /
+                            boost::geometry::area(mpu);
 
-        } else {
-          return 0;
-        }
-      }
+                   } else {
+                     return 0;
+                   }
+                 }
 
   );
 
@@ -183,7 +182,7 @@ namespace cpp_utils {
  */
 template <template <typename...> class Container, typename T>
 [[nodiscard]] Container<std::size_t> argsort(const Container<T> &c,
-                                             bool descending = false) {
+                                             const bool descending = false) {
 
   Container<size_t> idx(c.size());
   std::iota(idx.begin(), idx.end(), 0);

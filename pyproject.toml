@@ -1,8 +1,9 @@
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools==69.5.1",
     "pybind11>=2.10.0",
-    "torch",
+    "torch==2.1.0",
+    "numpy==1.24.0",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -10,7 +11,8 @@ build-backend = "setuptools.build_meta"
 name = "LidarAug"
 version = "0.0.1"
 dependencies = [
-    "torch",
+    "torch==2.1.0",
+    "numpy==1.24.0",
 ]
 
 # target-version = "py37"

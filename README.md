@@ -18,9 +18,6 @@ The following dependencies are necessary to build and test the C++ library for d
 - [boost](https://www.boost.org/)
 - GCC 13 or higher
 
-[TBB](https://github.com/oneapi-src/oneTBB) might also be required depending on your setup.
-It is necessary for C++17 execution policies and if you're on Linux, it should be available as a package.
-
 It is also necessary to set the environment variable `TORCH_PATH` to point to where `libtorch` is installed on your system.
 
 After that, just run `make ctest` to compile the library and run google test.
@@ -30,6 +27,8 @@ After that, just run `make ctest` to compile the library and run google test.
 To use the Python library, just run `make install` after cloning and entering the repository.
 
 To test the python functions/wrappers, install [pytest](https://docs.pytest.org/en/8.0.x/) (`pip install pytest`) and run `make testpy`.
+
+The required Python version is 3.11.
 
 #### Modules
 

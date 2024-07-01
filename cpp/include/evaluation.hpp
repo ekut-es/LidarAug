@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <execution>
 #include <map>
 #include <string>
 #include <torch/torch.h>
@@ -56,15 +55,15 @@ calculate_voc_average_precision(const std::vector<T> &recall,
   mean_recall[0] = 0;
   mean_recall[mean_recall.size() - 1] = 1;
 
-  std::transform(std::execution::par_unseq, recall.begin(), recall.end(),
-                 mean_recall.begin() + 1, [](const T val) { return val; });
+  std::transform(recall.begin(), recall.end(), mean_recall.begin() + 1,
+                 [](const T val) { return val; });
 
   std::vector<T> mean_precision(precision.size() + 2);
   mean_precision[0] = 0;
   mean_precision[mean_precision.size() - 1] = 0;
 
-  std::transform(std::execution::par_unseq, precision.begin(), precision.end(),
-                 mean_precision.begin() + 1, [](const T val) { return val; });
+  std::transform(precision.begin(), precision.end(), mean_precision.begin() + 1,
+                 [](const T val) { return val; });
 
   // TODO(tom): I want to do this with std::generate but I don't think I can
   //            because I'd need access to the iterator.
@@ -101,8 +100,6 @@ calculate_voc_average_precision(const std::vector<T> &recall,
  * @tparam T is the type of the average precision.
  *
  * @param results                a map with the results.
- * @param path                   the directory where the yaml file with the
- *                               results should be stored.
  * @param global_sort_detections ?
  */
 std::array<float, 3> evaluate_results(const result_dict &results,
