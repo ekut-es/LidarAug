@@ -33,9 +33,9 @@ void intersects(torch::Tensor point_cloud, const torch::Tensor &oise_filter,
 
 [[nodiscard]] inline torch::Tensor
 add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
-  auto v_ptr = v.data_ptr<float>();
-  auto k_ptr = k.data_ptr<float>();
-  auto l_ptr = l.data_ptr<float>();
+  const auto *const v_ptr = v.data_ptr<float>();
+  const auto *const k_ptr = k.data_ptr<float>();
+  const auto *const l_ptr = l.data_ptr<float>();
 
   return torch::tensor({v_ptr[0] + k_ptr[0] + l_ptr[0],
                         v_ptr[1] + k_ptr[1] + l_ptr[1],
@@ -44,22 +44,22 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
 
 [[nodiscard]] inline float scalar(const torch::Tensor &v,
                                   const torch::Tensor &k) {
-  auto v_ptr = v.data_ptr<float>();
-  auto k_ptr = k.data_ptr<float>();
+  const auto *const v_ptr = v.data_ptr<float>();
+  const auto *const k_ptr = k.data_ptr<float>();
 
   return (v_ptr[0] * k_ptr[0]) + (v_ptr[1] * k_ptr[1]) + (v_ptr[2] * k_ptr[2]);
 }
 
 [[nodiscard]] inline float vector_length(const torch::Tensor &v) {
-  auto v_ptr = v.data_ptr<float>();
+  const auto *const v_ptr = v.data_ptr<float>();
 
   return sqrt((v_ptr[0] * v_ptr[0]) + (v_ptr[1] * v_ptr[1]) +
               (v_ptr[2] * v_ptr[2]));
 }
 
 [[nodiscard]] inline torch::Tensor normalize(const torch::Tensor &v) {
-  auto length = vector_length(v);
-  auto v_ptr = v.data_ptr<float>();
+  const auto length = vector_length(v);
+  const auto *const v_ptr = v.data_ptr<float>();
 
   // TODO(tom): maybe do this in place? or use different datastructure?
   return torch::tensor(
@@ -68,16 +68,16 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
 
 [[nodiscard]] inline torch::Tensor cross(const torch::Tensor &v,
                                          const torch::Tensor &k) {
-  auto v_ptr = v.data_ptr<float>();
-  auto k_ptr = k.data_ptr<float>();
+  const auto *const v_ptr = v.data_ptr<float>();
+  const auto *const k_ptr = k.data_ptr<float>();
 
   return torch::tensor({(v_ptr[1] * k_ptr[2]) - (v_ptr[2] * k_ptr[1]),
                         (v_ptr[2] * k_ptr[0]) - (v_ptr[0] * k_ptr[2]),
                         (v_ptr[0] * k_ptr[1]) - (v_ptr[1] * k_ptr[0])});
 }
 
-[[nodiscard]] inline torch::Tensor rotate(const torch::Tensor &v,
-                                          const torch::Tensor &k, float angle) {
+[[nodiscard]] inline torch::Tensor
+rotate(const torch::Tensor &v, const torch::Tensor &k, const float angle) {
   return add(mul(v, cos(angle)), mul(rt::cross(v, k), sin(angle)),
              mul(k, scalar(k, v) * (1 - cos(angle))));
 }

@@ -10,26 +10,25 @@ using Slice = torch::indexing::Slice;
 
 #define NF_SPLIT_FACTOR 32
 
-[[nodiscard]] torch::Tensor
-rt::trace(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
-          const torch::Tensor &split_index,
-          float intensity_factor /*= 0.9*/) {
+[[nodiscard]] torch::Tensor rt::trace(torch::Tensor point_cloud,
+                                      const torch::Tensor &noise_filter,
+                                      const torch::Tensor &split_index,
+                                      const float intensity_factor /*= 0.9*/) {
 
   const auto num_points = point_cloud.size(0);
   constexpr auto num_rays = 11;
 
-  auto intersections = torch::zeros({num_points, num_rays}, F32);
-  auto distances = torch::zeros({num_points, num_rays}, F32);
-  auto distance_count = torch::zeros({num_points, num_rays}, F32);
-  auto most_intersect_count = torch::zeros({num_points}, F32);
-  auto most_intersect_dist = torch::zeros({num_points}, F32);
+  const auto intersections = torch::zeros({num_points, num_rays}, F32);
+  const auto distances = torch::zeros({num_points, num_rays}, F32);
+  const auto distance_count = torch::zeros({num_points, num_rays}, F32);
+  const auto most_intersect_count = torch::zeros({num_points}, F32);
+  const auto most_intersect_dist = torch::zeros({num_points}, F32);
 
   // TODO(tom): Since this used to be CUDA code, it would probably be a
   //            nobrainer to make it multithreaded on the CPU as well
   rt::intersects(point_cloud, noise_filter, split_index, intersections,
                  distances, distance_count, most_intersect_count,
-                 most_intersect_dist, num_points,
-                 intensity_factor);
+                 most_intersect_dist, num_points, intensity_factor);
 
   // select all points where x & y & z != 0
   const auto indices =
@@ -46,15 +45,15 @@ rt::trace(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
 
   // TODO(tom): this is very messy and needs revisiting
 
-  const auto si = split_index.const_data_ptr<int>();
-  const auto b = beam.const_data_ptr<float>();
+  const auto *const si = split_index.const_data_ptr<int>();
+  const auto *const b = beam.const_data_ptr<float>();
 
   const auto index = static_cast<int>(((atan2(b[1], b[0]) * 180 / M_PI) + 360) *
                                       NF_SPLIT_FACTOR) %
                      (360 * NF_SPLIT_FACTOR);
 
   for (auto i = si[index]; i < si[index + 1]; i++) {
-    const auto nf = noise_filter[i].const_data_ptr<float>();
+    const auto *const nf = noise_filter[i].const_data_ptr<float>();
 
     const auto sphere =
         (noise_filter[i][0], noise_filter[i][1], noise_filter[i][2]);
@@ -80,15 +79,15 @@ void rt::intersects(torch::Tensor point_cloud,
                     torch::Tensor intersections, const torch::Tensor &distances,
                     torch::Tensor distance_count,
                     torch::Tensor most_intersect_count,
-                    torch::Tensor most_intersect_dist, tensor_size_t num_points,
-                    float intensity_factor) {
+                    torch::Tensor most_intersect_dist,
+                    const tensor_size_t num_points, float intensity_factor) {
 
   constexpr auto NUM_RAYS = 11;
 
   const auto get_original_intersection = [intersections, noise_filter](
                                              const torch::Tensor &beam,
                                              const torch::Tensor &split_index,
-                                             tensor_size_t index) {
+                                             const tensor_size_t index) {
     tensor_size_t idx_count = 0;
 
     auto intersection_dist = rt::trace_beam(noise_filter, beam, split_index);
@@ -162,7 +161,8 @@ void rt::intersects(torch::Tensor point_cloud,
   const auto find_most_intersected_drop =
       [most_intersect_count, most_intersect_dist, distances, point_cloud,
        intensity_factor](const torch::Tensor &distance_count,
-                         uint32_t n_intersects, tensor_size_t index) {
+                         const uint32_t n_intersects,
+                         const tensor_size_t index) {
         const auto r_all = n_intersects / NUM_RAYS;
 
         tensor_size_t max_count = 0;
@@ -216,7 +216,7 @@ void rt::intersects(torch::Tensor point_cloud,
 }
 
 [[nodiscard]] torch::Tensor rt::sample_particles(int64_t num_particles,
-                                                 float precipitation,
+                                                 const float precipitation,
                                                  distribution d) {
   torch::Tensor (*f)(torch::Tensor, float);
 
@@ -239,7 +239,8 @@ void rt::intersects(torch::Tensor point_cloud,
 // needs to go in utils or something)
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 rt::generate_noise_filter(std::array<float, 6> dim, uint32_t dropsPerM3,
-                          float precipitation, int32_t scale, distribution d) {
+                          const float precipitation, int32_t scale,
+                          distribution d) {
 
   const auto total_drops =
       static_cast<int>(std::abs(dim[0] - dim[1]) * std::abs(dim[2] - dim[3]) *
