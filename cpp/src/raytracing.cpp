@@ -13,7 +13,7 @@ using Slice = torch::indexing::Slice;
 [[nodiscard]] torch::Tensor
 rt::trace(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
           const torch::Tensor &split_index,
-          std::optional<float> intensity_factor /*= 0.9*/) {
+          float intensity_factor /*= 0.9*/) {
 
   const auto num_points = point_cloud.size(0);
   constexpr auto num_rays = 11;
@@ -29,7 +29,7 @@ rt::trace(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
   rt::intersects(point_cloud, noise_filter, split_index, intersections,
                  distances, distance_count, most_intersect_count,
                  most_intersect_dist, num_points,
-                 intensity_factor.value_or(0.9));
+                 intensity_factor);
 
   // select all points where x & y & z != 0
   const auto indices =
