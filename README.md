@@ -18,9 +18,6 @@ The following dependencies are necessary to build and test the C++ library for d
 - [boost](https://www.boost.org/)
 - GCC 13 or higher
 
-[TBB](https://github.com/oneapi-src/oneTBB) might also be required depending on your setup.
-It is necessary for C++17 execution policies and if you're on Linux, it should be available as a package.
-
 It is also necessary to set the environment variable `TORCH_PATH` to point to where `libtorch` is installed on your system.
 
 After that, just run `make ctest` to compile the library and run google test.
