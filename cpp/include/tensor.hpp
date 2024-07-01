@@ -19,12 +19,12 @@ typedef struct {
  * number of features (equal to F-1).
  * 0s are used for padding.
  *
- * @param in        is the input tensor.
+ * @param input     is the input tensor.
  * @param batch_idx is the index of the batch index.
  *
  * @returns a new tensor with 0 padding.
  */
 [[nodiscard]] torch::Tensor
-change_sparse_representation(const torch::Tensor &in, tensor_size_t batch_idx);
+change_sparse_representation(const torch::Tensor &input, tensor_size_t batch_idx);
 
 #endif // !TENSOR_HPP
