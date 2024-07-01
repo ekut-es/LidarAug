@@ -89,7 +89,6 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, const float sigma,
     assert(point_indeces.size(0) == label_dims.num_items);
 
     for (int j = 0; j < label_dims.num_items; j++) {
-      auto box = labels[i][j];
       auto points = point_indeces[j];
 
       if (!at::any(points).item<bool>()) {
