@@ -113,9 +113,8 @@ void flip_random(at::Tensor points, at::Tensor labels, const std::size_t prob) {
 
   auto rng = get_rng();
   std::uniform_int_distribution<std::size_t> distrib(0, HUNDRED_PERCENT - 1);
-  const auto rand = distrib(rng);
 
-  if (prob > rand) {
+  if (const auto rand = distrib(rng); prob > rand) {
     const dimensions point_dims = {points.size(0), points.size(1),
                                    points.size(2)};
 
