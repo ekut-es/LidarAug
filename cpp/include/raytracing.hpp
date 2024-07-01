@@ -3,7 +3,6 @@
 
 #include "tensor.hpp"
 #include <cstdint>
-#include <optional>
 #include <torch/serialize/tensor.h>
 #include <utility>
 
