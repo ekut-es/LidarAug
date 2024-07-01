@@ -101,7 +101,7 @@ rotate(const torch::Tensor &v, const torch::Tensor &k, const float angle) {
                                              distribution d = EXPONENTIAL);
 
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
-generate_noise_filter(std::array<float, 6> dim, uint32_t dropsPerM3,
+generate_noise_filter(std::array<float, 6> dim, uint32_t drops_per_m3,
                       float precipitation = 5.0, int32_t scale = 1,
                       distribution d = EXPONENTIAL);
 

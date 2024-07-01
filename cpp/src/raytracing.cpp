@@ -238,13 +238,13 @@ void rt::intersects(torch::Tensor point_cloud,
 // TODO(tom): Make dim a 'distribution_ranges' (found in transformations.hpp,
 // needs to go in utils or something)
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
-rt::generate_noise_filter(std::array<float, 6> dim, uint32_t dropsPerM3,
+rt::generate_noise_filter(std::array<float, 6> dim, uint32_t drops_per_m3,
                           const float precipitation, int32_t scale,
                           distribution d) {
 
   const auto total_drops =
       static_cast<int>(std::abs(dim[0] - dim[1]) * std::abs(dim[2] - dim[3]) *
-                       std::abs(dim[4] - dim[5]) * dropsPerM3);
+                       std::abs(dim[4] - dim[5]) * drops_per_m3);
   // random.seed(42)
 
   std::uniform_real_distribution<float> x_ud(dim[0], dim[1]);
