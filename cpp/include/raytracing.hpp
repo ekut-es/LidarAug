@@ -37,9 +37,11 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
   const auto *const k_ptr = k.data_ptr<float>();
   const auto *const l_ptr = l.data_ptr<float>();
 
+  // NOLINTBEGIN (*-pro-bounds-pointer-arithmetic)
   return torch::tensor({v_ptr[0] + k_ptr[0] + l_ptr[0],
                         v_ptr[1] + k_ptr[1] + l_ptr[1],
                         v_ptr[2] + k_ptr[2] + l_ptr[2]});
+  // NOLINTEND (*-pro-bounds-pointer-arithmetic)
 }
 
 [[nodiscard]] inline float scalar(const torch::Tensor &v,
@@ -47,14 +49,18 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
   const auto *const v_ptr = v.data_ptr<float>();
   const auto *const k_ptr = k.data_ptr<float>();
 
+  // NOLINTBEGIN (*-pro-bounds-pointer-arithmetic)
   return (v_ptr[0] * k_ptr[0]) + (v_ptr[1] * k_ptr[1]) + (v_ptr[2] * k_ptr[2]);
+  // NOLINTEND (*-pro-bounds-pointer-arithmetic)
 }
 
 [[nodiscard]] inline float vector_length(const torch::Tensor &v) {
   const auto *const v_ptr = v.data_ptr<float>();
 
+  // NOLINTBEGIN (*-pro-bounds-pointer-arithmetic)
   return sqrt((v_ptr[0] * v_ptr[0]) + (v_ptr[1] * v_ptr[1]) +
               (v_ptr[2] * v_ptr[2]));
+  // NOLINTEND (*-pro-bounds-pointer-arithmetic)
 }
 
 [[nodiscard]] inline torch::Tensor normalize(const torch::Tensor &v) {
@@ -62,8 +68,10 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
   const auto *const v_ptr = v.data_ptr<float>();
 
   // TODO(tom): maybe do this in place? or use different datastructure?
+  // NOLINTBEGIN (*-pro-bounds-pointer-arithmetic)
   return torch::tensor(
       {v_ptr[0] / length, v_ptr[1] / length, v_ptr[2] / length});
+  // NOLINTEND (*-pro-bounds-pointer-arithmetic)
 }
 
 [[nodiscard]] inline torch::Tensor cross(const torch::Tensor &v,
@@ -71,9 +79,11 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
   const auto *const v_ptr = v.data_ptr<float>();
   const auto *const k_ptr = k.data_ptr<float>();
 
+  // NOLINTBEGIN (*-pro-bounds-pointer-arithmetic)
   return torch::tensor({(v_ptr[1] * k_ptr[2]) - (v_ptr[2] * k_ptr[1]),
                         (v_ptr[2] * k_ptr[0]) - (v_ptr[0] * k_ptr[2]),
                         (v_ptr[0] * k_ptr[1]) - (v_ptr[1] * k_ptr[0])});
+  // NOLINTEND (*-pro-bounds-pointer-arithmetic)
 }
 
 [[nodiscard]] inline torch::Tensor
