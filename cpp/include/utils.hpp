@@ -144,10 +144,10 @@ template <typename T>
   std::transform(boxes.begin(), boxes.end(), ious.begin(),
 
                  [box](const polygon_t &b) -> T {
-                   multi_polygon_t mpi;
-                   multi_polygon_t mpu;
-
                    if (boost::geometry::intersects(box, b)) {
+                     multi_polygon_t mpu;
+                     multi_polygon_t mpi;
+
                      boost::geometry::intersection(box, b, mpi);
                      boost::geometry::union_(box, b, mpu);
 
