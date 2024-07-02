@@ -66,7 +66,7 @@ T calculate_average_precision(
 }
 
 void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
-                                       torch::Tensor detection_score,
+                                       const torch::Tensor &detection_score,
                                        const torch::Tensor &ground_truth_box,
                                        float iou_threshold,
                                        result_dict &results) {
@@ -77,8 +77,6 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
   std::vector<float> l_detection_score(
       data, data + static_cast<std::size_t>(detection_score.size(0)));
-
-  detection_score.sort(-1, true);
 
   std::vector<float> true_positive;
   std::vector<float> false_positive;
