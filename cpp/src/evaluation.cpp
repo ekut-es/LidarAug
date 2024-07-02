@@ -101,7 +101,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
     // NOTE(tom): This depends on the left condition being evaluated first!
     if (ground_truth_polygon_list.empty() ||
-        *std::max_element(ious.begin(), ious.end()) < iou_threshold) {
+        *std::ranges::max_element(ious) < iou_threshold) {
 
       false_positive.emplace_back(1);
       true_positive.emplace_back(0);
@@ -150,15 +150,15 @@ std::array<float, 3> evaluate_results(const result_dict &results,
   std::array<float, 3> iou_thresholds{.3, .5, .7};
   std::array<float, 3> aps;
 
-  std::transform(iou_thresholds.begin(), iou_thresholds.end(), aps.begin(),
-                 [global_sort_detections, results](auto threshold) {
-                   auto ap = calculate_average_precision(
-                       threshold, global_sort_detections, results);
+  std::ranges::transform(iou_thresholds, aps.begin(),
+                         [global_sort_detections, results](auto threshold) {
+                             auto ap = calculate_average_precision(
+                                 threshold, global_sort_detections, results);
 
-                   std::printf("ap_%f: %f\n", threshold, ap);
+                             std::printf("ap_%f: %f\n", threshold, ap);
 
-                   return ap;
-                 });
+                             return ap;
+                         });
 
   return aps;
 }
