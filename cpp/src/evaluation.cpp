@@ -134,8 +134,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
   insert_list("tp", true_positive);
 
   // set ground truth
-  if (results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"].size() ==
-      0) {
+  if (results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"].empty()) {
     results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"].emplace_back(
         ground_truth);
   } else {
