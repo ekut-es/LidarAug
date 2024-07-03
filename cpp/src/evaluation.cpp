@@ -147,7 +147,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 std::array<float, 3> evaluate_results(const result_dict &results,
                                       bool global_sort_detections) {
 
-  std::array<float, 3> iou_thresholds{.3, .5, .7};
+  constexpr std::array<float, 3> iou_thresholds{.3, .5, .7};
   std::array<float, 3> aps;
 
   std::ranges::transform(iou_thresholds, aps.begin(),
