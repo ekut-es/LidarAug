@@ -1,4 +1,4 @@
-from torch.utils.cpp_extension import BuildExtension, CUDAExtension, CppExtension
+from torch.utils.cpp_extension import BuildExtension, CppExtension
 from setuptools import setup
 
 MODULE_NAME = "LidarAug"

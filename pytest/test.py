@@ -6,7 +6,7 @@ import pytest
 import torch
 from LidarAug import augmentations as aug
 from LidarAug import evaluation
-from LidarAug.transformations import NoiseType, DistributionRange, DistributionRanges, IntensityRange
+from LidarAug.transformations import NoiseType, IntensityRange
 
 import re
 
