@@ -22,9 +22,9 @@
  * Intensity goes from [0; MAX_INTENSITY], where MAX_INTENSITY is either 1 or
  * 255.
  */
-typedef enum {
+enum struct intensity_range {
   MAX_INTENSITY_1 = 1,
   MAX_INTENSITY_255 = 255,
-} intensity_range;
+} ;
 
 #endif // !POINT_CLOUD_HPP

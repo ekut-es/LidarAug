@@ -76,7 +76,7 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, const float sigma,
   const dimensions point_dims = {point_cloud.size(0), point_cloud.size(1),
                                  point_cloud.size(2)};
 
-  auto point_indeces =
+  const auto point_indeces =
       torch::zeros({label_dims.num_items, point_dims.num_items}, torch::kI32);
 
   for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
@@ -171,13 +171,13 @@ random_noise(const at::Tensor &points, const float sigma,
                     max = ranges.uniform_range.max,
                     max_intensity]() -> std::vector<float> {
       switch (type) {
-      case UNIFORM: {
+      case noise_type::UNIFORM: {
         std::uniform_real_distribution<float> ud(min, max);
         auto noise_intensity =
             std::get<VECTOR>(draw_values<float>(ud, num_points, true));
         return noise_intensity;
       }
-      case SALT_PEPPER: {
+      case noise_type::SALT_PEPPER: {
         const auto salt_len = num_points / 2;
         const std::vector<float> salt(salt_len, 0);
         const std::vector<float> pepper(num_points - salt_len,
@@ -191,17 +191,17 @@ random_noise(const at::Tensor &points, const float sigma,
                                pepper.end());
         return noise_intensity;
       }
-      case MIN: {
+      case noise_type::MIN: {
         std::vector<float> noise_intensity;
         noise_intensity.reserve(num_points);
-        std::fill(noise_intensity.begin(), noise_intensity.end(), 0);
+        std::ranges::fill(noise_intensity, 0);
         return noise_intensity;
       }
-      case MAX: {
+      case noise_type::MAX: {
         std::vector<float> noise_intensity;
         noise_intensity.reserve(num_points);
-        std::fill(noise_intensity.begin(), noise_intensity.end(),
-                  static_cast<float>(max_intensity));
+        std::ranges::fill(noise_intensity,
+                          static_cast<float>(max_intensity));
         return noise_intensity;
       }
 

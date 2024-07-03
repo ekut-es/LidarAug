@@ -15,7 +15,7 @@ template <typename T> struct distribution_ranges {
   range<T> x_range, y_range, z_range, uniform_range;
 };
 
-typedef enum { UNIFORM, SALT_PEPPER, MIN, MAX } noise_type;
+enum struct noise_type { UNIFORM, SALT_PEPPER, MIN, MAX };
 
 void translate(at::Tensor points, const at::Tensor &translation);
 void scale_points(at::Tensor points, float factor);
@@ -127,7 +127,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
                             const at::Tensor &names,
-                            const tensor_size_t min_points);
+                            tensor_size_t min_points);
 
 /**
  * Checks the amount of points for each bounding box.
