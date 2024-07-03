@@ -171,13 +171,13 @@ random_noise(const at::Tensor &points, const float sigma,
                     max = ranges.uniform_range.max,
                     max_intensity]() -> std::vector<float> {
       switch (type) {
-      case UNIFORM: {
+      case noise_type::UNIFORM: {
         std::uniform_real_distribution<float> ud(min, max);
         auto noise_intensity =
             std::get<VECTOR>(draw_values<float>(ud, num_points, true));
         return noise_intensity;
       }
-      case SALT_PEPPER: {
+      case noise_type::SALT_PEPPER: {
         const auto salt_len = num_points / 2;
         const std::vector<float> salt(salt_len, 0);
         const std::vector<float> pepper(num_points - salt_len,
@@ -191,13 +191,13 @@ random_noise(const at::Tensor &points, const float sigma,
                                pepper.end());
         return noise_intensity;
       }
-      case MIN: {
+      case noise_type::MIN: {
         std::vector<float> noise_intensity;
         noise_intensity.reserve(num_points);
         std::ranges::fill(noise_intensity, 0);
         return noise_intensity;
       }
-      case MAX: {
+      case noise_type::MAX: {
         std::vector<float> noise_intensity;
         noise_intensity.reserve(num_points);
         std::ranges::fill(noise_intensity,
