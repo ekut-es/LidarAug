@@ -174,7 +174,7 @@ def check_precision(val1: float, val2: float, precision: int) -> None:
     :param precision:  The number of significant digits after the comma.
     """
 
-    multiplier = 10**precision
+    multiplier = 10 ** precision
 
     assert int(val1 * multiplier) == int(val2 * multiplier)
 
@@ -240,7 +240,6 @@ def test_evaluate():
 
 @pytest.mark.evaltest
 def test_false_and_true_positive():
-
     result_stat_template = {
         3: {
             'tp': [],
