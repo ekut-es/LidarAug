@@ -127,7 +127,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
                             const at::Tensor &names,
-                            const tensor_size_t min_points);
+                            tensor_size_t min_points);
 
 /**
  * Checks the amount of points for each bounding box.
