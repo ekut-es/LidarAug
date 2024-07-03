@@ -112,11 +112,10 @@ def test_random_noise():
 
     assert points.shape[1] > 0, "No points have been added!"
     for point in points[0]:
-        assert point[0] <= 10 and point[0] >= 1, "x range not as parametrized"
-        assert point[1] <= 5 and point[1] >= 3, "y range not as parametrized"
-        assert point[2] <= 7 and point[2] >= 4, "z range not as parametrized"
-        assert point[3] <= 255 and point[
-            3] >= 0, "intensity range not as parametrized"
+        assert 10 >= point[0] >= 1, "x range not as parametrized"
+        assert 5 >= point[1] >= 3, "y range not as parametrized"
+        assert 7 >= point[2] >= 4, "z range not as parametrized"
+        assert 255 >= point[3] >= 0, "intensity range not as parametrized"
 
 
 @pytest.mark.transtest

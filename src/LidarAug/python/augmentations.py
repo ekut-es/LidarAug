@@ -143,7 +143,7 @@ def flip_random(points: Tensor, labels: Tensor, prob: int) -> None:
     :param prob:    is the probability with which the points should be flipped.
     """
 
-    assert prob >= 0 and prob <= 100, f"{prob}% is not a valid probability"
+    assert 0 <= prob <= 100, f"{prob}% is not a valid probability"
     _check_labels_and_points(points, labels)
 
     transformations.flip_random(points, labels, prob)
