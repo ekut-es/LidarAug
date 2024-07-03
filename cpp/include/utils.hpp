@@ -96,10 +96,9 @@ constexpr auto I32 = torch::kI32;
 
 namespace evaluation_utils {
 
-typedef boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>
-    point_t;
-typedef boost::geometry::model::polygon<point_t, false> polygon_t;
-typedef boost::geometry::model::multi_polygon<polygon_t> multi_polygon_t;
+using point_t = boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>;
+using polygon_t = boost::geometry::model::polygon<point_t, false>;
+using multi_polygon_t = boost::geometry::model::multi_polygon<polygon_t>;
 
 [[nodiscard]] inline std::vector<polygon_t>
 convert_format(const torch::Tensor &boxes) {

@@ -8,9 +8,9 @@
 // return type of `at::Tensor::size`
 using tensor_size_t = std::int64_t;
 
-typedef struct {
+using dimensions = struct {
   tensor_size_t batch_size, num_items, num_features;
-} dimensions;
+};
 
 /**
  * Changes the representation of a sparse tensor from a flat 2D tensor (N, F),
