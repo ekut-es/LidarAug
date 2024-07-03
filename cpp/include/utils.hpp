@@ -90,7 +90,7 @@ constexpr auto I32 = torch::kI32;
  *  @returns: a new tensor (shape: (N, 8, 3)).
  *
  */
-[[nodiscard]] torch::Tensor boxes_to_corners(torch::Tensor boxes);
+[[nodiscard]] torch::Tensor boxes_to_corners(const torch::Tensor &boxes);
 
 } // namespace torch_utils
 

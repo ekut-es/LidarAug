@@ -73,9 +73,9 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
   assert(detection_score.is_contiguous());
 
-  auto data = detection_score.data_ptr<float>();
+  const auto* const data = detection_score.const_data_ptr<float>();
 
-  std::vector<float> l_detection_score(
+  const std::vector<float> l_detection_score(
       data, data + static_cast<std::size_t>(detection_score.size(0)));
 
   std::vector<float> true_positive;
@@ -88,7 +88,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
   auto score_order_descend = cpp_utils::argsort(l_detection_score, true);
 
-  auto detection_polygon_list =
+  const auto detection_polygon_list =
       evaluation_utils::convert_format(detection_boxes);
   auto ground_truth_polygon_list =
       evaluation_utils::convert_format(ground_truth_box);
@@ -110,7 +110,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
       false_positive.emplace_back(0);
       true_positive.emplace_back(1);
 
-      auto gt_index =
+      const auto gt_index =
           torch::argmax(
               torch::from_blob(ious.data(),
                                static_cast<tensor_size_t>(ious.size())))

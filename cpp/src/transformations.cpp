@@ -76,7 +76,7 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, const float sigma,
   const dimensions point_dims = {point_cloud.size(0), point_cloud.size(1),
                                  point_cloud.size(2)};
 
-  auto point_indeces =
+  const auto point_indeces =
       torch::zeros({label_dims.num_items, point_dims.num_items}, torch::kI32);
 
   for (tensor_size_t i = 0; i < point_dims.batch_size; i++) {
