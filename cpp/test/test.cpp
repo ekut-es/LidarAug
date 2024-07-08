@@ -502,6 +502,49 @@ TEST(Raytracing, CheckNpzFile) {
       << std::filesystem::current_path();
 }
 
+TEST(Raytracing, TraceTest) {
+
+  const auto points =
+      torch::tensor({{0.79115541, 0.00995717, 0.85223702, 0.86795932},
+                     {0.88936069, 0.73058396, 0.66369673, 0.15326185},
+                     {0.2041209, 0.27948176, 0.25410868, 0.68685306},
+                     {0.40355785, 0.58527619, 0.50859593, 0.19754277},
+                     {0.23363058, 0.17909182, 0.15318045, 0.99695834},
+                     {0.59422449, 0.95887209, 0.60752133, 0.34042509},
+                     {0.16007366, 0.66038575, 0.53459956, 0.00381125},
+                     {0.71638315, 0.85775223, 0.00237889, 0.32981742},
+                     {0.27168068, 0.18565797, 0.96313797, 0.32289272},
+                     {0.06261661, 0.82851678, 0.09892672, 0.0678927}});
+
+  const auto expected =
+      torch::tensor({{0.79115541, 0.00995717, 0.85223702, 0.78116338},
+                     {0.88936069, 0.73058396, 0.66369673, 0.13793567},
+                     {0.2041209, 0.27948176, 0.25410868, 0.61816775},
+                     {0.40355785, 0.58527619, 0.50859593, 0.1777885},
+                     {0.23363058, 0.17909182, 0.15318045, 0.8972625},
+                     {0.59422449, 0.95887209, 0.60752133, 0.30638258},
+                     {0.16007366, 0.66038575, 0.53459956, 0.00343013},
+                     {0.71638315, 0.85775223, 0.00237889, 0.29683568},
+                     {0.27168068, 0.18565797, 0.96313797, 0.29060345},
+                     {0.06261661, 0.82851678, 0.09892672, 0.06110343}});
+
+  auto npz_data = cnpy::npz_load(npz_dir);
+
+  auto nf_array = npz_data["nf"];
+  const auto nf = torch::from_blob(
+      nf_array.data<float>(), {static_cast<tensor_size_t>(nf_array.num_vals)});
+
+  auto si_array = npz_data["nf"];
+  const auto si = torch::from_blob(
+      si_array.data<float>(), {static_cast<tensor_size_t>(si_array.num_vals)});
+
+  const auto result = rt::trace(points, nf, si);
+
+  EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << result;
+}
+
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
