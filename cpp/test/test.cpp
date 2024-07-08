@@ -5,10 +5,13 @@
 #include "../include/transformations.hpp"
 #include "../include/utils.hpp"
 #include "../include/weather.hpp"
+
+#include <filesystem>
 #include <gtest/gtest.h>
 #include <torch/types.h>
 
 using namespace torch_utils;
+const std::filesystem::path npz_dir{"../../pytest/data/npz/test.npz"};
 
 // NOLINTBEGIN
 
@@ -490,6 +493,13 @@ TEST(Raytracing, RotateTest) {
   EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
                                          << expected << "\nactual:\n"
                                          << result;
+}
+
+TEST(Raytracing, CheckNpzFile) {
+  ASSERT_TRUE(std::filesystem::exists(npz_dir))
+      << "File: " << npz_dir
+      << " could not be found in current working directory: "
+      << std::filesystem::current_path();
 }
 
 // doing tests with controlled random number generation (no random seed)
