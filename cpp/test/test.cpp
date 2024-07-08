@@ -545,6 +545,28 @@ TEST(Raytracing, TraceTest) {
                                          << result;
 }
 
+TEST(Raytracing, TraceBeamTest) {
+
+  const auto beam = torch::empty({1});
+
+  auto npz_data = cnpy::npz_load(npz_dir);
+
+  auto nf_array = npz_data["nf"];
+  const auto nf = torch::from_blob(
+      nf_array.data<float>(), {static_cast<tensor_size_t>(nf_array.num_vals)});
+
+  auto si_array = npz_data["nf"];
+  const auto si = torch::from_blob(
+      si_array.data<float>(), {static_cast<tensor_size_t>(si_array.num_vals)});
+
+  const auto expected = -1.0F;
+  const auto result = rt::trace_beam(nf, beam, si);
+
+  EXPECT_EQ(result, expected) << "expected:\n"
+                              << expected << "\nactual:\n"
+                              << result;
+}
+
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
