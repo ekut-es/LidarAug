@@ -45,7 +45,7 @@ using Slice = torch::indexing::Slice;
 
   // TODO(tom): this is very messy and needs revisiting
 
-  const auto *const si = split_index.const_data_ptr<int>();
+  const auto *const si = split_index.const_data_ptr<float>();
   const auto *const b = beam.const_data_ptr<float>();
 
   const auto index = static_cast<int>(((atan2(b[1], b[0]) * 180 / M_PI) + 360) *
