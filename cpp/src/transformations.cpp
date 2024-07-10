@@ -200,8 +200,7 @@ random_noise(const at::Tensor &points, const float sigma,
       case noise_type::MAX: {
         std::vector<float> noise_intensity;
         noise_intensity.reserve(num_points);
-        std::ranges::fill(noise_intensity,
-                          static_cast<float>(max_intensity));
+        std::ranges::fill(noise_intensity, static_cast<float>(max_intensity));
         return noise_intensity;
       }
 
@@ -222,10 +221,14 @@ random_noise(const at::Tensor &points, const float sigma,
     // axis=-1))
     for (std::size_t j = 0; j < num_points; j++) {
 
-      noise_tensor.index_put_({static_cast<tensor_size_t>(j), POINT_CLOUD_X_IDX}, x[j]);
-      noise_tensor.index_put_({static_cast<tensor_size_t>(j), POINT_CLOUD_Y_IDX}, y[j]);
-      noise_tensor.index_put_({static_cast<tensor_size_t>(j), POINT_CLOUD_Z_IDX}, z[j]);
-      noise_tensor.index_put_({static_cast<tensor_size_t>(j), POINT_CLOUD_I_IDX}, i[j]);
+      noise_tensor.index_put_(
+          {static_cast<tensor_size_t>(j), POINT_CLOUD_X_IDX}, x[j]);
+      noise_tensor.index_put_(
+          {static_cast<tensor_size_t>(j), POINT_CLOUD_Y_IDX}, y[j]);
+      noise_tensor.index_put_(
+          {static_cast<tensor_size_t>(j), POINT_CLOUD_Z_IDX}, z[j]);
+      noise_tensor.index_put_(
+          {static_cast<tensor_size_t>(j), POINT_CLOUD_I_IDX}, i[j]);
     }
 
     // concatenate points
@@ -322,7 +325,8 @@ void rotate_random(at::Tensor points, at::Tensor labels, const float sigma) {
         static_cast<std::size_t>(num_values));
 
     for (tensor_size_t j = 0; j < num_values; j++) {
-      new_tensor.index_put_({i, j}, points[i][indices[static_cast<std::size_t>(j)]]);
+      new_tensor.index_put_({i, j},
+                            points[i][indices[static_cast<std::size_t>(j)]]);
     }
   }
 
@@ -462,10 +466,14 @@ local_to_world_transform(const torch::Tensor &lidar_pose) {
   transformation.index_put_({2, 1}, -cos_pitch * sin_roll);
   transformation.index_put_({2, 2}, cos_pitch * cos_roll);
 
-  transformation.index_put_({0, 1}, cos_yaw * sin_pitch * sin_roll - sin_yaw * cos_roll);
-  transformation.index_put_({0, 2}, -cos_yaw * sin_pitch * cos_roll - sin_yaw * sin_roll);
-  transformation.index_put_({1, 1}, sin_yaw * sin_pitch * sin_roll + cos_yaw * cos_roll);
-  transformation.index_put_({1, 2}, -sin_yaw * sin_pitch * cos_roll + cos_yaw * sin_roll);
+  transformation.index_put_({0, 1}, cos_yaw * sin_pitch * sin_roll -
+                                        sin_yaw * cos_roll);
+  transformation.index_put_({0, 2}, -cos_yaw * sin_pitch * cos_roll -
+                                        sin_yaw * sin_roll);
+  transformation.index_put_({1, 1}, sin_yaw * sin_pitch * sin_roll +
+                                        cos_yaw * cos_roll);
+  transformation.index_put_({1, 2}, -sin_yaw * sin_pitch * cos_roll +
+                                        cos_yaw * sin_roll);
 
   return transformation;
 }

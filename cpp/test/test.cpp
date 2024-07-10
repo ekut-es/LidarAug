@@ -226,8 +226,8 @@ TEST(Transformation, RandomNoiseTest) {
   constexpr static distribution_ranges<float> ranges{
       {1, 2}, {1, 2}, {1, 2}, {1, 2}};
 
-  auto new_points =
-      random_noise(points, sigma, ranges, noise_type::UNIFORM, intensity_range::MAX_INTENSITY_255);
+  auto new_points = random_noise(points, sigma, ranges, noise_type::UNIFORM,
+                                 intensity_range::MAX_INTENSITY_255);
 
   EXPECT_GT(new_points.size(1), points.size(1)) << "No noise has been added...";
 }
@@ -803,7 +803,8 @@ TEST(RNGTransformation, IntensityNoiseTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
 
     constexpr float SIGMA = 20;
-    constexpr intensity_range MAX_INTENSITY = intensity_range::MAX_INTENSITY_255;
+    constexpr intensity_range MAX_INTENSITY =
+        intensity_range::MAX_INTENSITY_255;
 
     // NOTE(tom): values of intensity_shift =
     //           {21.2925453, 0, 21.2925453, 6.91568279}
@@ -848,7 +849,8 @@ TEST(RNGTransformation, IntensityShiftTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
 
     constexpr float SIGMA = 20;
-    constexpr intensity_range MAX_INTENSITY = intensity_range::MAX_INTENSITY_255;
+    constexpr intensity_range MAX_INTENSITY =
+        intensity_range::MAX_INTENSITY_255;
 
     // NOTE(tom): value of intensity_shift = 21.2925453
     const auto expected_points =

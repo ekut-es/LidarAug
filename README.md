@@ -1,4 +1,3 @@
-
 # LidarAug
 
 TODO
@@ -18,7 +17,8 @@ The following dependencies are necessary to build and test the C++ library for d
 - [boost](https://www.boost.org/)
 - GCC 13 or higher
 
-It is also necessary to set the environment variable `TORCH_PATH` to point to where `libtorch` is installed on your system.
+It is also necessary to set the environment variable `TORCH_PATH` to point to where `libtorch` is installed on your
+system.
 
 After that, just run `make ctest` to compile the library and run google test.
 
@@ -26,7 +26,8 @@ After that, just run `make ctest` to compile the library and run google test.
 
 To use the Python library, just run `make install` after cloning and entering the repository.
 
-To test the python functions/wrappers, install [pytest](https://docs.pytest.org/en/8.0.x/) (`pip install pytest`) and run `make testpy`.
+To test the python functions/wrappers, install [pytest](https://docs.pytest.org/en/8.0.x/) (`pip install pytest`) and
+run `make testpy`.
 
 The required Python version is 3.11.
 
@@ -40,7 +41,8 @@ The library contains 4 modules:
 
 2. **weather_simulations:**
 
-`weather_simulations` contains any C++ enums, structs and functions that have bindings and are used for weather simulations.
+`weather_simulations` contains any C++ enums, structs and functions that have bindings and are used for weather
+simulations.
 
 3. **augmentations:**
 

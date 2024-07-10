@@ -13,7 +13,7 @@ def _check_points(points: Tensor) -> None:
         shape
     ) == 3, "Tensor is not of shape (B, N, F), where B is the batch-size, N is the number of points and F is the number of features!"
     assert shape[
-        2] == 4, "point is supposed to have 4 components (x, y, z, intensity)!"
+               2] == 4, "point is supposed to have 4 components (x, y, z, intensity)!"
 
 
 def _check_labels(labels: Tensor) -> None:
@@ -26,7 +26,7 @@ def _check_labels(labels: Tensor) -> None:
         shape
     ) == 3, "Tensor is not of shape (B, N, F), where B is the batch-size, N is the number of labels and F is the number of features!"
     assert shape[
-        2] == 7, "label is supposed to have 7 components (x, y, z, width, height, length, theta)!"
+               2] == 7, "label is supposed to have 7 components (x, y, z, width, height, length, theta)!"
 
 
 def _check_labels_and_points(points: Tensor, labels: Tensor) -> None:
