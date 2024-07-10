@@ -43,30 +43,33 @@ using Slice = torch::indexing::Slice;
                                    const torch::Tensor &beam,
                                    const torch::Tensor &split_index) {
 
-  // TODO(tom): this is very messy and needs revisiting
+  const auto index =
+      static_cast<int>(
+          ((atan2(beam[1].item<float>(), beam[0].item<float>()) * 180 / M_PI) +
+           360) *
+          NF_SPLIT_FACTOR) %
+      (360 * NF_SPLIT_FACTOR);
 
-  const auto *const si = split_index.const_data_ptr<float>();
-  const auto *const b = beam.const_data_ptr<float>();
+  for (auto i = split_index[index].item<tensor_size_t>();
+       i < split_index[index + 1].item<tensor_size_t>(); i++) {
+    const auto nf = noise_filter[i];
 
-  const auto index = static_cast<int>(((atan2(b[1], b[0]) * 180 / M_PI) + 360) *
-                                      NF_SPLIT_FACTOR) %
-                     (360 * NF_SPLIT_FACTOR);
+    const auto sphere = torch::tensor(
+        {nf[0].item<float>(), nf[1].item<float>(), nf[2].item<float>()});
 
-  for (auto i = si[index]; i < si[index + 1]; i++) {
-    const auto *const nf = noise_filter[i].const_data_ptr<float>();
-
-    const auto sphere =
-        (noise_filter[i][0], noise_filter[i][1], noise_filter[i][2]);
-    const auto beam_dist = rt::vector_length(beam);
-    if (beam_dist < nf[3])
+    if (const auto beam_dist = rt::vector_length(beam);
+        beam_dist < nf[3].item<float>())
       return -1;
 
-    const auto length_beam_sphere = rt::scalar(sphere, rt::normalize(beam));
-    if (length_beam_sphere > 0.0) {
-      const auto dist_beam_sphere =
-          sqrt((nf[3] * nf[3]) - (length_beam_sphere * length_beam_sphere));
-      if (dist_beam_sphere < nf[4])
-        return nf[3];
+    if (const auto length_beam_sphere = rt::scalar(sphere, rt::normalize(beam));
+        length_beam_sphere > 0.0) {
+
+      if (const auto dist_beam_sphere =
+              sqrt(nf[3].item<float>() * nf[3].item<float>() -
+                   length_beam_sphere * length_beam_sphere);
+          dist_beam_sphere < nf[4].item<float>())
+
+        return nf[3].item<float>();
     }
   }
 
