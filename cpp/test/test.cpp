@@ -697,9 +697,9 @@ TEST(RNGTransformation, RotateRandomTest) {
   const float *const label2 = l2.const_data_ptr<float>();
 
   const float angle_label1 =
-      fmodf32((math_utils::PI_RAD + angle), (2.0f * math_utils::PI_RAD));
+      fmodf((math_utils::PI_RAD + angle), (2.0f * math_utils::PI_RAD));
   const float angle_label2 =
-      fmodf32((math_utils::PI_RAD + angle), (2.0f * math_utils::PI_RAD));
+      fmodf((math_utils::PI_RAD + angle), (2.0f * math_utils::PI_RAD));
 
   const auto expected_labels = torch::tensor(
       {{label1[0], label1[1], label1[2], 2.0f, 3.0f, 2.5f, angle_label1},
