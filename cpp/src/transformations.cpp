@@ -485,7 +485,7 @@ local_to_local_transform(const torch::Tensor &from_pose,
   auto local_to_world = local_to_world_transform(from_pose);
   auto world_to_local = torch::linalg_inv(local_to_world_transform(to_pose));
 
-  return local_to_world.mm(world_to_local);
+  return world_to_local.mm(local_to_world);
 }
 
 void apply_transformation(torch::Tensor points,
