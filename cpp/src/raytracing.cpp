@@ -3,6 +3,7 @@
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
+#include <omp.h>
 #include <torch/csrc/autograd/generated/variable_factories.h>
 
 using namespace torch_utils;
@@ -275,10 +276,20 @@ rt::sort_noise_filter(torch::Tensor nf) {
   nf = nf.index({nf.index({Slice(), 3}).argsort()});
   nf = nf.index({nf.index({Slice(), 5}).argsort()});
 
-  for (tensor_size_t i = 0; i < nf.size(0) - 1; i++) {
-    if (!nf.index({i, 5}).equal(nf.index({i + 1, 5}))) {
+  const auto *const nf_ptr = nf.const_data_ptr<float>();
+  const auto row_size = nf.size(1);
 
-      split_index[nf.index({i + 1, 5}).item<tensor_size_t>()] = i + 1;
+#pragma omp parallel for
+  for (tensor_size_t i = 0; i < nf.size(0) - 1; i++) {
+
+    const auto idx = i * row_size + 5;
+
+    const auto val_at_i = nf_ptr[idx];
+    const auto val_at_i_plus_one = nf_ptr[idx + row_size];
+
+    if (val_at_i != val_at_i_plus_one) {
+      split_index.index_put_({static_cast<tensor_size_t>(val_at_i_plus_one)},
+                             i + 1);
     }
   }
 
