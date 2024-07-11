@@ -8,7 +8,7 @@
 using namespace torch_utils;
 using Slice = torch::indexing::Slice;
 
-#define NF_SPLIT_FACTOR 32
+constexpr auto NF_SPLIT_FACTOR = 32;
 
 [[nodiscard]] torch::Tensor rt::trace(torch::Tensor point_cloud,
                                       const torch::Tensor &noise_filter,
