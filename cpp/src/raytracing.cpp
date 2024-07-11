@@ -3,6 +3,7 @@
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
+#include <torch/csrc/autograd/generated/variable_factories.h>
 
 using namespace torch_utils;
 using Slice = torch::indexing::Slice;
@@ -248,9 +249,9 @@ void rt::intersects(torch::Tensor point_cloud,
   std::uniform_real_distribution<float> y_ud(dim[2], dim[3]);
   std::uniform_real_distribution<float> z_ud(dim[4], dim[5]);
 
-  const auto x = draw_values<float, F32>(x_ud, total_drops);
-  const auto y = draw_values<float, F32>(y_ud, total_drops);
-  const auto z = draw_values<float, F32>(z_ud, total_drops);
+  const auto x = torch::empty({total_drops}).uniform_(dim[0], dim[1]);
+  const auto y = torch::empty({total_drops}).uniform_(dim[2], dim[3]);
+  const auto z = torch::empty({total_drops}).uniform_(dim[4], dim[5]);
 
   const auto dist =
       torch::sqrt(torch::pow(x, 2) + torch::pow(y, 2) + torch::pow(z, 2));
