@@ -225,13 +225,13 @@ void rt::intersects(torch::Tensor point_cloud,
   torch::Tensor (*f)(torch::Tensor, float);
 
   switch (d) {
-  case LOG_NORMAL:
+  case distribution::log_normal:
     f = inverted_lognormal_cdf;
     break;
-  case EXPONENTIAL:
+  case distribution::exponential:
     f = inverted_exponential_cdf;
     break;
-  case GM:
+  case distribution::gm:
     f = inverted_exponential_gm;
     break;
   }

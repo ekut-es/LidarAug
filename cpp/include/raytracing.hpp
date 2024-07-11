@@ -6,11 +6,11 @@
 #include <torch/serialize/tensor.h>
 #include <utility>
 
-typedef enum {
-  EXPONENTIAL,
-  LOG_NORMAL,
-  GM,
-} distribution;
+enum struct distribution : std::uint8_t {
+  exponential,
+  log_normal,
+  gm,
+};
 
 namespace rt {
 
@@ -96,14 +96,14 @@ rotate(const torch::Tensor &v, const torch::Tensor &k, const float angle) {
                                const torch::Tensor &beam,
                                const torch::Tensor &split_index);
 
-[[nodiscard]] torch::Tensor sample_particles(int64_t num_particles,
-                                             float precipitation,
-                                             distribution d = EXPONENTIAL);
+[[nodiscard]] torch::Tensor
+sample_particles(int64_t num_particles, float precipitation,
+                 distribution d = distribution::exponential);
 
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 generate_noise_filter(const std::array<float, 6> &dim, uint32_t drops_per_m3,
                       float precipitation = 5.0, int32_t scale = 1,
-                      distribution d = EXPONENTIAL);
+                      distribution d = distribution::exponential);
 
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 sort_noise_filter(torch::Tensor nf);
