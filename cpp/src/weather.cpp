@@ -130,8 +130,8 @@ fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
                                  float precipitation, int32_t scale,
                                  float max_intensity) {
 
-  auto [nf, si] =
-      rt::generate_noise_filter(dims, num_drops, precipitation, scale, GM);
+  auto [nf, si] = rt::generate_noise_filter(dims, num_drops, precipitation,
+                                            scale, distribution::gm);
   point_cloud = rt::trace(point_cloud, nf, si, 1.25);
   point_cloud.index({point_cloud.index({Slice(), 3}) > max_intensity, 3}) =
       max_intensity;
