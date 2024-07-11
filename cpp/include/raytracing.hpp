@@ -21,7 +21,7 @@ namespace rt {
 
 void intersects(torch::Tensor point_cloud, const torch::Tensor &oise_filter,
                 const torch::Tensor &split_index, torch::Tensor intersections,
-                const torch::Tensor &distances, torch::Tensor distance_count,
+                torch::Tensor distances, torch::Tensor distance_count,
                 torch::Tensor most_intersect_count,
                 torch::Tensor most_intersect_dist, tensor_size_t num_points,
                 float intensity_factor);

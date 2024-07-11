@@ -79,7 +79,7 @@ using Slice = torch::indexing::Slice;
 void rt::intersects(torch::Tensor point_cloud,
                     const torch::Tensor &noise_filter,
                     const torch::Tensor &split_index,
-                    torch::Tensor intersections, const torch::Tensor &distances,
+                    torch::Tensor intersections, torch::Tensor distances,
                     torch::Tensor distance_count,
                     torch::Tensor most_intersect_count,
                     torch::Tensor most_intersect_dist,
@@ -87,7 +87,7 @@ void rt::intersects(torch::Tensor point_cloud,
 
   constexpr auto NUM_RAYS = 11;
 
-  const auto get_original_intersection = [intersections, noise_filter](
+  const auto get_original_intersection = [&intersections, noise_filter](
                                              const torch::Tensor &beam,
                                              const torch::Tensor &split_index,
                                              const tensor_size_t index) {
@@ -95,14 +95,14 @@ void rt::intersects(torch::Tensor point_cloud,
 
     auto intersection_dist = rt::trace_beam(noise_filter, beam, split_index);
     if (intersection_dist > 0) {
-      intersections[index][idx_count] = intersection_dist;
+      intersections.index_put_({index, idx_count}, intersection_dist);
       idx_count += 1;
     }
 
     return std::make_pair(intersection_dist, idx_count);
   };
 
-  const auto rotate_points = [noise_filter, intersections,
+  const auto rotate_points = [noise_filter, &intersections,
                               split_index](const torch::Tensor &original_point,
                                            float &intersection_dist,
                                            tensor_size_t &idx_count,
@@ -127,7 +127,7 @@ void rt::intersects(torch::Tensor point_cloud,
         intersection_dist = rt::trace_beam(noise_filter, beam, split_index);
 
         if (intersection_dist > 0) {
-          intersections[index][idx_count] = intersection_dist;
+          intersections.index_put_({index, idx_count}, intersection_dist);
           idx_count += 1;
         }
         rot_vec = rt::rotate(rot_vec, rt::normalize(original_point),
@@ -136,19 +136,19 @@ void rt::intersects(torch::Tensor point_cloud,
     }
   };
 
-  const auto count_intersections = [intersections, distances,
-                                    distance_count](tensor_size_t index) {
+  const auto count_intersections = [intersections, &distances,
+                                    &distance_count](tensor_size_t index) {
     uint32_t n_intersects = 0;
 
     for (auto i = 0; i < intersections.size(1); i++) {
       const auto intersect = intersections[index][i].item<float>();
       if (intersect != 0)
         n_intersects += 1;
-      for (auto j = 0; j < NUM_RAYS; j++) {
+      for (tensor_size_t j = 0; j < NUM_RAYS; j++) {
         if (intersect != 0) {
           if (distances[index][j].item<float>() == 0) {
-            distance_count[index][j] = 1;
-            distances[index][j] = intersect;
+            distance_count.index_put_({index, j}, 1);
+            distances.index_put_({index, j}, intersect);
             break;
           } else if (intersect == distances[index][j].item<float>()) {
             distance_count[index][j] += 1;
@@ -162,7 +162,7 @@ void rt::intersects(torch::Tensor point_cloud,
   };
 
   const auto find_most_intersected_drop =
-      [most_intersect_count, most_intersect_dist, distances, point_cloud,
+      [&most_intersect_count, &most_intersect_dist, distances, &point_cloud,
        intensity_factor](const torch::Tensor &distance_count,
                          const uint32_t n_intersects,
                          const tensor_size_t index) {
@@ -177,35 +177,36 @@ void rt::intersects(torch::Tensor point_cloud,
             max_count = count;
             max_intersection_dist = distances[index][i].item<float>();
           }
-          most_intersect_count[index] = max_count;
-          most_intersect_dist[index] = max_intersection_dist;
+          most_intersect_count.index_put_({index}, max_count);
+          most_intersect_dist.index_put_({index}, max_intersection_dist);
+        }
 
-          const auto r_most = max_count / n_intersects;
+        const auto r_most = max_count / n_intersects;
 
-          if (r_all > 0.15) {
-            if (r_most > 0.8) { // set point towards sensor
-              const auto dist = rt::vector_length(point_cloud[index]);
+        if (r_all > 0.15) {
+          if (r_most > 0.8) { // set point towards sensor
+            const auto dist = rt::vector_length(point_cloud[index]);
 
-              point_cloud[index][0] *= max_intersection_dist / dist;
-              point_cloud[index][1] *= max_intersection_dist / dist;
-              point_cloud[index][2] *= max_intersection_dist / dist;
-              point_cloud[index][3] *= 0.005;
-            } else { // delete point (filtered out later)
-              point_cloud[index][0] = 0;
-              point_cloud[index][1] = 0;
-              point_cloud[index][2] = 0;
-              point_cloud[index][3] = 0;
-            }
-          } else { // modify intensity of unaltered point
-            point_cloud[index][3] *= intensity_factor;
+            point_cloud[index][0] *= max_intersection_dist / dist;
+            point_cloud[index][1] *= max_intersection_dist / dist;
+            point_cloud[index][2] *= max_intersection_dist / dist;
+            point_cloud[index][3] *= 0.005;
+          } else { // delete point (filtered out later)
+            point_cloud.index_put_({index, 0}, 0);
+            point_cloud.index_put_({index, 1}, 0);
+            point_cloud.index_put_({index, 2}, 0);
+            point_cloud.index_put_({index, 3}, 0);
           }
+        } else { // modify intensity of unaltered point
+          point_cloud[index][3] *= intensity_factor;
         }
       };
 
   for (tensor_size_t i = 0; i < num_points; i++) {
 
-    const auto original_point =
-        (point_cloud[i][0], point_cloud[i][1], point_cloud[i][2]);
+    const auto original_point = torch::tensor(
+        {point_cloud[i][0].item<float>(), point_cloud[i][1].item<float>(),
+         point_cloud[i][2].item<float>()});
 
     auto [intersection_dist, idx_count] =
         get_original_intersection(original_point, split_index, i);
