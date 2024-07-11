@@ -9,6 +9,7 @@
 #include <ATen/ops/empty.h>
 #include <boost/math/distributions/normal.hpp>
 #include <c10/core/ScalarType.h>
+#include <numbers>
 #include <random>
 #include <torch/torch.h>
 #include <variant>
@@ -174,22 +175,22 @@ draw_unique_uniform_values(std::size_t size, std::size_t num_values) {
   return values;
 }
 
-[[nodiscard]] inline torch::Tensor inverted_lognormal_cdf(torch::Tensor D,
-                                                          float R) {
+[[nodiscard]] inline torch::Tensor
+inverted_lognormal_cdf(const torch::Tensor &D, float R) {
   return std::pow(R, 0.23) *
-         torch::exp((std::sqrt(2) * std::log(1.43 - (0.0003 * R)) *
+         torch::exp((std::numbers::sqrt2 * std::log(1.43 - (0.0003 * R)) *
                      torch::erfinv((0.0116279 * D) / (std::pow(R, 0.22)))) -
                     0.328504);
 }
 
-[[nodiscard]] inline torch::Tensor inverted_exponential_cdf(torch::Tensor D,
-                                                            float R) {
+[[nodiscard]] inline torch::Tensor
+inverted_exponential_cdf(const torch::Tensor &D, float R) {
   return -0.243902 * std::pow(R, 0.21) *
          torch::log(0.0005124998718750320 * D * std::pow(R, -0.21));
 }
 
-[[nodiscard]] inline torch::Tensor inverted_exponential_gm(torch::Tensor D,
-                                                           float R) {
+[[nodiscard]] inline torch::Tensor
+inverted_exponential_gm(const torch::Tensor &D, float R) {
   return -0.436681 * std::pow(R, 0.48) *
              torch::log(0.000916002564807181 * D * std::pow(R, 0.46)) -
          5.9143581981431375;
