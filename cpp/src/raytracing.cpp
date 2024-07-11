@@ -8,7 +8,7 @@
 using namespace torch_utils;
 using Slice = torch::indexing::Slice;
 
-constexpr auto NF_SPLIT_FACTOR = 32;
+constexpr auto nf_split_factor = 32;
 
 [[nodiscard]] torch::Tensor rt::trace(torch::Tensor point_cloud,
                                       const torch::Tensor &noise_filter,
@@ -47,8 +47,8 @@ constexpr auto NF_SPLIT_FACTOR = 32;
       static_cast<int>(
           ((atan2(beam[1].item<float>(), beam[0].item<float>()) * 180 / M_PI) +
            360) *
-          NF_SPLIT_FACTOR) %
-      (360 * NF_SPLIT_FACTOR);
+          nf_split_factor) %
+      (360 * nf_split_factor);
 
   for (auto i = split_index[index].item<tensor_size_t>();
        i < split_index[index + 1].item<tensor_size_t>(); i++) {
@@ -85,7 +85,7 @@ void rt::intersects(torch::Tensor point_cloud,
                     torch::Tensor most_intersect_dist,
                     const tensor_size_t num_points, float intensity_factor) {
 
-  constexpr auto NUM_RAYS = 11;
+  constexpr auto num_rays = 11;
 
   const auto get_original_intersection = [&intersections, noise_filter](
                                              const torch::Tensor &beam,
@@ -144,7 +144,7 @@ void rt::intersects(torch::Tensor point_cloud,
       const auto intersect = intersections[index][i].item<float>();
       if (intersect != 0)
         n_intersects += 1;
-      for (tensor_size_t j = 0; j < NUM_RAYS; j++) {
+      for (tensor_size_t j = 0; j < num_rays; j++) {
         if (intersect != 0) {
           if (distances[index][j].item<float>() == 0) {
             distance_count.index_put_({index, j}, 1);
@@ -166,7 +166,7 @@ void rt::intersects(torch::Tensor point_cloud,
        intensity_factor](const torch::Tensor &distance_count,
                          const uint32_t n_intersects,
                          const tensor_size_t index) {
-        const auto r_all = n_intersects / NUM_RAYS;
+        const auto r_all = n_intersects / num_rays;
 
         tensor_size_t max_count = 0;
         auto max_intersection_dist = 0.0;
@@ -265,9 +265,9 @@ rt::generate_noise_filter(const std::array<float, 6> &dim,
 
   const auto index =
       (((torch::arctan2(y, x) * 180 / math_utils::PI_RAD) + 360) *
-       NF_SPLIT_FACTOR)
+       nf_split_factor)
           .toType(I32) %
-      (360 * NF_SPLIT_FACTOR);
+      (360 * nf_split_factor);
   auto nf = torch::stack({x, y, z, dist, size, index}, -1);
 
   return sort_noise_filter(nf);
@@ -276,7 +276,7 @@ rt::generate_noise_filter(const std::array<float, 6> &dim,
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 rt::sort_noise_filter(torch::Tensor nf) {
 
-  auto split_index = torch::zeros(360 * NF_SPLIT_FACTOR + 1);
+  auto split_index = torch::zeros(360 * nf_split_factor + 1);
 
   nf = nf.index({nf.index({Slice(), 3}).argsort()});
   nf = nf.index({nf.index({Slice(), 5}).argsort()});
