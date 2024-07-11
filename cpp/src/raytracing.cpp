@@ -223,19 +223,13 @@ void rt::intersects(torch::Tensor point_cloud,
 [[nodiscard]] torch::Tensor rt::sample_particles(int64_t num_particles,
                                                  const float precipitation,
                                                  const distribution d) {
-  torch::Tensor (*f)(torch::Tensor, float);
+  constexpr std::array function_table = {
+      inverted_exponential_cdf,
+      inverted_lognormal_cdf,
+      inverted_exponential_gm,
+  };
 
-  switch (d) {
-  case distribution::log_normal:
-    f = inverted_lognormal_cdf;
-    break;
-  case distribution::exponential:
-    f = inverted_exponential_cdf;
-    break;
-  case distribution::gm:
-    f = inverted_exponential_gm;
-    break;
-  }
+  const auto f = function_table.at(static_cast<size_t>(d));
 
   return f(torch::rand({num_particles}), precipitation) * (1 / 2000);
 }
