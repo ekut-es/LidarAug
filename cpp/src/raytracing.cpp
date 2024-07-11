@@ -3,7 +3,6 @@
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
-#include <utility>
 
 using namespace torch_utils;
 using Slice = torch::indexing::Slice;

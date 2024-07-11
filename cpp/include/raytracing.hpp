@@ -4,7 +4,6 @@
 #include "tensor.hpp"
 #include <cstdint>
 #include <torch/serialize/tensor.h>
-#include <utility>
 
 enum struct distribution : std::uint8_t {
   exponential,
