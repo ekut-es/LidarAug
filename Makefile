@@ -25,6 +25,9 @@ testpy: ./pytest/test.py
 rerun: ./cpp/build_files
 	cd ./cpp/build_files && ctest --rerun-failed --output-on-failure
 
+sim: release
+	cd ./cpp/build_files && ctest --output-on-failure -R 'Simulation.*'
+
 install:
 	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.11 -m pip install . && rm -rf ./tmp
 
