@@ -6,9 +6,9 @@
 #include <torch/serialize/tensor.h>
 
 enum struct distribution : std::uint8_t {
-  exponential,
-  log_normal,
-  gm,
+  exponential = 0,
+  log_normal = 1,
+  gm = 2,
 };
 
 namespace rt {
@@ -18,14 +18,14 @@ namespace rt {
                                   const torch::Tensor &split_index,
                                   float intensity_factor = 0.9);
 
-void intersects(torch::Tensor point_cloud, const torch::Tensor &oise_filter,
+void intersects(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
                 const torch::Tensor &split_index, torch::Tensor intersections,
                 torch::Tensor distances, torch::Tensor distance_count,
                 torch::Tensor most_intersect_count,
                 torch::Tensor most_intersect_dist, tensor_size_t num_points,
                 float intensity_factor);
 
-[[nodiscard]] inline torch::Tensor mul(const torch::Tensor &v, float c) {
+[[nodiscard]] inline torch::Tensor mul(const torch::Tensor &v, const float c) {
   // NOTE(tom): This is almost the same as `scale_points`
   return v * c;
 }

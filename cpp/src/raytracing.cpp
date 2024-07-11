@@ -106,16 +106,16 @@ void rt::intersects(torch::Tensor point_cloud,
                                            float &intersection_dist,
                                            tensor_size_t &idx_count,
                                            tensor_size_t index) {
-    constexpr auto divergence_angle = 2e-4;
     constexpr auto vector_rotation_angle = M_PI / 5;
     constexpr auto num_streaks = 5;
-    constexpr auto num_points_per_streak = 2;
     const auto z_axis = torch::tensor({0.0, 0.0, 1.0});
 
     auto rot_vec = normalize(rt::cross(original_point, z_axis));
 
     for (auto j = 0; j < num_streaks; j++) {
+      constexpr auto num_points_per_streak = 2;
       for (auto k = 1; k < num_points_per_streak + 1; k++) {
+        constexpr auto divergence_angle = 2e-4;
 
         auto beam = rt::rotate(original_point, rot_vec,
                                (k <= num_points_per_streak / 2)
@@ -149,7 +149,9 @@ void rt::intersects(torch::Tensor point_cloud,
             distance_count.index_put_({index, j}, 1);
             distances.index_put_({index, j}, intersect);
             break;
-          } else if (intersect == distances[index][j].item<float>()) {
+          }
+
+          if (intersect == distances[index][j].item<float>()) {
             distance_count[index][j] += 1;
             break;
           }
@@ -165,14 +167,12 @@ void rt::intersects(torch::Tensor point_cloud,
        intensity_factor](const torch::Tensor &distance_count,
                          const uint32_t n_intersects,
                          const tensor_size_t index) {
-        const auto r_all = n_intersects / num_rays;
-
         tensor_size_t max_count = 0;
         auto max_intersection_dist = 0.0;
 
         for (auto i = 0; i < distance_count.size(1); i++) {
-          auto count = distance_count[index][i].item<tensor_size_t>();
-          if (count > max_count) {
+          if (const auto count = distance_count[index][i].item<tensor_size_t>();
+              count > max_count) {
             max_count = count;
             max_intersection_dist = distances[index][i].item<float>();
           }
@@ -180,10 +180,12 @@ void rt::intersects(torch::Tensor point_cloud,
           most_intersect_dist.index_put_({index}, max_intersection_dist);
         }
 
-        const auto r_most = max_count / n_intersects;
+        if (const auto r_all = n_intersects / static_cast<double>(num_rays);
+            r_all > 0.15) {
+          assert(n_intersects != 0);
+          if (const auto r_most = max_count / static_cast<double>(n_intersects);
+              r_most > 0.8) { // set point towards sensor
 
-        if (r_all > 0.15) {
-          if (r_most > 0.8) { // set point towards sensor
             const auto dist = rt::vector_length(point_cloud[index]);
 
             point_cloud[index][0] *= max_intersection_dist / dist;
@@ -220,7 +222,7 @@ void rt::intersects(torch::Tensor point_cloud,
 
 [[nodiscard]] torch::Tensor rt::sample_particles(int64_t num_particles,
                                                  const float precipitation,
-                                                 distribution d) {
+                                                 const distribution d) {
   torch::Tensor (*f)(torch::Tensor, float);
 
   switch (d) {
@@ -240,15 +242,13 @@ void rt::intersects(torch::Tensor point_cloud,
 
 // TODO(tom): Make dim a 'distribution_ranges' (found in transformations.hpp,
 // needs to go in utils or something)
-[[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
-rt::generate_noise_filter(const std::array<float, 6> &dim,
-                          uint32_t drops_per_m3, const float precipitation,
-                          int32_t scale, distribution d) {
+[[nodiscard]] std::pair<torch::Tensor, torch::Tensor> rt::generate_noise_filter(
+    const std::array<float, 6> &dim, const uint32_t drops_per_m3,
+    const float precipitation, const int32_t scale, const distribution d) {
 
-  const auto total_drops =
-      static_cast<int>(std::abs(dim[0] - dim[1]) * std::abs(dim[2] - dim[3]) *
-                       std::abs(dim[4] - dim[5]) * drops_per_m3);
-  // random.seed(42)
+  const auto total_drops = static_cast<int>(
+      std::abs(dim[0] - dim[1]) * std::abs(dim[2] - dim[3]) *
+      std::abs(dim[4] - dim[5]) * static_cast<float>(drops_per_m3));
 
   std::uniform_real_distribution<float> x_ud(dim[0], dim[1]);
   std::uniform_real_distribution<float> y_ud(dim[2], dim[3]);
@@ -267,7 +267,7 @@ rt::generate_noise_filter(const std::array<float, 6> &dim,
        nf_split_factor)
           .toType(I32) %
       (360 * nf_split_factor);
-  auto nf = torch::stack({x, y, z, dist, size, index}, -1);
+  const auto nf = torch::stack({x, y, z, dist, size, index}, -1);
 
   return sort_noise_filter(nf);
 }
