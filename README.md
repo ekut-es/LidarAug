@@ -1,4 +1,3 @@
-
 # LidarAug
 
 TODO
@@ -18,10 +17,8 @@ The following dependencies are necessary to build and test the C++ library for d
 - [boost](https://www.boost.org/)
 - GCC 13 or higher
 
-[TBB](https://github.com/oneapi-src/oneTBB) might also be required depending on your setup.
-It is necessary for C++17 execution policies and if you're on Linux, it should be available as a package.
-
-It is also necessary to set the environment variable `TORCH_PATH` to point to where `libtorch` is installed on your system.
+It is also necessary to set the environment variable `TORCH_PATH` to point to where `libtorch` is installed on your
+system.
 
 After that, just run `make ctest` to compile the library and run google test.
 
@@ -33,7 +30,8 @@ Open3d is waiting for the full release of TensorFlow 2.16.0, which adds Python 3
 
 On Linux at least TensorFlow 2.16.0-rc0 is available, but open3d is waiting for a full release before adding 3.12 support.
 
-To test the python functions/wrappers, install [pytest](https://docs.pytest.org/en/8.0.x/) (`pip install pytest`) and run `make testpy`.
+To test the python functions/wrappers, install [pytest](https://docs.pytest.org/en/8.0.x/) (`pip install pytest`) and
+run `make testpy`.
 
 The required Python version is 3.11.
 
@@ -47,7 +45,8 @@ The library contains 4 modules:
 
 2. **weather_simulations:**
 
-`weather_simulations` contains any C++ enums, structs and functions that have bindings and are used for weather simulations.
+`weather_simulations` contains any C++ enums, structs and functions that have bindings and are used for weather
+simulations.
 
 3. **augmentations:**
 

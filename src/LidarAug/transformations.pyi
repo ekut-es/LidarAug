@@ -91,7 +91,7 @@ def scale_random(points: Tensor, labels: Tensor, sigma: float,
 
     :param points:    is the point cloud that contains the points that will be scaled.
     :param labels:    are the labels belonging to the aforementioned point cloud.
-    :param sigma:     is the the standard deviation of the truncated normal distribution.
+    :param sigma:     is the standard deviation of the truncated normal distribution.
     :param max_scale: is the upper limit of the truncated normal distribution. The lower limit is the inverse.
     """
     ...
@@ -109,7 +109,7 @@ def scale_local(points: Tensor, labels: Tensor, sigma: float,
 
     :param points:    is the point cloud that contains the points that will be scaled.
     :param labels:    are the labels belonging to the aforementioned point cloud.
-    :param sigma:     is the the standard deviation of the truncated normal distribution.
+    :param sigma:     is the standard deviation of the truncated normal distribution.
     :param max_scale: is the upper limit of the truncated normal distribution. The lower limit is the inverse.
     """
     ...
@@ -145,15 +145,15 @@ def random_noise(points: Tensor, sigma: float,
 
 def thin_out(points: Tensor, sigma: float) -> Tensor:
     """
-     Randomly genereates a percentage from a norma distribution, which determines
-     how many items should be 'thinned out'. From that percentage random indeces
+     Randomly generates a percentage from a norma distribution, which determines
+     how many items should be 'thinned out'. From that percentage random indices
      are uniformly drawn (in a random order, where each index is unique).
 
-     Finally a new tensor is created containing the items present at those
-     indeces.
+     Finally, a new tensor is created containing the items present at those
+     indices.
 
     :param points: is the point cloud.
-    :param sigma:  is the standard diviation of the distribution that genereates the percentage.
+    :param sigma:  is the standard deviation of the distribution that generates the percentage.
     :return: a new tensor containing the new set of points.
     """
     ...
@@ -161,7 +161,7 @@ def thin_out(points: Tensor, sigma: float) -> Tensor:
 
 def rotate_deg(points: Tensor, angle: float) -> None:
     """
-    Rotates a batch of points anlong the 'z' axis (yaw).
+    Rotates a batch of points along the 'z' axis (yaw).
 
     :param points: is the point cloud that the rotation is applied to.
     :param angle:  is the angle (in degrees) by which the points are to be rotated.
@@ -171,7 +171,7 @@ def rotate_deg(points: Tensor, angle: float) -> None:
 
 def rotate_rad(points: Tensor, angle: float) -> None:
     """
-    Rotates a batch of points anlong the 'z' axis (yaw).
+    Rotates a batch of points along the 'z' axis (yaw).
 
     :param points: is the point cloud that the rotation is applied to.
     :param angle:  is the angle (in radians) by which the points are to be rotated.
@@ -182,7 +182,7 @@ def rotate_rad(points: Tensor, angle: float) -> None:
 def rotate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
     """
     Rotates points and labels.
-    The number of degrees that they are rotated by is determined by a randomly genereated value from a normal distribution.
+    The number of degrees that they are rotated by is determined by a randomly generated value from a normal distribution.
 
     :param points: is the point cloud that the rotation is applied to.
     :param labels: are the labels belonging to the point cloud that the rotation is applied to.
@@ -213,7 +213,7 @@ def random_point_noise(points: Tensor, sigma: float) -> None:
     How much each coordinate is changed is decided by values drawn from a normal distribution.
 
     :param points: is the point cloud from which each point is moved.
-    :param sigma:  is the standard diviation of the normal distribution.
+    :param sigma:  is the standard deviation of the normal distribution.
     """
     ...
 
@@ -224,7 +224,7 @@ def transform_along_ray(points: Tensor, sigma: float) -> None:
     How much it is moved is decided by a value drawn from a normal distribution.
 
     :param points: is the point cloud from which each point is moved.
-    :param sigma:  is the standard diviation of the normal distribution.
+    :param sigma:  is the standard deviation of the normal distribution.
     """
     ...
 
@@ -235,7 +235,7 @@ def intensity_noise(points: Tensor, sigma: float,
     Shifts the intensity value of every point in the point cloud by a random amount drawn from a normal distribution.
 
     :param points:        is the point cloud with all the points.
-    :param sigma:         is the standard diviation of the normal distribution.
+    :param sigma:         is the standard deviation of the normal distribution.
     :param max_intensity: is the maximum intensity value (either 1 or 255, depending on the dataset).
     """
     ...
@@ -247,7 +247,7 @@ def intensity_shift(points: Tensor, sigma: float,
     Shifts the intensity value of every point in the point cloud by a single value drawn from a normal distribution.
 
     :param points:        is the point cloud with all the points.
-    :param sigma:         is the standard diviation of the normal distribution.
+    :param sigma:         is the standard deviation of the normal distribution.
     :param max_intensity: is the maximum intensity value (either 1 or 255, depending on the dataset).
     """
     ...

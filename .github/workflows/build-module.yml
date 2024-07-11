@@ -1,7 +1,7 @@
 name: Build and test module
 
 on:
-  ["push", "pull_request"]
+  [ "push", "pull_request" ]
 
 jobs:
   build:
@@ -10,33 +10,33 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11"]
+        python-version: [ "3.11" ]
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install C++ build tools
-      run: sudo apt-get update && sudo apt-get install -y build-essential
-    - name: Install Boost
-      run: sudo apt-get update && sudo apt-get install -y libboost-all-dev
-    - name: Install setuptools
-      run: python -m pip install setuptools==69.5.1
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install pytest pybind11 numpy==1.24.0
-        python -m pip install torch==2.1.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Find PyTorch cmake path
-      id: find-torch-cmake-path
-      run: |
-        echo "TORCH_PATH=$(python -c 'import torch; import os; print(os.path.join(torch.__path__[0], "share", "cmake"))')" >> $GITHUB_ENV
-    - name: Build and install C++ module
-      run: |
-        python -m pip install . --no-cache-dir
-    - name: Test with pytest
-      run: |
-        python -m pytest ./pytest/test.py -v
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install C++ build tools
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+      - name: Install Boost
+        run: sudo apt-get update && sudo apt-get install -y libboost-all-dev
+      - name: Install setuptools
+        run: python -m pip install setuptools==69.5.1
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pybind11 numpy==1.24.0
+          python -m pip install torch==2.1.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Find PyTorch cmake path
+        id: find-torch-cmake-path
+        run: |
+          echo "TORCH_PATH=$(python -c 'import torch; import os; print(os.path.join(torch.__path__[0], "share", "cmake"))')" >> $GITHUB_ENV
+      - name: Build and install C++ module
+        run: |
+          python -m pip install . --no-cache-dir
+      - name: Test with pytest
+        run: |
+          python -m pytest ./pytest/test.py -v

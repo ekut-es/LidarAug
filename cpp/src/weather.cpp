@@ -39,8 +39,8 @@ calculate_factors(fog_parameter metric, float viewing_dist) {
 }
 
 [[nodiscard]] std::optional<std::vector<torch::Tensor>>
-fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
-    float sigma, int mean) {
+fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
+    const float sigma, const int mean) {
 
   auto rng = get_rng();
   std::uniform_real_distribution<float> distrib(0, HUNDRED_PERCENT - 1);
@@ -130,8 +130,8 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
                                  float precipitation, int32_t scale,
                                  float max_intensity) {
 
-  auto [nf, si] =
-      rt::generate_noise_filter(dims, num_drops, precipitation, scale, GM);
+  auto [nf, si] = rt::generate_noise_filter(dims, num_drops, precipitation,
+                                            scale, distribution::gm);
   point_cloud = rt::trace(point_cloud, nf, si, 1.25);
   point_cloud.index({point_cloud.index({Slice(), 3}) > max_intensity, 3}) =
       max_intensity;

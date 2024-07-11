@@ -5,14 +5,12 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
-#include <execution>
 #include <map>
 #include <string>
 #include <torch/torch.h>
 #include <vector>
 
-typedef std::map<std::uint8_t, std::map<std::string, std::vector<float>>>
-    result_dict;
+using result_dict = std::map<std::uint8_t, std::map<std::string, std::vector<float>>>;
 
 /**
  * Calculates the false and true positive numbers of the current frames.
@@ -27,7 +25,7 @@ typedef std::map<std::uint8_t, std::map<std::string, std::vector<float>>>
  *                         positive numbers as well as the ground truth.
  */
 void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
-                                       torch::Tensor detection_score,
+                                       const torch::Tensor &detection_score,
                                        const torch::Tensor &ground_truth_box,
                                        float iou_threshold,
                                        result_dict &results);
@@ -101,8 +99,6 @@ calculate_voc_average_precision(const std::vector<T> &recall,
  * @tparam T is the type of the average precision.
  *
  * @param results                a map with the results.
- * @param path                   the directory where the yaml file with the
- *                               results should be stored.
  * @param global_sort_detections ?
  */
 std::array<float, 3> evaluate_results(const result_dict &results,

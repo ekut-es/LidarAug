@@ -25,12 +25,12 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("rain", &rain, "rain weather simulation");
 
   pybind11::enum_<fog_parameter>(m, "FogParameter")
-      .value("DIST", DIST)
-      .value("CHAMFER", CHAMFER)
+      .value("DIST", fog_parameter::DIST)
+      .value("CHAMFER", fog_parameter::CHAMFER)
       .export_values();
   pybind11::enum_<distribution>(m, "Distribution")
-      .value("EXPONENTIAL", EXPONENTIAL)
-      .value("LOG_NORMAL", LOG_NORMAL)
-      .value("GM", GM)
+      .value("EXPONENTIAL", distribution::exponential)
+      .value("LOG_NORMAL", distribution::log_normal)
+      .value("GM", distribution::gm)
       .export_values();
 }

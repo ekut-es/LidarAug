@@ -15,7 +15,7 @@ template <typename T> struct distribution_ranges {
   range<T> x_range, y_range, z_range, uniform_range;
 };
 
-typedef enum { UNIFORM, SALT_PEPPER, MIN, MAX } noise_type;
+enum struct noise_type { UNIFORM, SALT_PEPPER, MIN, MAX };
 
 void translate(at::Tensor points, const at::Tensor &translation);
 void scale_points(at::Tensor points, float factor);
@@ -47,13 +47,13 @@ void scale_random(at::Tensor points, at::Tensor labels, float sigma,
  * The truncated normal distribution has a mean of 1. The standard deviation, as
  * well as upper and lower limits are determined by the function parameters.
  *
- * @param points    is the point cloud that contains the points that will be
- *                  scaled.
- * @param labels    are the labels belonging to the aforementioned point cloud.
- * @param sigma     is the the standard deviation of the truncated normal
- *                  distribution.
- * @param max_scale is the upper limit of the truncated normal distribution. The
- *                  lower limit is the inverse.
+ * @param point_cloud is the point cloud that contains the points that will be
+ *                    scaled.
+ * @param labels      are the labels belonging to the aforementioned point cloud.
+ * @param sigma       is the the standard deviation of the truncated normal
+ *                    distribution.
+ * @param max_scale   is the upper limit of the truncated normal distribution. The
+ *                    lower limit is the inverse.
  */
 void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
                  float max_scale);
@@ -127,7 +127,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
                             const at::Tensor &names,
-                            const tensor_size_t min_points);
+                            tensor_size_t min_points);
 
 /**
  * Checks the amount of points for each bounding box.
@@ -148,8 +148,8 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
  */
 [[nodiscard]] inline std::pair<torch::Tensor, torch::Tensor>
 _delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
-                             const at::Tensor &names, tensor_size_t min_points,
-                             tensor_size_t batch_idx) {
+                             const at::Tensor &names, const tensor_size_t min_points,
+                             const tensor_size_t batch_idx) {
 
   const tensor_size_t num_labels = labels.size(0);
   const tensor_size_t num_points = points.size(0);

@@ -8,19 +8,19 @@ constexpr auto None = torch::indexing::None;
 
 namespace torch_utils {
 
-[[nodiscard]] torch::Tensor boxes_to_corners(torch::Tensor boxes) {
+[[nodiscard]] torch::Tensor boxes_to_corners(const torch::Tensor &boxes) {
 
-  auto t = torch::tensor({
-               {1, -1, -1},
-               {1, 1, -1},
-               {-1, 1, -1},
-               {-1, -1, -1},
-               {1, -1, 1},
-               {1, 1, 1},
-               {-1, 1, 1},
-               {-1, -1, 1},
-           }) /
-           2;
+    const auto t = torch::tensor({
+                       {1, -1, -1},
+                       {1, 1, -1},
+                       {-1, 1, -1},
+                       {-1, -1, -1},
+                       {1, -1, 1},
+                       {1, 1, 1},
+                       {-1, 1, 1},
+                       {-1, -1, 1},
+                   }) /
+                   2;
 
   auto corners = boxes.index({Slice(), None, Slice(3, 6)}).repeat({1, 8, 1}) *
                  t.index({None, Slice(), Slice()});
@@ -41,7 +41,7 @@ namespace torch_utils {
   auto zeros = angle.new_zeros(points.size(0));
   auto ones = angle.new_ones(points.size(0));
 
-  auto rot_matrix =
+  const auto rot_matrix =
       torch::stack({cos, sin, zeros, -sin, cos, zeros, zeros, zeros, ones}, 1)
           .view({-1, 3, 3});
 

@@ -6,7 +6,7 @@
 
 template <typename T>
 T calculate_average_precision(
-    float iou_threshold, bool global_sort_detections,
+    const float iou_threshold, const bool global_sort_detections,
     const std::map<std::uint8_t, std::map<std::string, std::vector<T>>>
         &results) {
 
@@ -66,19 +66,17 @@ T calculate_average_precision(
 }
 
 void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
-                                       torch::Tensor detection_score,
+                                       const torch::Tensor &detection_score,
                                        const torch::Tensor &ground_truth_box,
                                        float iou_threshold,
                                        result_dict &results) {
 
   assert(detection_score.is_contiguous());
 
-  auto data = detection_score.data_ptr<float>();
+  const auto* const data = detection_score.const_data_ptr<float>();
 
-  std::vector<float> l_detection_score(
+  const std::vector<float> l_detection_score(
       data, data + static_cast<std::size_t>(detection_score.size(0)));
-
-  detection_score.sort(-1, true);
 
   std::vector<float> true_positive;
   std::vector<float> false_positive;
@@ -90,7 +88,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
   auto score_order_descend = cpp_utils::argsort(l_detection_score, true);
 
-  auto detection_polygon_list =
+  const auto detection_polygon_list =
       evaluation_utils::convert_format(detection_boxes);
   auto ground_truth_polygon_list =
       evaluation_utils::convert_format(ground_truth_box);
@@ -103,7 +101,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
     // NOTE(tom): This depends on the left condition being evaluated first!
     if (ground_truth_polygon_list.empty() ||
-        *std::max_element(ious.begin(), ious.end()) < iou_threshold) {
+        *std::ranges::max_element(ious) < iou_threshold) {
 
       false_positive.emplace_back(1);
       true_positive.emplace_back(0);
@@ -112,7 +110,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
       false_positive.emplace_back(0);
       true_positive.emplace_back(1);
 
-      auto gt_index =
+      const auto gt_index =
           torch::argmax(
               torch::from_blob(ious.data(),
                                static_cast<tensor_size_t>(ious.size())))
@@ -136,32 +134,31 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
   insert_list("tp", true_positive);
 
   // set ground truth
-  if (results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"].size() ==
-      0) {
+  if (results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"].empty()) {
     results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"].emplace_back(
         ground_truth);
   } else {
 
     results[static_cast<std::uint8_t>(iou_threshold * 10)]["gt"][0] +=
-        ground_truth;
+        static_cast<float>(ground_truth);
   }
 }
 
 std::array<float, 3> evaluate_results(const result_dict &results,
                                       bool global_sort_detections) {
 
-  std::array<float, 3> iou_thresholds{.3, .5, .7};
+  constexpr std::array<float, 3> iou_thresholds{.3, .5, .7};
   std::array<float, 3> aps;
 
-  std::transform(iou_thresholds.begin(), iou_thresholds.end(), aps.begin(),
-                 [global_sort_detections, results](auto threshold) {
-                   auto ap = calculate_average_precision(
-                       threshold, global_sort_detections, results);
+  std::ranges::transform(iou_thresholds, aps.begin(),
+                         [global_sort_detections, results](auto threshold) {
+                             auto ap = calculate_average_precision(
+                                 threshold, global_sort_detections, results);
 
-                   std::printf("ap_%f: %f\n", threshold, ap);
+                             std::printf("ap_%f: %f\n", threshold, ap);
 
-                   return ap;
-                 });
+                             return ap;
+                         });
 
   return aps;
 }
