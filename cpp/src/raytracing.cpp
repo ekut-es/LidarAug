@@ -280,7 +280,8 @@ rt::sort_noise_filter(torch::Tensor nf) {
       split_index[nf.index({i + 1, 5}).item<tensor_size_t>()] = i + 1;
     }
   }
-  split_index[split_index.size(0) - 1] = nf.size(0) - 1;
+
+  split_index.index_put_({split_index.size(0) - 1}, nf.size(0) - 1);
 
   return std::make_pair(nf, split_index);
 }
