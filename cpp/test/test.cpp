@@ -531,12 +531,15 @@ TEST(Raytracing, TraceTest) {
   auto npz_data = cnpy::npz_load(npz_dir);
 
   auto nf_array = npz_data["nf"];
-  const auto nf = torch::from_blob(
-      nf_array.data<float>(), {static_cast<tensor_size_t>(nf_array.num_vals)});
+  const auto nf =
+      torch::from_blob(nf_array.data<float>(),
+                       {static_cast<tensor_size_t>(nf_array.num_vals)})
+          .reshape({-1, 6});
 
-  auto si_array = npz_data["nf"];
-  const auto si = torch::from_blob(
-      si_array.data<float>(), {static_cast<tensor_size_t>(si_array.num_vals)});
+  auto si_array = npz_data["si"];
+  const auto si =
+      torch::from_blob(si_array.data<tensor_size_t>(),
+                       {static_cast<tensor_size_t>(si_array.num_vals)});
 
   const auto result = rt::trace(points, nf, si);
 
