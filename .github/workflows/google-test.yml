@@ -1,6 +1,6 @@
 name: CMake and Google Test
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   build:
@@ -8,38 +8,38 @@ jobs:
 
     strategy:
       matrix:
-        compiler: [gcc]
+        compiler: [ gcc ]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    - name: setup google test
-      uses: Bacondish2023/setup-googletest@v1
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: setup google test
+        uses: Bacondish2023/setup-googletest@v1
 
-    - name: Install CMake
-      run: sudo apt-get update && sudo apt-get install -y cmake
+      - name: Install CMake
+        run: sudo apt-get update && sudo apt-get install -y cmake
 
-    - name: Install Boost
-      run: sudo apt-get update && sudo apt-get install -y libboost-all-dev
+      - name: Install Boost
+        run: sudo apt-get update && sudo apt-get install -y libboost-all-dev
 
-    - name: Install libtorch
-      run: |
-        wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.3.0%2Bcpu.zip
-        unzip libtorch-cxx11-abi-shared-with-deps-2.3.0+cpu.zip -d /opt/
+      - name: Install libtorch
+        run: |
+          wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.3.0%2Bcpu.zip
+          unzip libtorch-cxx11-abi-shared-with-deps-2.3.0+cpu.zip -d /opt/
 
-    - name: Create build directory
-      run: mkdir build
-      working-directory: ./cpp
+      - name: Create build directory
+        run: mkdir build
+        working-directory: ./cpp
 
-    - name: Configure and build
-      run: |
-        cd build
-        cmake -DBOOST_ROOT=/usr/include/boost -DCMAKE_PREFIX_PATH=/opt/libtorch ..
-        make
-      working-directory: ./cpp
+      - name: Configure and build
+        run: |
+          cd build
+          cmake -DBOOST_ROOT=/usr/include/boost -DCMAKE_PREFIX_PATH=/opt/libtorch ..
+          make
+        working-directory: ./cpp
 
-    - name: Run Google Test
-      run: |
-        cd build
-        ctest --output-on-failure
-      working-directory: ./cpp
+      - name: Run Google Test
+        run: |
+          cd build
+          ctest --output-on-failure
+        working-directory: ./cpp

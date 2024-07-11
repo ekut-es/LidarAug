@@ -39,8 +39,8 @@ calculate_factors(fog_parameter metric, float viewing_dist) {
 }
 
 [[nodiscard]] std::optional<std::vector<torch::Tensor>>
-fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
-    float sigma, int mean) {
+fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
+    const float sigma, const int mean) {
 
   auto rng = get_rng();
   std::uniform_real_distribution<float> distrib(0, HUNDRED_PERCENT - 1);

@@ -49,14 +49,14 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def("change_sparse_representation", &change_sparse_representation,
         "Changes the representation of sparse tensors.");
   pybind11::enum_<noise_type>(m, "NoiseType")
-      .value("UNIFORM", UNIFORM)
-      .value("SALT_PEPPER", SALT_PEPPER)
-      .value("MIN", MIN)
-      .value("MAX", MAX)
+      .value("UNIFORM", noise_type::UNIFORM)
+      .value("SALT_PEPPER", noise_type::SALT_PEPPER)
+      .value("MIN", noise_type::MIN)
+      .value("MAX", noise_type::MAX)
       .export_values();
   pybind11::enum_<intensity_range>(m, "IntensityRange")
-      .value("MAX_INTENSITY_1", MAX_INTENSITY_1)
-      .value("MAX_INTENSITY_255", MAX_INTENSITY_255)
+      .value("MAX_INTENSITY_1", intensity_range::MAX_INTENSITY_1)
+      .value("MAX_INTENSITY_255", intensity_range::MAX_INTENSITY_255)
       .export_values();
 
   // NOTE(tom): Unfortunately it is necessary to export this with defined types,

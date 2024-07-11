@@ -7,12 +7,12 @@ import torch
 from LidarAug import augmentations as aug
 from LidarAug import weather_simulations
 from LidarAug import evaluation
-from LidarAug.transformations import NoiseType, DistributionRange, DistributionRanges, IntensityRange
+from LidarAug.transformations import NoiseType, IntensityRange
 
 import re
 
-POINT_CLOUD_FEATRUES = 4
-LABEL_FEATRUES = 7
+POINT_CLOUD_FEATURES = 4
+LABEL_FEATURES = 7
 WRONG_NUMBER_OF_FEATURES_PC = re.escape(
     "point is supposed to have 4 components (x, y, z, intensity)!")
 
@@ -20,11 +20,11 @@ WRONG_NUMBER_OF_FEATURES_LABEL = re.escape(
     "label is supposed to have 7 components (x, y, z, width, height, length, theta)!"
 )
 WRONG_SHAPE_PC = re.escape(
-    "Tensor is not of shape (B, N, F), where B is the batchsize, N is the number of points and F is the number of features!"
+    "Tensor is not of shape (B, N, F), where B is the batch-size, N is the number of points and F is the number of features!"
 )
 
 WRONG_SHAPE_LABELS = re.escape(
-    "Tensor is not of shape (B, N, F), where B is the batchsize, N is the number of labels and F is the number of features!"
+    "Tensor is not of shape (B, N, F), where B is the batch-size, N is the number of labels and F is the number of features!"
 )
 INCOMPATIBLE_BATCH_SIZES = re.escape(
     "Batch sizes for points and labels are not equal!")
@@ -32,21 +32,21 @@ INCOMPATIBLE_BATCH_SIZES = re.escape(
 WRONG_FRAME_DIMENSIONS = re.escape(
     "`frame` is supposed to be a 6-vector (x, y, z, roll, yaw, pitch)")
 
-test_points: torch.Tensor = torch.randn([3, 100, POINT_CLOUD_FEATRUES])
+test_points: torch.Tensor = torch.randn([3, 100, POINT_CLOUD_FEATURES])
 
 
 @pytest.mark.shapetest
 @pytest.mark.parametrize(
     "tensor,expectation",
-    [(torch.randn([1, 2, POINT_CLOUD_FEATRUES - 1]),
+    [(torch.randn([1, 2, POINT_CLOUD_FEATURES - 1]),
       pytest.raises(AssertionError, match=WRONG_NUMBER_OF_FEATURES_PC)),
-     (torch.randn([30, 19, POINT_CLOUD_FEATRUES]), does_not_raise()),
-     (torch.randn([3, 2, POINT_CLOUD_FEATRUES + 3]),
+     (torch.randn([30, 19, POINT_CLOUD_FEATURES]), does_not_raise()),
+     (torch.randn([3, 2, POINT_CLOUD_FEATURES + 3]),
       pytest.raises(AssertionError, match=WRONG_NUMBER_OF_FEATURES_PC)),
-     (torch.randn([30, POINT_CLOUD_FEATRUES
+     (torch.randn([30, POINT_CLOUD_FEATURES
                    ]), pytest.raises(AssertionError, match=WRONG_SHAPE_PC)),
      (torch.randn([
-         POINT_CLOUD_FEATRUES, POINT_CLOUD_FEATRUES, POINT_CLOUD_FEATRUES - 1
+         POINT_CLOUD_FEATURES, POINT_CLOUD_FEATURES, POINT_CLOUD_FEATURES - 1
      ]), pytest.raises(AssertionError, match=WRONG_NUMBER_OF_FEATURES_PC)),
      (torch.randn([20]), pytest.raises(AssertionError, match=WRONG_SHAPE_PC))])
 def test_check_points(tensor, expectation):
@@ -57,16 +57,16 @@ def test_check_points(tensor, expectation):
 @pytest.mark.shapetest
 @pytest.mark.parametrize(
     "tensor,expectation",
-    [(torch.randn([1, 2, LABEL_FEATRUES - 1]),
+    [(torch.randn([1, 2, LABEL_FEATURES - 1]),
       pytest.raises(AssertionError, match=WRONG_NUMBER_OF_FEATURES_LABEL)),
-     (torch.randn([1, 2, POINT_CLOUD_FEATRUES]),
+     (torch.randn([1, 2, POINT_CLOUD_FEATURES]),
       pytest.raises(AssertionError, match=WRONG_NUMBER_OF_FEATURES_LABEL)),
-     (torch.randn([30, 19, LABEL_FEATRUES]), does_not_raise()),
-     (torch.randn([3, 2, LABEL_FEATRUES + 3]),
+     (torch.randn([30, 19, LABEL_FEATURES]), does_not_raise()),
+     (torch.randn([3, 2, LABEL_FEATURES + 3]),
       pytest.raises(AssertionError, match=WRONG_NUMBER_OF_FEATURES_LABEL)),
-     (torch.randn([30, LABEL_FEATRUES]),
+     (torch.randn([30, LABEL_FEATURES]),
       pytest.raises(AssertionError, match=WRONG_SHAPE_LABELS)),
-     (torch.randn([LABEL_FEATRUES, LABEL_FEATRUES, LABEL_FEATRUES - 1]),
+     (torch.randn([LABEL_FEATURES, LABEL_FEATURES, LABEL_FEATURES - 1]),
       pytest.raises(AssertionError, match=WRONG_NUMBER_OF_FEATURES_LABEL)),
      (torch.randn([20]), pytest.raises(AssertionError,
                                        match=WRONG_SHAPE_LABELS))])
@@ -77,12 +77,12 @@ def test_check_labels(tensor, expectation):
 
 @pytest.mark.shapetest
 @pytest.mark.parametrize("points,labels,expectation", [
-    (torch.randn([1, 2, POINT_CLOUD_FEATRUES
-                  ]), torch.randn([1, 2, LABEL_FEATRUES]), does_not_raise()),
-    (torch.randn([1, 1, POINT_CLOUD_FEATRUES
-                  ]), torch.randn([1, 2, LABEL_FEATRUES]), does_not_raise()),
-    (torch.randn([2, 2, POINT_CLOUD_FEATRUES
-                  ]), torch.randn([1, 2, LABEL_FEATRUES]),
+    (torch.randn([1, 2, POINT_CLOUD_FEATURES
+                  ]), torch.randn([1, 2, LABEL_FEATURES]), does_not_raise()),
+    (torch.randn([1, 1, POINT_CLOUD_FEATURES
+                  ]), torch.randn([1, 2, LABEL_FEATURES]), does_not_raise()),
+    (torch.randn([2, 2, POINT_CLOUD_FEATURES
+                  ]), torch.randn([1, 2, LABEL_FEATURES]),
      pytest.raises(AssertionError, match=INCOMPATIBLE_BATCH_SIZES)),
 ])
 def test_check_points_and_labels(points, labels, expectation):
@@ -92,9 +92,9 @@ def test_check_points_and_labels(points, labels, expectation):
 
 @pytest.mark.shapetest
 @pytest.mark.parametrize("frame,expectation", [
-    (torch.randn([1, 2, POINT_CLOUD_FEATRUES]),
+    (torch.randn([1, 2, POINT_CLOUD_FEATURES]),
      pytest.raises(AssertionError, match=WRONG_FRAME_DIMENSIONS)),
-    (torch.randn([1, 2, LABEL_FEATRUES]),
+    (torch.randn([1, 2, LABEL_FEATURES]),
      pytest.raises(AssertionError, match=WRONG_FRAME_DIMENSIONS)),
     (torch.randn([6]), does_not_raise()),
     (torch.tensor([1, 2, 3, 4, 5, 6]), does_not_raise()),
@@ -113,11 +113,10 @@ def test_random_noise():
 
     assert points.shape[1] > 0, "No points have been added!"
     for point in points[0]:
-        assert point[0] <= 10 and point[0] >= 1, "x range not as parametrized"
-        assert point[1] <= 5 and point[1] >= 3, "y range not as parametrized"
-        assert point[2] <= 7 and point[2] >= 4, "z range not as parametrized"
-        assert point[3] <= 255 and point[
-            3] >= 0, "intensity range not as parametrized"
+        assert 10 >= point[0] >= 1, "x range not as parametrized"
+        assert 5 >= point[1] >= 3, "y range not as parametrized"
+        assert 7 >= point[2] >= 4, "z range not as parametrized"
+        assert 255 >= point[3] >= 0, "intensity range not as parametrized"
 
 
 @pytest.mark.transtest
@@ -175,7 +174,7 @@ def check_precision(val1: float, val2: float, precision: int) -> None:
     :param precision:  The number of significant digits after the comma.
     """
 
-    multiplier = 10**precision
+    multiplier = 10 ** precision
 
     assert int(val1 * multiplier) == int(val2 * multiplier)
 
@@ -241,7 +240,6 @@ def test_evaluate():
 
 @pytest.mark.evaltest
 def test_false_and_true_positive():
-
     result_stat_template = {
         3: {
             'tp': [],
