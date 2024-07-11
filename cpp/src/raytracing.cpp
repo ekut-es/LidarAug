@@ -3,6 +3,8 @@
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
+#include <omp.h>
+#include <torch/csrc/autograd/generated/variable_factories.h>
 
 using namespace torch_utils;
 using Slice = torch::indexing::Slice;
@@ -248,9 +250,9 @@ void rt::intersects(torch::Tensor point_cloud,
   std::uniform_real_distribution<float> y_ud(dim[2], dim[3]);
   std::uniform_real_distribution<float> z_ud(dim[4], dim[5]);
 
-  const auto x = draw_values<float, F32>(x_ud, total_drops);
-  const auto y = draw_values<float, F32>(y_ud, total_drops);
-  const auto z = draw_values<float, F32>(z_ud, total_drops);
+  const auto x = torch::empty({total_drops}).uniform_(dim[0], dim[1]);
+  const auto y = torch::empty({total_drops}).uniform_(dim[2], dim[3]);
+  const auto z = torch::empty({total_drops}).uniform_(dim[4], dim[5]);
 
   const auto dist =
       torch::sqrt(torch::pow(x, 2) + torch::pow(y, 2) + torch::pow(z, 2));
@@ -274,13 +276,24 @@ rt::sort_noise_filter(torch::Tensor nf) {
   nf = nf.index({nf.index({Slice(), 3}).argsort()});
   nf = nf.index({nf.index({Slice(), 5}).argsort()});
 
-  for (tensor_size_t i = 0; i < nf.size(0) - 1; i++) {
-    if (!nf.index({i, 5}).equal(nf.index({i + 1, 5}))) {
+  const auto *const nf_ptr = nf.const_data_ptr<float>();
+  const auto row_size = nf.size(1);
 
-      split_index[nf.index({i + 1, 5}).item<tensor_size_t>()] = i + 1;
+#pragma omp parallel for
+  for (tensor_size_t i = 0; i < nf.size(0) - 1; i++) {
+
+    const auto idx = i * row_size + 5;
+
+    const auto val_at_i = nf_ptr[idx];
+    const auto val_at_i_plus_one = nf_ptr[idx + row_size];
+
+    if (val_at_i != val_at_i_plus_one) {
+      split_index.index_put_({static_cast<tensor_size_t>(val_at_i_plus_one)},
+                             i + 1);
     }
   }
-  split_index[split_index.size(0) - 1] = nf.size(0) - 1;
+
+  split_index.index_put_({split_index.size(0) - 1}, nf.size(0) - 1);
 
   return std::make_pair(nf, split_index);
 }
