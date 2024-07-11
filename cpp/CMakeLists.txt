@@ -43,6 +43,21 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+include(FetchContent)
+FetchContent_Declare(cnpy
+        GIT_REPOSITORY "https://github.com/rogersce/cnpy"
+        GIT_SHALLOW True
+)
+FetchContent_MakeAvailable(cnpy)
+
+
+# Adding the include directory for cnpy
+FetchContent_GetProperties(cnpy)
+if (cnpy_POPULATED)
+    add_library(cnpy_lib INTERFACE)
+    target_include_directories(cnpy_lib INTERFACE ${cnpy_SOURCE_DIR})
+endif ()
+
 
 find_package(Boost REQUIRED)
 
@@ -70,6 +85,7 @@ add_executable(
 )
 target_link_libraries(
         transformations_test
+        cnpy_lib
         "${TORCH_LIBRARIES}"
         "${Boost_LIBRARIES}"
         GTest::gtest_main

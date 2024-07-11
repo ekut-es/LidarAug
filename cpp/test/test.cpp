@@ -5,10 +5,13 @@
 #include "../include/transformations.hpp"
 #include "../include/utils.hpp"
 #include "../include/weather.hpp"
+
+#include <filesystem>
 #include <gtest/gtest.h>
 #include <torch/types.h>
 
 using namespace torch_utils;
+const std::filesystem::path npz_dir{"../../pytest/data/npz/test.npz"};
 
 // NOLINTBEGIN
 
@@ -470,6 +473,104 @@ TEST(Raytracing, CrossTest) {
   EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
                                          << expected << "\nactual:\n"
                                          << result;
+}
+
+TEST(Raytracing, RotateTest) {
+  auto v = torch::tensor({1, 2, 3}, F32);
+  auto k = torch::tensor({4, 5, 6}, F32);
+  float angle = 180;
+
+  auto v_o = torch::tensor({1, 2, 3}, F32);
+  auto k_o = torch::tensor({4, 5, 6}, F32);
+
+  auto expected = torch::tensor({206.40788, 249.74979, 307.5124}, F32);
+  auto result = rt::rotate(v, k, angle);
+
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k_o
+                            << " has changed unexpectidly!\nWas " << k;
+  EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << result;
+}
+
+TEST(Raytracing, CheckNpzFile) {
+  ASSERT_TRUE(std::filesystem::exists(npz_dir))
+      << "File: " << npz_dir
+      << " could not be found in current working directory: "
+      << std::filesystem::current_path();
+}
+
+TEST(Raytracing, TraceTest) {
+
+  const auto points =
+      torch::tensor({{0.79115541, 0.00995717, 0.85223702, 0.86795932},
+                     {0.88936069, 0.73058396, 0.66369673, 0.15326185},
+                     {0.2041209, 0.27948176, 0.25410868, 0.68685306},
+                     {0.40355785, 0.58527619, 0.50859593, 0.19754277},
+                     {0.23363058, 0.17909182, 0.15318045, 0.99695834},
+                     {0.59422449, 0.95887209, 0.60752133, 0.34042509},
+                     {0.16007366, 0.66038575, 0.53459956, 0.00381125},
+                     {0.71638315, 0.85775223, 0.00237889, 0.32981742},
+                     {0.27168068, 0.18565797, 0.96313797, 0.32289272},
+                     {0.06261661, 0.82851678, 0.09892672, 0.0678927}});
+
+  const auto expected =
+      torch::tensor({{0.79115541, 0.00995717, 0.85223702, 0.78116338},
+                     {0.88936069, 0.73058396, 0.66369673, 0.13793567},
+                     {0.2041209, 0.27948176, 0.25410868, 0.61816775},
+                     {0.40355785, 0.58527619, 0.50859593, 0.1777885},
+                     {0.23363058, 0.17909182, 0.15318045, 0.8972625},
+                     {0.59422449, 0.95887209, 0.60752133, 0.30638258},
+                     {0.16007366, 0.66038575, 0.53459956, 0.00343013},
+                     {0.71638315, 0.85775223, 0.00237889, 0.29683568},
+                     {0.27168068, 0.18565797, 0.96313797, 0.29060345},
+                     {0.06261661, 0.82851678, 0.09892672, 0.06110343}});
+
+  auto npz_data = cnpy::npz_load(npz_dir);
+
+  auto nf_array = npz_data["nf"];
+  const auto nf =
+      torch::from_blob(nf_array.data<float>(),
+                       {static_cast<tensor_size_t>(nf_array.num_vals)})
+          .reshape({-1, 6});
+
+  auto si_array = npz_data["si"];
+  const auto si =
+      torch::from_blob(si_array.data<tensor_size_t>(),
+                       {static_cast<tensor_size_t>(si_array.num_vals)});
+
+  const auto result = rt::trace(points, nf, si);
+
+  EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << result;
+}
+
+TEST(Raytracing, TraceBeamTest) {
+
+  const auto beam = torch::tensor({1, 2, 3});
+
+  auto npz_data = cnpy::npz_load(npz_dir);
+
+  auto nf_array = npz_data["nf"];
+  const auto nf =
+      torch::from_blob(nf_array.data<float>(),
+                       {static_cast<tensor_size_t>(nf_array.num_vals)})
+          .reshape({-1, 6});
+
+  auto si_array = npz_data["si"];
+  const auto si =
+      torch::from_blob(si_array.data<tensor_size_t>(),
+                       {static_cast<tensor_size_t>(si_array.num_vals)});
+
+  const auto expected = -1.0F;
+  const auto result = rt::trace_beam(nf, beam, si);
+
+  EXPECT_EQ(result, expected) << "expected:\n"
+                              << expected << "\nactual:\n"
+                              << result;
 }
 
 // doing tests with controlled random number generation (no random seed)
