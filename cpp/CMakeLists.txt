@@ -45,18 +45,10 @@ FetchContent_MakeAvailable(googletest)
 
 include(FetchContent)
 FetchContent_Declare(cnpy
-        GIT_REPOSITORY "https://github.com/rogersce/cnpy"
+        GIT_REPOSITORY "https://github.com/TomSchammo/cnpy"
         GIT_SHALLOW True
 )
 FetchContent_MakeAvailable(cnpy)
-
-
-# Adding the include directory for cnpy
-FetchContent_GetProperties(cnpy)
-if (cnpy_POPULATED)
-    add_library(cnpy_lib INTERFACE)
-    target_include_directories(cnpy_lib INTERFACE ${cnpy_SOURCE_DIR})
-endif ()
 
 
 find_package(Boost REQUIRED)
@@ -89,7 +81,7 @@ add_executable(
 if(OpenMP_CXX_FOUND)
     target_link_libraries(
         transformations_test
-        cnpy_lib
+        cnpy
         "${TORCH_LIBRARIES}"
         "${Boost_LIBRARIES}"
         OpenMP::OpenMP_CXX
@@ -105,6 +97,7 @@ else ()
         "${Boost_LIBRARIES}"
         "${ZLIB_LIBRARIES}"
         GTest::gtest_main
+        cnpy
         # GTest::gtest
     )
 endif()
