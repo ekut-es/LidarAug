@@ -29,7 +29,7 @@ sim: release
 	cd ./cpp/build_files && ctest --output-on-failure -R 'Simulation.*'
 
 install:
-	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.11 -m pip install . && rm -rf ./tmp
+	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.11 -m pip install -v . && rm -rf ./tmp
 
 clean: ./cpp/build_files
 	rm -rfv ./cpp/build_files
