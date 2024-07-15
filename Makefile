@@ -8,10 +8,10 @@ configure_test:
 	cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="$(TORCH_PATH)" -S ./cpp/ -B ./cpp/build_files
 
 build: configure_test
-	cmake --build ./cpp/build_files -j 4
+	cmake --build ./cpp/build_files -j 8
 
 release: configure
-	cmake --build ./cpp/build_files -j 4 --config
+	cmake --build ./cpp/build_files -j 8
 
 ctest: build
 	cd ./cpp/build_files && ctest

@@ -3,6 +3,9 @@
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
+#include <ATen/ops/clone.h>
+#include <c10/core/TensorOptions.h>
+#include <cstdio>
 #include <omp.h>
 #include <torch/csrc/autograd/generated/variable_factories.h>
 
@@ -246,10 +249,6 @@ void rt::intersects(torch::Tensor point_cloud,
       std::abs(dim[0] - dim[1]) * std::abs(dim[2] - dim[3]) *
       std::abs(dim[4] - dim[5]) * static_cast<float>(drops_per_m3));
 
-  std::uniform_real_distribution<float> x_ud(dim[0], dim[1]);
-  std::uniform_real_distribution<float> y_ud(dim[2], dim[3]);
-  std::uniform_real_distribution<float> z_ud(dim[4], dim[5]);
-
   const auto x = torch::empty({total_drops}).uniform_(dim[0], dim[1]);
   const auto y = torch::empty({total_drops}).uniform_(dim[2], dim[3]);
   const auto z = torch::empty({total_drops}).uniform_(dim[4], dim[5]);
@@ -275,6 +274,12 @@ rt::sort_noise_filter(torch::Tensor nf) {
 
   nf = nf.index({nf.index({Slice(), 3}).argsort()});
   nf = nf.index({nf.index({Slice(), 5}).argsort()});
+
+  if (!nf.is_contiguous()) {
+    std::printf(
+        "for performance reasons, please make sure that 'nf' is contiguous!");
+    nf = torch::clone(nf, torch::MemoryFormat::Contiguous);
+  }
 
   const auto *const nf_ptr = nf.const_data_ptr<float>();
   const auto row_size = nf.size(1);

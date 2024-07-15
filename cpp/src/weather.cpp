@@ -2,7 +2,6 @@
 #include "../include/weather.hpp"
 #include "../include/stats.hpp"
 #include "../include/tensor.hpp"
-#include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
 #include <ATen/ops/from_blob.h>
 #include <ATen/ops/pow.h>
@@ -12,7 +11,6 @@
 #include <tuple>
 
 using namespace torch::indexing;
-using namespace torch_utils;
 
 [[nodiscard]] inline std::tuple<float, float, float>
 calculate_factors(fog_parameter metric, float viewing_dist) {
