@@ -3,6 +3,9 @@
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
+#include <ATen/ops/clone.h>
+#include <c10/core/TensorOptions.h>
+#include <cstdio>
 #include <omp.h>
 #include <torch/csrc/autograd/generated/variable_factories.h>
 
@@ -271,6 +274,12 @@ rt::sort_noise_filter(torch::Tensor nf) {
 
   nf = nf.index({nf.index({Slice(), 3}).argsort()});
   nf = nf.index({nf.index({Slice(), 5}).argsort()});
+
+  if (!nf.is_contiguous()) {
+    std::printf(
+        "for performance reasons, please make sure that 'nf' is contiguous!");
+    nf = torch::clone(nf, torch::MemoryFormat::Contiguous);
+  }
 
   const auto *const nf_ptr = nf.const_data_ptr<float>();
   const auto row_size = nf.size(1);
