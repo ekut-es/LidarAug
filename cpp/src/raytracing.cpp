@@ -193,15 +193,11 @@ void rt::intersects(torch::Tensor point_cloud,
 
             const auto dist = rt::vector_length(point_cloud[index]);
 
-            point_cloud[index][0] *= max_intersection_dist / dist;
-            point_cloud[index][1] *= max_intersection_dist / dist;
-            point_cloud[index][2] *= max_intersection_dist / dist;
+            point_cloud.index({index, Slice(0, 3)}) *=
+                max_intersection_dist / dist;
             point_cloud[index][3] *= 0.005;
           } else { // delete point (filtered out later)
-            point_cloud.index_put_({index, 0}, 0);
-            point_cloud.index_put_({index, 1}, 0);
-            point_cloud.index_put_({index, 2}, 0);
-            point_cloud.index_put_({index, 3}, 0);
+            point_cloud.index_put_({index, Slice(0, 4)}, 0);
           }
         } else { // modify intensity of unaltered point
           point_cloud[index][3] *= intensity_factor;
@@ -211,9 +207,7 @@ void rt::intersects(torch::Tensor point_cloud,
 #pragma omp parallel for
   for (tensor_size_t i = 0; i < num_points; i++) {
 
-    const auto original_point = torch::tensor(
-        {point_cloud[i][0].item<float>(), point_cloud[i][1].item<float>(),
-         point_cloud[i][2].item<float>()});
+    const auto original_point = point_cloud.index({i, Slice(0, 3)});
 
     auto [intersection_dist, idx_count] =
         get_original_intersection(original_point, split_index, i);
