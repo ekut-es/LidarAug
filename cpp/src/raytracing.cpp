@@ -246,10 +246,6 @@ void rt::intersects(torch::Tensor point_cloud,
       std::abs(dim[0] - dim[1]) * std::abs(dim[2] - dim[3]) *
       std::abs(dim[4] - dim[5]) * static_cast<float>(drops_per_m3));
 
-  std::uniform_real_distribution<float> x_ud(dim[0], dim[1]);
-  std::uniform_real_distribution<float> y_ud(dim[2], dim[3]);
-  std::uniform_real_distribution<float> z_ud(dim[4], dim[5]);
-
   const auto x = torch::empty({total_drops}).uniform_(dim[0], dim[1]);
   const auto y = torch::empty({total_drops}).uniform_(dim[2], dim[3]);
   const auto z = torch::empty({total_drops}).uniform_(dim[4], dim[5]);
