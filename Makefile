@@ -1,3 +1,15 @@
+ifeq ($(OS),Windows_NT)
+    CXXFLAGS += openmp
+    CFLAGS+= openmp
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Darwin)
+		CXXFLAGS += -Xpreprocessor
+		CFLAGS += -Xpreprocessor
+	endif
+	CXXFLAGS += -fopenmp
+	CFLAGS += -fopenmp
+endif
 
 all: install testpy build ctest
 
@@ -29,6 +41,8 @@ sim: release
 	cd ./cpp/build_files && ctest --output-on-failure -R 'Simulation.*'
 
 install:
+	@echo "CXXFLAGS: $(CXXFLAGS)"
+	@echo "CFLAGS: $(CFLAGS)"
 	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.11 -m pip install -v . && rm -rf ./tmp
 
 clean: ./cpp/build_files
