@@ -28,13 +28,11 @@ constexpr auto nf_split_factor = 32;
   const auto most_intersect_count = torch::zeros({num_points}, I64);
   const auto most_intersect_dist = torch::zeros({num_points}, F32);
 
-  // TODO(tom): Since this used to be CUDA code, it would probably be a
-  //            nobrainer to make it multithreaded on the CPU as well
   rt::intersects(point_cloud, noise_filter, split_index, intersections,
                  distances, distance_count, most_intersect_count,
                  most_intersect_dist, num_points, intensity_factor);
 
-  // select all points where x & y & z != 0
+  // select all points where any of x, y, z != 0
   const auto indices =
       (point_cloud.index({Slice(), Slice(0, 3)}) != 0).sum(1).nonzero();
 
