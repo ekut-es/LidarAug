@@ -24,8 +24,8 @@ constexpr auto nf_split_factor = 32;
 
   const auto intersections = torch::zeros({num_points, num_rays}, F32);
   const auto distances = torch::zeros({num_points, num_rays}, F32);
-  const auto distance_count = torch::zeros({num_points, num_rays}, F32);
-  const auto most_intersect_count = torch::zeros({num_points}, F32);
+  const auto distance_count = torch::zeros({num_points, num_rays}, I64);
+  const auto most_intersect_count = torch::zeros({num_points}, I64);
   const auto most_intersect_dist = torch::zeros({num_points}, F32);
 
   // TODO(tom): Since this used to be CUDA code, it would probably be a
