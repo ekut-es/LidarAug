@@ -204,7 +204,7 @@ void rt::intersects(torch::Tensor point_cloud,
         }
       };
 
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
   for (tensor_size_t i = 0; i < num_points; i++) {
 
     const auto original_point = point_cloud.index({i, Slice(0, 3)});
