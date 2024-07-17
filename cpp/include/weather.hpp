@@ -7,6 +7,7 @@
 #include <array>
 #include <cstdint>
 #include <optional>
+#include <string_view>
 #include <torch/serialize/tensor.h>
 #include <vector>
 
@@ -23,10 +24,20 @@ fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,
                                  std::array<float, 6> dims, uint32_t num_drops,
                                  float precipitation, distribution d);
 
+[[nodiscard]] std::optional<torch::Tensor>
+rain(torch::Tensor point_cloud, std::string_view noise_filter_path,
+     uint32_t num_drops_sigma, float precipitation_sigma, float prob);
+
 [[nodiscard]] torch::Tensor snow(torch::Tensor point_cloud,
                                  std::array<float, 6> dims, uint32_t num_drops,
                                  float precipitation, int32_t scale,
                                  float max_intensity = 1);
+
+[[nodiscard]] std::optional<torch::Tensor>
+snow(torch::Tensor point_cloud, std::string_view noise_filter_path,
+     uint32_t num_drops_sigma, float precipitation_sigma, int32_t scale,
+     float prob);
+
 void universal_weather(torch::Tensor point_cloud, float prob, float sigma,
                        int mean, float ext_a, float ext_b, float beta_a,
                        float beta_b, float del_a, float del_b, int int_a,

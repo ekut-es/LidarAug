@@ -5,7 +5,12 @@
 #include <ATen/TensorIndexing.h>
 #include <ATen/ops/from_blob.h>
 #include <ATen/ops/pow.h>
+#include <cmath>
+#include <cnpy.hpp>
 #include <cstddef>
+#include <cstdint>
+#include <filesystem>
+#include <format>
 #include <random>
 #include <torch/csrc/autograd/generated/variable_factories.h>
 #include <tuple>
@@ -121,6 +126,92 @@ fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
   auto [nf, si] =
       rt::generate_noise_filter(dims, num_drops, precipitation, 1, d);
   return rt::trace(point_cloud, nf, si, 0.9);
+}
+
+[[nodiscard]] std::optional<torch::Tensor>
+rain(torch::Tensor point_cloud, const std::string_view noise_filter_path,
+     const uint32_t num_drops_sigma, const float precipitation_sigma,
+     const float prob) {
+
+  auto rng = get_rng();
+  std::uniform_real_distribution<float> distrib(0, HUNDRED_PERCENT - 1);
+  auto rand = distrib(rng);
+
+  if (prob > rand) {
+    const auto r = static_cast<std::int32_t>(std::floor(
+        get_truncated_normal_value(0, precipitation_sigma, 0, 20) + 1));
+    const auto n =
+        static_cast<std::int32_t>(std::floor(
+            get_truncated_normal_value(0, num_drops_sigma, 0, 6) + 1)) *
+        200;
+
+    const auto filename = std::format("nf_N={}_R={}.npz", n, r);
+    std::filesystem::path noise_file(noise_filter_path);
+    noise_file.append(filename);
+
+    auto npz_data = cnpy::npz_load(noise_file);
+
+    auto nf_array = npz_data["nf"];
+    const auto nf =
+        torch::from_blob(nf_array.data<float>(),
+                         {static_cast<tensor_size_t>(nf_array.num_vals())})
+            .reshape({-1, 6});
+
+    auto si_array = npz_data["si"];
+    const auto si =
+        torch::from_blob(si_array.data<tensor_size_t>(),
+                         {static_cast<tensor_size_t>(si_array.num_vals())});
+    const auto result = rt::trace(point_cloud, nf, si);
+    point_cloud = result;
+    return result;
+  }
+
+  return std::nullopt;
+}
+
+[[nodiscard]] std::optional<torch::Tensor>
+snow(torch::Tensor point_cloud, const std::string_view noise_filter_path,
+     const uint32_t num_drops_sigma, const float precipitation_sigma,
+     const int32_t scale, const float prob) {
+
+  auto rng = get_rng();
+  std::uniform_real_distribution<float> distrib(0, HUNDRED_PERCENT - 1);
+  auto rand = distrib(rng);
+
+  if (prob > rand) {
+    const auto r = static_cast<std::int32_t>(std::floor(
+        get_truncated_normal_value(0, precipitation_sigma, 0, 10) + 1));
+    const auto n =
+        static_cast<std::int32_t>(std::floor(
+            get_truncated_normal_value(0, num_drops_sigma, 0, 12) + 1)) *
+        100;
+
+    const auto filename = std::format("nf_N={}_R={}.npz", n, r);
+    std::filesystem::path noise_file(noise_filter_path);
+    noise_file.append(filename);
+    auto npz_data = cnpy::npz_load(noise_file);
+
+    auto nf_array = npz_data["nf"];
+    auto nf =
+        torch::from_blob(nf_array.data<float>(),
+                         {static_cast<tensor_size_t>(nf_array.num_vals())})
+            .reshape({-1, 6});
+
+    nf.index({Slice(), 4}) *= scale;
+
+    auto si_array = npz_data["si"];
+    const auto si =
+        torch::from_blob(si_array.data<tensor_size_t>(),
+                         {static_cast<tensor_size_t>(si_array.num_vals())});
+
+    auto result = rt::trace(point_cloud, nf, si, 1.25);
+    result.index_put_({result.index({Slice(), 3}) > 255, 3}, 255);
+
+    point_cloud = result;
+    return result;
+  }
+
+  return std::nullopt;
 }
 
 [[nodiscard]] torch::Tensor snow(torch::Tensor point_cloud,
