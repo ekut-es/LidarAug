@@ -19,10 +19,23 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       arg("point_cloud"), arg("metric"), arg("viewing_dist"),
       arg("max_intensity") = 1, "fog weather simulation");
 
-  m.def("snow", &snow, arg("point_cloud"), arg("dims"), arg("num_drops"),
-        arg("precipitation"), arg("scale"), arg("max_intensity") = 1,
+  m.def("snow",
+        pybind11::overload_cast<torch::Tensor, std::array<float, 6>, uint32_t,
+                                float, int32_t, float>(&snow),
+        arg("point_cloud"), arg("dims"), arg("num_drops"), arg("precipitation"),
+        arg("scale"), arg("max_intensity") = 1, "snow weather simulation");
+  m.def("snow",
+        pybind11::overload_cast<torch::Tensor, std::string_view, uint32_t,
+                                float, int32_t, float>(&snow),
         "snow weather simulation");
-  m.def("rain", &rain, "rain weather simulation");
+  m.def("rain",
+        pybind11::overload_cast<torch::Tensor, std::array<float, 6>, uint32_t,
+                                float, distribution>(&rain),
+        "rain weather simulation");
+  m.def("rain",
+        pybind11::overload_cast<torch::Tensor, std::string_view, uint32_t,
+                                float, float>(&rain),
+        "rain weather simulation");
 
   pybind11::enum_<fog_parameter>(m, "FogParameter")
       .value("DIST", fog_parameter::DIST)
