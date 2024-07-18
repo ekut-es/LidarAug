@@ -19,6 +19,8 @@ ext_modules = [
     CppExtension(
         name=f"{MODULE_NAME}.weather_simulations",
         sources=["cpp/src/weather.cpp", "cpp/src/raytracing.cpp"],
+        library_dirs=['/usr/local/lib'],
+        libraries=['cnpy'],
         define_macros=[("BUILD_MODULE", None)],
         extra_link_args=link_args,
         extra_compile_args=['-std=c++20', '-O3', '-I/usr/local/include'],
