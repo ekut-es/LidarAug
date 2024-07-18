@@ -237,7 +237,7 @@ rt::sort_noise_filter(torch::Tensor nf) {
   auto split_index = torch::zeros(360 * nf_split_factor + 1);
 
   nf = nf.index({nf.index({Slice(), 3}).argsort()});
-  nf = nf.index({nf.index({Slice(), 5}).argsort()});
+  nf = nf.index({nf.index({Slice(), 5}).argsort(true)});
 
   if (!nf.is_contiguous()) {
     std::printf(
