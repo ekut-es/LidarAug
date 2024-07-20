@@ -39,7 +39,7 @@ jobs:
           mkdir build
           cd build
           cmake ..
-          make install
+          sudo make install
       - name: Install setuptools
         run: python -m pip install setuptools==69.5.1
       - name: Install dependencies
