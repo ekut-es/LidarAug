@@ -574,6 +574,57 @@ TEST(Raytracing, TraceBeamTest) {
                               << result;
 }
 
+TEST(Raytracing, SortNoiseFilterTest) {
+
+  auto compute_median = [](torch::Tensor tensor) {
+    auto sorted_tensor = std::get<0>(tensor.sort());
+    int64_t size = sorted_tensor.size(0);
+
+    if (size % 2 == 0) {
+      return (sorted_tensor[size / 2 - 1].item<double>() +
+              sorted_tensor[size / 2].item<double>()) /
+             2.0;
+    } else {
+      return sorted_tensor[size / 2].item<double>();
+    }
+  };
+
+  auto npz_data = cnpy::npz_load(npz_dir);
+
+  auto nf_array = npz_data["nf"];
+  const auto nf =
+      torch::from_blob(nf_array.data<double>(),
+                       {static_cast<tensor_size_t>(nf_array.num_vals())}, F64)
+          .reshape({-1, 6});
+
+  auto si_array = npz_data["si"];
+  const auto si =
+      torch::from_blob(si_array.data<double>(),
+                       {static_cast<tensor_size_t>(si_array.num_vals())}, F64);
+
+  auto [result_nf, result_si] = rt::sort_noise_filter(nf);
+
+  EXPECT_TRUE(torch::equal(nf, result_nf)) << "expected:\n"
+                                           << nf << "\nactual:\n"
+                                           << result_nf;
+
+  EXPECT_EQ(si.size(0), result_si.size(0));
+
+  std::cout << "min comparison (expected, result): " << si.min().item<double>()
+            << " vs " << result_si.min().item<double>() << "\n";
+  std::cout << "max comparison (expected, result): " << si.max().item<double>()
+            << " vs " << result_si.max().item<double>() << "\n";
+  std::cout << "average comparison (expected, result): "
+            << si.sum().item<double>() / si.size(0) << " vs "
+            << result_si.sum().item<double>() / result_si.size(0) << "\n";
+  std::cout << "median comparison (expected, result): " << compute_median(si)
+            << " vs " << compute_median(result_si) << "\n";
+
+  EXPECT_TRUE(torch::allclose(si, result_si)) << "expected:\n"
+                                              << si << "\nactual:\n"
+                                              << result_si;
+}
+
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
