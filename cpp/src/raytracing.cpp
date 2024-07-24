@@ -46,10 +46,10 @@ constexpr auto nf_split_factor = 32;
                                    const torch::Tensor &split_index) {
 
   const auto index =
-      static_cast<int>(
-          ((atan2(beam[1].item<float>(), beam[0].item<float>()) * 180 / M_PI) +
-           360) *
-          nf_split_factor) %
+      static_cast<int>(((atan2(beam[1].item<float>(), beam[0].item<float>()) *
+                         180 / math_utils::PI_RAD) +
+                        360) *
+                       nf_split_factor) %
       (360 * nf_split_factor);
 
   for (auto i = split_index[index].item<tensor_size_t>();
