@@ -234,7 +234,7 @@ void rt::intersects(torch::Tensor point_cloud,
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 rt::sort_noise_filter(torch::Tensor nf) {
 
-  auto split_index = torch::zeros(360 * nf_split_factor + 1);
+  auto split_index = torch::zeros(360 * nf_split_factor + 1, F64);
 
   nf = nf.index({nf.index({Slice(), 3}).argsort()});
   nf = nf.index({nf.index({Slice(), 5}).argsort(true)});
@@ -245,7 +245,7 @@ rt::sort_noise_filter(torch::Tensor nf) {
     nf = torch::clone(nf, torch::MemoryFormat::Contiguous);
   }
 
-  const auto *const nf_ptr = nf.const_data_ptr<float>();
+  const auto *const nf_ptr = nf.const_data_ptr<double>();
   const auto row_size = nf.size(1);
 
 #pragma omp parallel for
