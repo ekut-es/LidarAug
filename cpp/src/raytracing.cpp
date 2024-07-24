@@ -1,18 +1,14 @@
 
 #include "../include/raytracing.hpp"
 #include "../include/stats.hpp"
-#include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
 #include <ATen/ops/clone.h>
 #include <c10/core/TensorOptions.h>
 #include <cstdio>
-#include <omp.h>
 #include <torch/csrc/autograd/generated/variable_factories.h>
 
 using namespace torch_utils;
 using Slice = torch::indexing::Slice;
-
-constexpr auto nf_split_factor = 32;
 
 [[nodiscard]] torch::Tensor rt::trace(torch::Tensor point_cloud,
                                       const torch::Tensor &noise_filter,
@@ -201,68 +197,4 @@ void rt::intersects(torch::Tensor point_cloud,
   const auto f = function_table.at(static_cast<size_t>(d));
 
   return f(torch::rand({num_particles}), precipitation) * (1 / 2000);
-}
-
-// TODO(tom): Make dim a 'distribution_ranges' (found in transformations.hpp,
-// needs to go in utils or something)
-[[nodiscard]] std::pair<torch::Tensor, torch::Tensor> rt::generate_noise_filter(
-    const std::array<float, 6> &dim, const uint32_t drops_per_m3,
-    const float precipitation, const int32_t scale, const distribution d) {
-
-  const auto total_drops = static_cast<int>(
-      std::abs(dim[0] - dim[1]) * std::abs(dim[2] - dim[3]) *
-      std::abs(dim[4] - dim[5]) * static_cast<float>(drops_per_m3));
-
-  const auto x = torch::empty({total_drops}, F32).uniform_(dim[0], dim[1]);
-  const auto y = torch::empty({total_drops}, F32).uniform_(dim[2], dim[3]);
-  const auto z = torch::empty({total_drops}, F32).uniform_(dim[4], dim[5]);
-
-  const auto dist =
-      torch::sqrt(torch::pow(x, 2) + torch::pow(y, 2) + torch::pow(z, 2));
-  const auto size = sample_particles(total_drops, precipitation, d) * scale;
-
-  const auto index =
-      (((torch::arctan2(y, x) * 180 / math_utils::PI_RAD) + 360) *
-       nf_split_factor)
-          .toType(I32) %
-      (360 * nf_split_factor);
-  const auto nf = torch::stack({x, y, z, dist, size, index}, -1);
-
-  return sort_noise_filter(nf);
-}
-
-[[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
-rt::sort_noise_filter(torch::Tensor nf) {
-
-  auto split_index = torch::zeros(360 * nf_split_factor + 1, F64);
-
-  nf = nf.index({nf.index({Slice(), 3}).argsort()});
-  nf = nf.index({nf.index({Slice(), 5}).argsort(true)});
-
-  if (!nf.is_contiguous()) {
-    std::printf(
-        "for performance reasons, please make sure that 'nf' is contiguous!");
-    nf = torch::clone(nf, torch::MemoryFormat::Contiguous);
-  }
-
-  const auto *const nf_ptr = nf.const_data_ptr<double>();
-  const auto row_size = nf.size(1);
-
-#pragma omp parallel for
-  for (tensor_size_t i = 0; i < nf.size(0) - 1; i++) {
-
-    const auto idx = i * row_size + 5;
-
-    const auto val_at_i = nf_ptr[idx];
-    const auto val_at_i_plus_one = nf_ptr[idx + row_size];
-
-    if (val_at_i != val_at_i_plus_one) {
-      split_index.index_put_({static_cast<tensor_size_t>(val_at_i_plus_one)},
-                             i + 1);
-    }
-  }
-
-  split_index.index_put_({split_index.size(0) - 1}, nf.size(0) - 1);
-
-  return std::make_pair(nf, split_index);
 }

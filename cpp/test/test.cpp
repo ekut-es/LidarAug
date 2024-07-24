@@ -602,7 +602,7 @@ TEST(Raytracing, SortNoiseFilterTest) {
       torch::from_blob(si_array.data<double>(),
                        {static_cast<tensor_size_t>(si_array.num_vals())}, F64);
 
-  auto [result_nf, result_si] = rt::sort_noise_filter(nf);
+  auto [result_nf, result_si] = rt::sort_noise_filter<double, F64>(nf);
 
   EXPECT_TRUE(torch::equal(nf, result_nf)) << "expected:\n"
                                            << nf << "\nactual:\n"

@@ -2,6 +2,7 @@
 #include "../include/weather.hpp"
 #include "../include/stats.hpp"
 #include "../include/tensor.hpp"
+#include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
 #include <ATen/ops/from_blob.h>
 #include <ATen/ops/pow.h>
@@ -11,6 +12,7 @@
 #include <tuple>
 
 using namespace torch::indexing;
+using namespace torch_utils;
 
 [[nodiscard]] inline std::tuple<float, float, float>
 calculate_factors(fog_parameter metric, float viewing_dist) {
@@ -118,8 +120,8 @@ fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
                                  std::array<float, 6> dims, uint32_t num_drops,
                                  float precipitation, distribution d) {
 
-  auto [nf, si] =
-      rt::generate_noise_filter(dims, num_drops, precipitation, 1, d);
+  auto [nf, si] = rt::generate_noise_filter<float, F32>(dims, num_drops,
+                                                        precipitation, 1, d);
   return rt::trace(point_cloud, nf, si, 0.9);
 }
 
@@ -128,8 +130,8 @@ fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
                                  float precipitation, int32_t scale,
                                  float max_intensity) {
 
-  auto [nf, si] = rt::generate_noise_filter(dims, num_drops, precipitation,
-                                            scale, distribution::gm);
+  auto [nf, si] = rt::generate_noise_filter<float, F32>(
+      dims, num_drops, precipitation, scale, distribution::gm);
   point_cloud = rt::trace(point_cloud, nf, si, 1.25);
   point_cloud.index({point_cloud.index({Slice(), 3}) > max_intensity, 3}) =
       max_intensity;
