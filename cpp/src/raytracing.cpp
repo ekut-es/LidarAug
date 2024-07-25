@@ -10,6 +10,9 @@
 using namespace torch_utils;
 using Slice = torch::indexing::Slice;
 
+// Set minimum intersection distance to 1m
+constexpr tensor_size_t min_intersect_dist = 1;
+
 [[nodiscard]] torch::Tensor rt::trace(torch::Tensor point_cloud,
                                       const torch::Tensor &noise_filter,
                                       const torch::Tensor &split_index,
@@ -122,8 +125,11 @@ void rt::intersects(torch::Tensor point_cloud,
 
         intersection_dist = rt::trace_beam(noise_filter, beam, split_index);
 
-        if (intersection_dist > 0) {
+        if (intersection_dist > min_intersect_dist) {
           intersections.index_put_({i, idx_count}, intersection_dist);
+          idx_count += 1;
+        } else if (/* min_intersect_dist > */ intersection_dist > 0) {
+          intersections.index_put_({i, idx_count}, 1);
           idx_count += 1;
         }
         rot_vec = rt::rotate(rot_vec, rt::normalize(original_point),
