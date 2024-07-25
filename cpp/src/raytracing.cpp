@@ -56,8 +56,9 @@ using Slice = torch::indexing::Slice;
         {nf[0].item<float>(), nf[1].item<float>(), nf[2].item<float>()});
 
     if (const auto beam_dist = rt::vector_length(beam);
-        beam_dist < nf[3].item<float>())
+        beam_dist < nf[3].item<float>()) {
       return -1;
+    }
 
     if (const auto length_beam_sphere = rt::scalar(sphere, rt::normalize(beam));
         length_beam_sphere > 0.0) {
@@ -65,9 +66,10 @@ using Slice = torch::indexing::Slice;
       if (const auto dist_beam_sphere =
               sqrt(nf[3].item<float>() * nf[3].item<float>() -
                    length_beam_sphere * length_beam_sphere);
-          dist_beam_sphere < nf[4].item<float>())
+          dist_beam_sphere < nf[4].item<float>()) {
 
         return nf[3].item<float>();
+      }
     }
   }
 
