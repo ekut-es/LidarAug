@@ -196,5 +196,5 @@ void rt::intersects(torch::Tensor point_cloud,
 
   const auto f = function_table.at(static_cast<size_t>(d));
 
-  return f(torch::rand({num_particles}), precipitation) * (1 / 2000);
+  return f(torch::rand({num_particles}), precipitation) * (1 / 2000.0);
 }
