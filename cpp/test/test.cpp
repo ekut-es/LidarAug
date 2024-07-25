@@ -542,7 +542,7 @@ TEST(Raytracing, TraceTest) {
       torch::from_blob(si_array.data<tensor_size_t>(),
                        {static_cast<tensor_size_t>(si_array.num_vals())});
 
-  const auto result = rt::trace(points, nf, si);
+  const auto result = rt::trace(points, nf, si, simulation_type::rain);
 
   EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
                                          << expected << "\nactual:\n"

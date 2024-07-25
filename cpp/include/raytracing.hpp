@@ -3,6 +3,7 @@
 
 #include "../include/utils.hpp"
 #include "tensor.hpp"
+#include <array>
 #include <cstdint>
 #include <omp.h>
 #include <torch/serialize/tensor.h>
@@ -15,11 +16,19 @@ enum struct distribution : std::uint8_t {
   gm = 2,
 };
 
+enum struct simulation_type : std::uint8_t { snow = 0, rain = 1 };
+
+constexpr std::array<std::pair<float, float>, 2> r_table = {{
+    {0.6, 0.2},
+    {0.15, 0.8},
+}};
+
 namespace rt {
 
 [[nodiscard]] torch::Tensor trace(torch::Tensor point_cloud,
                                   const torch::Tensor &noise_filter,
                                   const torch::Tensor &split_index,
+                                  simulation_type simt,
                                   float intensity_factor = 0.9);
 
 void intersects(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
@@ -27,7 +36,7 @@ void intersects(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
                 torch::Tensor distances, torch::Tensor distance_count,
                 torch::Tensor most_intersect_count,
                 torch::Tensor most_intersect_dist, tensor_size_t num_points,
-                float intensity_factor);
+                simulation_type simt, float intensity_factor);
 
 [[nodiscard]] inline torch::Tensor mul(const torch::Tensor &v, const float c) {
   // NOTE(tom): This is almost the same as `scale_points`

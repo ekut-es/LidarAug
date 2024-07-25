@@ -2,9 +2,7 @@
 #include "../include/raytracing.hpp"
 #include "../include/stats.hpp"
 #include <ATen/TensorIndexing.h>
-#include <ATen/ops/clone.h>
 #include <c10/core/TensorOptions.h>
-#include <cstdio>
 #include <torch/csrc/autograd/generated/variable_factories.h>
 
 using namespace torch_utils;
@@ -16,6 +14,7 @@ constexpr tensor_size_t min_intersect_dist = 1;
 [[nodiscard]] torch::Tensor rt::trace(torch::Tensor point_cloud,
                                       const torch::Tensor &noise_filter,
                                       const torch::Tensor &split_index,
+                                      const simulation_type simt,
                                       const float intensity_factor /*= 0.9*/) {
 
   const auto num_points = point_cloud.size(0);
@@ -29,7 +28,7 @@ constexpr tensor_size_t min_intersect_dist = 1;
 
   rt::intersects(point_cloud, noise_filter, split_index, intersections,
                  distances, distance_count, most_intersect_count,
-                 most_intersect_dist, num_points, intensity_factor);
+                 most_intersect_dist, num_points, simt, intensity_factor);
 
   // select all points where any of x, y, z != 0
   const auto indices =
@@ -86,9 +85,16 @@ void rt::intersects(torch::Tensor point_cloud,
                     torch::Tensor distance_count,
                     torch::Tensor most_intersect_count,
                     torch::Tensor most_intersect_dist,
-                    const tensor_size_t num_points, float intensity_factor) {
+                    const tensor_size_t num_points, const simulation_type simt,
+                    float intensity_factor) {
 
   constexpr auto num_rays = 11;
+
+  const auto t = r_table.at(static_cast<size_t>(simt));
+
+  // for som reason I can't use structured bindings here with clang
+  const auto r_all_threshold = std::get<0>(t);
+  const auto r_most_threshold = std::get<1>(t);
 
 #pragma omp parallel for schedule(dynamic)
   for (tensor_size_t i = 0; i < num_points; i++) {
@@ -175,10 +181,10 @@ void rt::intersects(torch::Tensor point_cloud,
     }
 
     if (const auto r_all = n_intersects / static_cast<double>(num_rays);
-        r_all > 0.15) {
+        r_all > r_all_threshold) {
       assert(n_intersects != 0);
       if (const auto r_most = max_count / static_cast<double>(n_intersects);
-          r_most > 0.8) { // set point towards sensor
+          r_most > r_most_threshold) { // set point towards sensor
 
         const auto dist = rt::vector_length(point_cloud[i]);
 
