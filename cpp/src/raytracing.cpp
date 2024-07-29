@@ -44,8 +44,8 @@ constexpr tensor_size_t min_intersect_dist = 1;
                                    const torch::Tensor &split_index) {
 
   const auto index =
-      static_cast<int>(((atan2(beam[1].item<float>(), beam[0].item<float>()) *
-                         180 / math_utils::PI_RAD) +
+      static_cast<int>(((torch::atan2(beam[1], beam[0]).item<float>() * 180 /
+                         math_utils::PI_RAD) +
                         360) *
                        nf_split_factor) %
       (360 * nf_split_factor);
