@@ -6,7 +6,7 @@
 #include <ATen/ops/from_blob.h>
 #include <ATen/ops/pow.h>
 #include <cmath>
-#include <cnpy.hpp>
+#include <cnpy/cnpy.hpp>
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>

@@ -97,7 +97,7 @@ else ()
         "${Boost_LIBRARIES}"
         "${ZLIB_LIBRARIES}"
         GTest::gtest_main
-        cnpy
+        cnpy::cnpy
         # GTest::gtest
     )
 endif()
