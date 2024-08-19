@@ -2,7 +2,9 @@
 #ifndef WEATHER_HPP
 #define WEATHER_HPP
 
+#include "../include/point_cloud.hpp"
 #include "../include/raytracing.hpp"
+#include "../include/stats.hpp"
 #include <ATen/core/List.h>
 #include <array>
 #include <cstdint>
@@ -11,6 +13,23 @@
 #include <vector>
 
 typedef enum { DIST, CHAMFER } fog_parameter;
+
+[[nodiscard]] inline auto get_intensity(simulation_type sim_t) {
+
+  auto rng = get_rng();
+
+  switch (sim_t) {
+  case simulation_type::snow: {
+    SnowIntensityDistribution<double> d(0.11,
+                                        point_cloud_data::max_intensity::get());
+    return d(rng);
+  }
+  case simulation_type::rain: {
+    std::uniform_real_distribution<double> d(0, 0.005);
+    return point_cloud_data::max_intensity::get() * d(rng);
+  }
+  }
+}
 
 [[nodiscard]] std::optional<std::vector<torch::Tensor>>
 fog(const torch::Tensor &point_cloud, float prob, fog_parameter metric,

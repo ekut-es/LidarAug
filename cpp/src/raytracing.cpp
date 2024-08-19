@@ -1,6 +1,7 @@
 
 #include "../include/raytracing.hpp"
 #include "../include/stats.hpp"
+#include "../include/weather.hpp"
 #include <ATen/TensorIndexing.h>
 #include <c10/core/TensorOptions.h>
 #include <torch/csrc/autograd/generated/variable_factories.h>
@@ -189,7 +190,7 @@ void rt::intersects(torch::Tensor point_cloud,
         const auto dist = rt::vector_length(point_cloud[i]);
 
         point_cloud.index({i, Slice(0, 3)}) *= max_intersection_dist / dist;
-        point_cloud[i][3] *= 0.005;
+        point_cloud.index_put_({i, 3}, get_intensity(sim_t));
       } else { // delete point (filtered out later)
         point_cloud.index_put_({i, Slice(0, 4)}, 0);
       }
