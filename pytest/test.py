@@ -7,7 +7,8 @@ import torch
 from LidarAug import augmentations as aug
 from LidarAug import weather_simulations
 from LidarAug import evaluation
-from LidarAug.transformations import NoiseType, IntensityRange
+from LidarAug.transformations import NoiseType
+from LidarAug.point_cloud import IntensityRange
 
 import re
 
