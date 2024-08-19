@@ -28,7 +28,7 @@ namespace rt {
 [[nodiscard]] torch::Tensor trace(torch::Tensor point_cloud,
                                   const torch::Tensor &noise_filter,
                                   const torch::Tensor &split_index,
-                                  simulation_type simt,
+                                  simulation_type sim_t,
                                   float intensity_factor = 0.9);
 
 void intersects(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
@@ -36,7 +36,7 @@ void intersects(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
                 torch::Tensor distances, torch::Tensor distance_count,
                 torch::Tensor most_intersect_count,
                 torch::Tensor most_intersect_dist, tensor_size_t num_points,
-                simulation_type simt, float intensity_factor);
+                simulation_type sim_t, float intensity_factor);
 
 [[nodiscard]] inline torch::Tensor mul(const torch::Tensor &v, const float c) {
   // NOTE(tom): This is almost the same as `scale_points`
