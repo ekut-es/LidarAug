@@ -1,7 +1,6 @@
 
 #include "../include/tensor.hpp"
 #include "../include/transformations.hpp"
-#include "point_cloud.hpp"
 #include <pybind11/pybind11.h>
 #include <torch/extension.h>
 
@@ -54,12 +53,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       .value("SALT_PEPPER", noise_type::SALT_PEPPER)
       .value("MIN", noise_type::MIN)
       .value("MAX", noise_type::MAX)
-      .export_values();
-  pybind11::enum_<point_cloud_data::intensity_range>(m, "IntensityRange")
-      .value("MAX_INTENSITY_1",
-             point_cloud_data::intensity_range::MAX_INTENSITY_1)
-      .value("MAX_INTENSITY_255",
-             point_cloud_data::intensity_range::MAX_INTENSITY_255)
       .export_values();
 
   // NOTE(tom): Unfortunately it is necessary to export this with defined types,
