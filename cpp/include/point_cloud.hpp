@@ -3,6 +3,7 @@
 #ifndef POINT_CLOUD_HPP
 #define POINT_CLOUD_HPP
 
+#include <cstdint>
 namespace point_cloud {
 
 /**
@@ -28,6 +29,16 @@ enum struct intensity_range {
   MAX_INTENSITY_1 = 1,
   MAX_INTENSITY_255 = 255,
 };
+
+namespace max_intensity {
+
+static uint8_t intensity =
+    static_cast<uint8_t>(intensity_range::MAX_INTENSITY_1);
+
+inline void set(intensity_range val) { intensity = static_cast<uint8_t>(val); }
+[[nodiscard]] inline uint8_t get() { return intensity; }
+
+} // namespace max_intensity
 
 } // namespace point_cloud
 
