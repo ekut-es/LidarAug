@@ -27,6 +27,10 @@ ext_modules = [
                  sources=["cpp/src/evaluation.cpp", "cpp/src/utils.cpp"],
                  define_macros=[("BUILD_MODULE", None)],
                  extra_compile_args=['-std=c++20', '-O3']),
+    CppExtension(name=f"{MODULE_NAME}.point_cloud",
+                 sources=["cpp/src/point_cloud.cpp"],
+                 define_macros=[("BUILD_MODULE", None)],
+                 extra_compile_args=['-std=c++20', '-O3']),
 ]
 
 setup(
