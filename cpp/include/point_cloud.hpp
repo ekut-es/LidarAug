@@ -3,6 +3,8 @@
 #ifndef POINT_CLOUD_HPP
 #define POINT_CLOUD_HPP
 
+namespace point_cloud {
+
 /**
  * A point cloud tensor represents a point cloud and has the following values:
  *
@@ -25,6 +27,8 @@
 enum struct intensity_range {
   MAX_INTENSITY_1 = 1,
   MAX_INTENSITY_255 = 255,
-} ;
+};
+
+} // namespace point_cloud
 
 #endif // !POINT_CLOUD_HPP
