@@ -2,7 +2,7 @@ from torch.utils.cpp_extension import BuildExtension, CppExtension
 from setuptools import setup
 import platform
 
-link_args = []
+link_args = ['-lz']
 
 if platform.system() == 'Darwin':
     link_args.append("-lomp")
@@ -19,7 +19,7 @@ ext_modules = [
     CppExtension(
         name=f"{MODULE_NAME}.weather_simulations",
         sources=["cpp/src/weather.cpp", "cpp/src/raytracing.cpp"],
-        library_dirs=['/usr/local/lib'],
+        library_dirs=['/usr/local/lib', '/usr/local/lib64/'],
         libraries=['cnpy'],
         define_macros=[("BUILD_MODULE", None)],
         extra_link_args=link_args,
