@@ -68,8 +68,9 @@ fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
   }
 }
 
-[[nodiscard]] torch::Tensor fog(torch::Tensor point_cloud, fog_parameter metric,
-                                float viewing_dist, float max_intensity) {
+[[nodiscard]] torch::Tensor
+fog(torch::Tensor point_cloud, fog_parameter metric, float viewing_dist,
+    point_cloud_data::intensity_range max_intensity) {
 
   const auto [extinction_factor, beta, delete_probability] =
       calculate_factors(metric, viewing_dist);
@@ -109,7 +110,8 @@ fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
 
     point_cloud.index_put_(
         {altered_points, 3},
-        torch::empty({num_altered_points}).uniform_(0, max_intensity * 0.3));
+        torch::empty({num_altered_points})
+            .uniform_(0, static_cast<float>(max_intensity) * 0.3));
   }
 
   // delete points
