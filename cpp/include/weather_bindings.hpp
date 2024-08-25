@@ -27,7 +27,12 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         arg("max_intensity") =
             point_cloud_data::intensity_range::MAX_INTENSITY_1,
         "snow weather simulation");
-  m.def("rain", &rain, "rain weather simulation");
+
+  m.def("rain", &rain, arg("point_cloud"), arg("dims"), arg("num_drops"),
+        arg("precipitation"), arg("d"),
+        arg("max_intensity") =
+            point_cloud_data::intensity_range::MAX_INTENSITY_1,
+        "rain weather simulation");
 
   pybind11::enum_<fog_parameter>(m, "FogParameter")
       .value("DIST", fog_parameter::DIST)
