@@ -1,4 +1,5 @@
 
+#include "../include/point_cloud.hpp"
 #include "../include/weather.hpp"
 #include <ATen/core/TensorBody.h>
 #include <pybind11/detail/common.h>
@@ -13,11 +14,13 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         pybind11::overload_cast<const torch::Tensor &, float, fog_parameter,
                                 float, int>(&fog),
         "fog weather simulation");
-  m.def(
-      "fog",
-      pybind11::overload_cast<torch::Tensor, fog_parameter, float, float>(&fog),
-      arg("point_cloud"), arg("metric"), arg("viewing_dist"),
-      arg("max_intensity") = 1, "fog weather simulation");
+  m.def("fog",
+        pybind11::overload_cast<torch::Tensor, fog_parameter, float,
+                                point_cloud_data::intensity_range>(&fog),
+        arg("point_cloud"), arg("metric"), arg("viewing_dist"),
+        arg("max_intensity") =
+            point_cloud_data::intensity_range::MAX_INTENSITY_1,
+        "fog weather simulation");
 
   m.def("snow", &snow, arg("point_cloud"), arg("dims"), arg("num_drops"),
         arg("precipitation"), arg("scale"), arg("max_intensity") = 1,

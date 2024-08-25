@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Optional, overload
 from torch import Tensor
+from point_cloud import IntensityRange
 
 
 class FogParameter(Enum):
@@ -22,5 +23,5 @@ def fog(point_cloud: Tensor, prob: float, metric: FogParameter, sigma: float,
 
 @overload
 def fog(point_cloud: Tensor, metric: FogParameter, viewing_dist: float,
-        max_intensity: int) -> Tensor:
+        max_intensity: IntensityRange) -> Tensor:
     ...

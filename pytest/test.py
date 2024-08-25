@@ -320,7 +320,8 @@ def test_fog():
     metric = weather_simulations.FogParameter.DIST
     viewing_dist = 100
 
-    result = weather_simulations.fog(points, metric, viewing_dist, 1)
+    result = weather_simulations.fog(points, metric, viewing_dist,
+                                     IntensityRange.MAX_INTENSITY_1)
 
     assert not result.equal(points)
 
