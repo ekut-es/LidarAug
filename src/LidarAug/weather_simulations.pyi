@@ -44,5 +44,6 @@ def rain(point_cloud: Tensor, dims: list[float], num_drops: int,
 
 
 def snow(point_cloud: Tensor, dims: list[float], num_drops: int,
-         precipitation: float, scale: int, max_intensity: IntensityRange):
+         precipitation: float, scale: int,
+         max_intensity: IntensityRange) -> Tensor:
     ...
