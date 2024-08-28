@@ -41,8 +41,6 @@ sim: release
 	cd ./cpp/build_files && ctest --output-on-failure -R 'Simulation.*'
 
 install:
-	@echo "CXXFLAGS: $(CXXFLAGS)"
-	@echo "CFLAGS: $(CFLAGS)"
 	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.11 -m pip install -v . && rm -rf ./tmp
 
 clean: ./cpp/build_files
