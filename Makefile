@@ -6,9 +6,9 @@ else
 	ifeq ($(UNAME_S),Darwin)
 		CXXFLAGS += -Xpreprocessor
 		CFLAGS += -Xpreprocessor
+		CXXFLAGS += -fopenmp
+		CFLAGS += -fopenmp
 	endif
-	CXXFLAGS += -fopenmp
-	CFLAGS += -fopenmp
 endif
 
 all: install testpy build ctest

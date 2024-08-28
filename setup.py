@@ -9,6 +9,9 @@ link_args = []
 
 if platform.system() == 'Darwin':
     link_args.append("-lomp")
+elif platform.system() == 'Linux':
+    weather_compile_args.append('-fopenmp')
+    link_args.append("-fopenmp")
 
 MODULE_NAME = "LidarAug"
 
