@@ -38,7 +38,7 @@ jobs:
           cd cnpy
           mkdir build
           cd build
-          cmake ..
+          cmake .. -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0"
           make VERBOSE=1
           sudo make install
       - name: Install setuptools
