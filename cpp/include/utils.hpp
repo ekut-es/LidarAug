@@ -96,28 +96,28 @@ constexpr auto I32 = torch::kI32;
 
 namespace evaluation_utils {
 
-using point_t =
+using point2d_t =
     boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>;
-using polygon_t = boost::geometry::model::polygon<point_t, false>;
-using multi_polygon_t = boost::geometry::model::multi_polygon<polygon_t>;
+using polygon2d_t = boost::geometry::model::polygon<point2d_t, false>;
+using multi_polygon2d_t = boost::geometry::model::multi_polygon<polygon2d_t>;
 
-[[nodiscard]] inline std::vector<polygon_t>
+[[nodiscard]] inline std::vector<polygon2d_t>
 convert_format(const torch::Tensor &boxes) {
 
   const auto corners = torch_utils::boxes_to_corners(boxes);
 
-  std::vector<polygon_t> ps;
+  std::vector<polygon2d_t> ps;
   ps.reserve(static_cast<std::size_t>(corners.size(0)));
 
   for (tensor_size_t i = 0; i < corners.size(0); i++) {
     auto box = corners[i];
 
-    point_t p1{box[0][0].item<float>(), box[0][1].item<float>()};
-    point_t p2{box[1][0].item<float>(), box[1][1].item<float>()};
-    point_t p3{box[2][0].item<float>(), box[2][1].item<float>()};
-    point_t p4{box[3][0].item<float>(), box[3][1].item<float>()};
+    point2d_t p1{box[0][0].item<float>(), box[0][1].item<float>()};
+    point2d_t p2{box[1][0].item<float>(), box[1][1].item<float>()};
+    point2d_t p3{box[2][0].item<float>(), box[2][1].item<float>()};
+    point2d_t p4{box[3][0].item<float>(), box[3][1].item<float>()};
 
-    polygon_t p{{p1, p2, p3, p4, p1}};
+    polygon2d_t p{{p1, p2, p3, p4, p1}};
 
     ps.emplace_back(p);
   }
@@ -135,18 +135,18 @@ convert_format(const torch::Tensor &boxes) {
  * `box`.
  */
 template <typename T>
-[[nodiscard]] inline std::vector<T> iou(const polygon_t &box,
-                                        const std::vector<polygon_t> &boxes) {
+[[nodiscard]] inline std::vector<T> iou(const polygon2d_t &box,
+                                        const std::vector<polygon2d_t> &boxes) {
   std::vector<T> ious(boxes.size());
 
   // NOTE(tom): I have parallelized this, but this might only be worth it for
   //            larger sizes `boxes`. Should be perf tested.
   std::transform(boxes.begin(), boxes.end(), ious.begin(),
 
-                 [box](const polygon_t &b) -> T {
+                 [box](const polygon2d_t &b) -> T {
                    if (boost::geometry::intersects(box, b)) {
-                     multi_polygon_t mpu;
-                     multi_polygon_t mpi;
+                     multi_polygon2d_t mpu;
+                     multi_polygon2d_t mpi;
 
                      boost::geometry::intersection(box, b, mpi);
                      boost::geometry::union_(box, b, mpu);
