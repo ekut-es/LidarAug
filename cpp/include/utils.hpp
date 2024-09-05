@@ -98,8 +98,25 @@ namespace evaluation_utils {
 
 using point2d_t =
     boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>;
-using polygon2d_t = boost::geometry::model::polygon<point2d_t, false>;
-using multi_polygon2d_t = boost::geometry::model::multi_polygon<polygon2d_t>;
+using point3d_t =
+    boost::geometry::model::point<float, 3, boost::geometry::cs::cartesian>;
+
+template <typename point_type,
+          typename = std::enable_if_t<std::is_same_v<point_type, point2d_t> ||
+                                      std::is_same_v<point_type, point3d_t>>>
+using polygon_t = boost::geometry::model::polygon<point_type, false>;
+
+template <typename point_type,
+          typename = std::enable_if_t<std::is_same_v<point_type, point2d_t> ||
+                                      std::is_same_v<point_type, point3d_t>>>
+using multi_polygon_t =
+    boost::geometry::model::multi_polygon<polygon_t<point_type>>;
+
+using polygon3d_t = polygon_t<point3d_t>;
+using multi_polygon3d_t = multi_polygon_t<point3d_t>;
+
+using polygon2d_t = polygon_t<point2d_t>;
+using multi_polygon2d_t = multi_polygon_t<point2d_t>;
 
 [[nodiscard]] inline std::vector<polygon2d_t>
 convert_format(const torch::Tensor &boxes) {
