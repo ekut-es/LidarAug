@@ -156,8 +156,6 @@ template <typename T>
                                         const std::vector<polygon2d_t> &boxes) {
   std::vector<T> ious(boxes.size());
 
-  // NOTE(tom): I have parallelized this, but this might only be worth it for
-  //            larger sizes `boxes`. Should be perf tested.
   std::transform(boxes.begin(), boxes.end(), ious.begin(),
 
                  [box](const polygon2d_t &b) -> T {
