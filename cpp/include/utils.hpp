@@ -172,23 +172,19 @@ template <typename point_t>
   }
 }
 
-[[nodiscard]] inline std::vector<polygon2d_t>
+template <typename point_t>
+[[nodiscard]] inline std::vector<polygon_t<point_t>>
 convert_format(const torch::Tensor &boxes) {
 
   const auto corners = torch_utils::boxes_to_corners(boxes);
 
-  std::vector<polygon2d_t> ps;
+  std::vector<polygon_t<point_t>> ps;
   ps.reserve(static_cast<std::size_t>(corners.size(0)));
 
   for (tensor_size_t i = 0; i < corners.size(0); i++) {
     auto box = corners[i];
 
-    point2d_t p1{box[0][0].item<float>(), box[0][1].item<float>()};
-    point2d_t p2{box[1][0].item<float>(), box[1][1].item<float>()};
-    point2d_t p3{box[2][0].item<float>(), box[2][1].item<float>()};
-    point2d_t p4{box[3][0].item<float>(), box[3][1].item<float>()};
-
-    polygon2d_t p{{p1, p2, p3, p4, p1}};
+    auto p = make_polygon<point_t>(box);
 
     ps.emplace_back(p);
   }
