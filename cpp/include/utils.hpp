@@ -1,6 +1,7 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include "boost/geometry/core/coordinate_dimension.hpp"
 #include "tensor.hpp"
 #include <algorithm>
 #include <boost/geometry.hpp>
@@ -117,6 +118,59 @@ using multi_polygon3d_t = multi_polygon_t<point3d_t>;
 
 using polygon2d_t = polygon_t<point2d_t>;
 using multi_polygon2d_t = multi_polygon_t<point2d_t>;
+
+template <typename point_t>
+[[nodiscard]] auto make_polygon(const torch::Tensor &box) {
+
+  static_assert(std::is_same_v<point_t, point2d_t> ||
+                std::is_same_v<point_t, point3d_t>);
+
+  if constexpr (boost::geometry::dimension<point_t>::value == 2) {
+    point2d_t p1{box[0][0].item<float>(), box[0][1].item<float>()};
+    point2d_t p2{box[1][0].item<float>(), box[1][1].item<float>()};
+    point2d_t p3{box[2][0].item<float>(), box[2][1].item<float>()};
+    point2d_t p4{box[3][0].item<float>(), box[3][1].item<float>()};
+
+    return polygon_t<point_t>{{p1, p2, p3, p4, p1}};
+  } else if constexpr (boost::geometry::dimension<point_t>::value == 3) {
+
+    // clang-format off
+    point3d_t p1{box[0][0].item<float>(),
+                 box[0][1].item<float>(),
+                 box[0][2].item<float>()};
+
+    point3d_t p2{box[1][0].item<float>(),
+                 box[1][1].item<float>(),
+                 box[1][2].item<float>()};
+
+    point3d_t p3{box[2][0].item<float>(),
+                 box[2][1].item<float>(),
+                 box[2][2].item<float>()};
+
+    point3d_t p4{box[3][0].item<float>(),
+                 box[3][1].item<float>(),
+                 box[3][2].item<float>()};
+
+    point3d_t p5{box[4][0].item<float>(),
+                 box[4][1].item<float>(),
+                 box[4][2].item<float>()};
+
+    point3d_t p6{box[5][0].item<float>(),
+                 box[5][1].item<float>(),
+                 box[5][2].item<float>()};
+
+    point3d_t p7{box[6][0].item<float>(),
+                 box[6][1].item<float>(),
+                 box[6][2].item<float>()};
+
+    point3d_t p8{box[7][0].item<float>(),
+                 box[7][1].item<float>(),
+                 box[7][2].item<float>()};
+    // clang-format on
+
+    return polygon_t<point_t>{{p1, p2, p3, p4, p5, p6, p7, p8, p1}};
+  }
+}
 
 [[nodiscard]] inline std::vector<polygon2d_t>
 convert_format(const torch::Tensor &boxes) {
