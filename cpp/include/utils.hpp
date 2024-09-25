@@ -179,6 +179,83 @@ iou_2d(const polygon2d_t &gt_box, const std::vector<polygon2d_t> &boxes) {
   return ious;
 }
 
+/**
+ * Computes intersection over union between (a 3D) `gt_box` and `boxes`.
+ *
+ * @param box   is a polygon representing a bounding box.
+ * @param boxes is a vector of polygons representing boxes.
+ *
+ * @returns a vector of floats containing the ious of each box in `boxes` with
+ * `box`.
+ */
+template <typename T>
+[[nodiscard]] inline std::vector<T>
+iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
+  std::vector<T> ious;
+
+  const auto gt_box_outer = gt_box.outer();
+  const polygon2d_t gt_2d{
+      {gt_box_outer[0].get<0>(), gt_box.outer()[0].get<2>()},
+      {gt_box_outer[1].get<0>(), gt_box.outer()[1].get<2>()},
+      {gt_box_outer[2].get<0>(), gt_box.outer()[2].get<2>()},
+      {gt_box_outer[3].get<0>(), gt_box.outer()[3].get<2>()},
+  };
+
+  const T gt_box_height =
+      boost::geometry::length(gt_box_outer[1], gt_box_outer[5]);
+
+  std::transform(
+      boxes.begin(), boxes.end(), ious.begin(),
+
+      [gt_2d, gt_box_outer](const polygon3d_t &box) -> T {
+        const auto box_outer = box.outer();
+
+        // get base
+        polygon2d_t box_2d{
+            {box_outer[0].get<0>(), box_outer[0].get<2>()},
+            {box_outer[1].get<0>(), box_outer[1].get<2>()},
+            {box_outer[2].get<0>(), box_outer[2].get<2>()},
+            {box_outer[3].get<0>(), box_outer[3].get<2>()},
+        };
+
+        if (boost::geometry::intersects(gt_2d, box_2d)) {
+          T y_high = fmin(box_outer[5].get<1>(), gt_box_outer[5].get<1>());
+          T y_low = fmax(box_outer[1].get<1>(), gt_box_outer[1].get<1>());
+
+          // intersection area > 0
+          if (y_high > y_low) {
+            multi_polygon2d_t mpu;
+            multi_polygon2d_t mpi;
+
+            boost::geometry::intersection(gt_2d, box_2d, mpi);
+
+            const T intersection_area =
+                boost::geometry::area(mpi) * (y_high - y_low);
+
+            const T box_height =
+                boost::geometry::length(box_outer[1], box_outer[5]);
+
+            const T boxes_union = boost::geometry::area(box_2d) * box_height +
+                                  boost::geometry::area(gt_2d) * gt_box_height -
+                                  intersection_area;
+
+            return intersection_area / boxes_union;
+
+          } else {
+
+            return 0;
+          }
+
+        } else {
+          return 0;
+        }
+      }
+
+  );
+
+  return ious;
+}
+
 } // namespace evaluation_utils
 
 namespace cpp_utils {
