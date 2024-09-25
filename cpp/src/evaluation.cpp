@@ -73,7 +73,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
   assert(detection_score.is_contiguous());
 
-  const auto* const data = detection_score.const_data_ptr<float>();
+  const auto *const data = detection_score.const_data_ptr<float>();
 
   const std::vector<float> l_detection_score(
       data, data + static_cast<std::size_t>(detection_score.size(0)));
@@ -105,7 +105,6 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
       false_positive.emplace_back(1);
       true_positive.emplace_back(0);
-
     } else {
       false_positive.emplace_back(0);
       true_positive.emplace_back(1);
@@ -152,12 +151,12 @@ std::array<float, 3> evaluate_results(const result_dict &results,
 
   std::ranges::transform(iou_thresholds, aps.begin(),
                          [global_sort_detections, results](auto threshold) {
-                             auto ap = calculate_average_precision(
-                                 threshold, global_sort_detections, results);
+                           auto ap = calculate_average_precision(
+                               threshold, global_sort_detections, results);
 
-                             std::printf("ap_%f: %f\n", threshold, ap);
+                           std::printf("ap_%f: %f\n", threshold, ap);
 
-                             return ap;
+                           return ap;
                          });
 
   return aps;

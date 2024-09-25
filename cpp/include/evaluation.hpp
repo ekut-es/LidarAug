@@ -10,7 +10,8 @@
 #include <torch/torch.h>
 #include <vector>
 
-using result_dict = std::map<std::uint8_t, std::map<std::string, std::vector<float>>>;
+using result_dict =
+    std::map<std::uint8_t, std::map<std::string, std::vector<float>>>;
 
 /**
  * Calculates the false and true positive numbers of the current frames.
