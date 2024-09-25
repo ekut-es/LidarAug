@@ -143,28 +143,28 @@ convert_format(const torch::Tensor &boxes) {
 }
 
 /**
- * Computes intersection over union between `box` and `boxes`.
+ * Computes intersection over union between (2D) `gt_box` and `boxes`.
  *
- * @param box   is a polygon representing a bounding box.
- * @param boxes is a vector of polygons representing boxes.
+ * @param gt_box is a polygon representing a bounding box.
+ * @param boxes  is a vector of polygons representing boxes.
  *
  * @returns a vector of floats containing the ious of each box in `boxes` with
  * `box`.
  */
 template <typename T>
-[[nodiscard]] inline std::vector<T> iou(const polygon2d_t &box,
-                                        const std::vector<polygon2d_t> &boxes) {
+[[nodiscard]] inline std::vector<T>
+iou_2d(const polygon2d_t &gt_box, const std::vector<polygon2d_t> &boxes) {
   std::vector<T> ious(boxes.size());
 
   std::transform(boxes.begin(), boxes.end(), ious.begin(),
 
-                 [box](const polygon2d_t &b) -> T {
-                   if (boost::geometry::intersects(box, b)) {
+                 [gt_box](const polygon2d_t &box) -> T {
+                   if (boost::geometry::intersects(gt_box, box)) {
                      multi_polygon2d_t mpu;
                      multi_polygon2d_t mpi;
 
-                     boost::geometry::intersection(box, b, mpi);
-                     boost::geometry::union_(box, b, mpu);
+                     boost::geometry::intersection(gt_box, box, mpi);
+                     boost::geometry::union_(gt_box, box, mpu);
 
                      return boost::geometry::area(mpi) /
                             boost::geometry::area(mpu);
