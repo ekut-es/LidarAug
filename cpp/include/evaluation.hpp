@@ -25,6 +25,7 @@ using result_dict =
  * @param results          is an unordered map containing the false- & true
  *                         positive numbers as well as the ground truth.
  */
+template <typename point_t>
 void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
                                        const torch::Tensor &detection_score,
                                        const torch::Tensor &ground_truth_box,
