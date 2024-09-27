@@ -90,9 +90,9 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
   auto score_order_descend = cpp_utils::argsort(l_detection_score, true);
 
   const auto detection_polygon_list =
-      evaluation_utils::convert_format(detection_boxes);
+      evaluation_utils::convert_format<point_t>(detection_boxes);
   auto ground_truth_polygon_list =
-      evaluation_utils::convert_format(ground_truth_box);
+      evaluation_utils::convert_format<point_t>(ground_truth_box);
 
   // match prediction and ground truth bounding box
   for (const auto idx : score_order_descend) {
