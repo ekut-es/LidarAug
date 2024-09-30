@@ -291,15 +291,10 @@ iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
                                   intersection_area;
 
             return intersection_area / boxes_union;
-
-          } else {
-
-            return 0;
           }
-
-        } else {
-          return 0;
         }
+
+        return 0;
       }
 
   );
