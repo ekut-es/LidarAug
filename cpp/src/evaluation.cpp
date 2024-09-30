@@ -97,17 +97,9 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
   // match prediction and ground truth bounding box
   for (const auto idx : score_order_descend) {
     const auto detection_polygon = detection_polygon_list[idx];
-    std::vector<float> ious = []() {
-      if constexpr (boost::geometry::dimension<point_t>::value == 2) {
-        return evaluation_utils::iou_2d<>(detection_polygon,
-                                          ground_truth_polygon_list);
 
-        if constexpr (boost::geometry::dimension<point_t>::value == 3) {
-          return evaluation_utils::iou_3d<>(detection_polygon,
-                                            ground_truth_polygon_list);
-        };
-      }
-    }();
+    std::vector<float> ious = evaluation_utils::iou<float, point_t>(
+        detection_polygon, ground_truth_polygon_list);
 
     // NOTE(tom): This depends on the left condition being evaluated first!
     if (ground_truth_polygon_list.empty() ||

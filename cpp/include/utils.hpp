@@ -307,6 +307,19 @@ iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
   return ious;
 }
 
+template <typename T, typename point_t>
+[[nodiscard]] inline std::vector<T>
+iou(const polygon_t<point_t> &gt_box, std::vector<polygon_t<point_t>> &boxes) {
+
+  if constexpr (boost::geometry::dimension<point_t>::value == 2) {
+    return iou_2d<float>(gt_box, boxes);
+  }
+
+  if constexpr (boost::geometry::dimension<point_t>::value == 3) {
+    return iou_3d<float>(gt_box, boxes);
+  }
+}
+
 } // namespace evaluation_utils
 
 namespace cpp_utils {
