@@ -243,6 +243,7 @@ template <typename T>
 [[nodiscard]] inline std::vector<T>
 iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
   std::vector<T> ious;
+  ious.resize(boxes.size());
 
   const auto gt_box_outer = gt_box.outer();
   const polygon2d_t gt_2d{{
