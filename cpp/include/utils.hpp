@@ -257,7 +257,7 @@ iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
   std::transform(
       boxes.begin(), boxes.end(), ious.begin(),
 
-      [gt_2d, gt_box_outer](const polygon3d_t &box) -> T {
+      [gt_2d, gt_box_outer, gt_box_height](const polygon3d_t &box) -> T {
         const auto box_outer = box.outer();
 
         // get base
