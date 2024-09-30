@@ -276,7 +276,6 @@ iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
 
           // intersection area > 0
           if (y_high > y_low) {
-            multi_polygon2d_t mpu;
             multi_polygon2d_t mpi;
 
             boost::geometry::intersection(gt_2d, box_2d, mpi);
