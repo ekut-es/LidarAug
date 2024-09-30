@@ -1,6 +1,7 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include "boost/geometry/algorithms/detail/distance/interface.hpp"
 #include "boost/geometry/core/coordinate_dimension.hpp"
 #include "tensor.hpp"
 #include <algorithm>
@@ -252,7 +253,7 @@ iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
   }};
 
   const T gt_box_height =
-      boost::geometry::length(gt_box_outer[1], gt_box_outer[5]);
+      boost::geometry::distance(gt_box_outer[1], gt_box_outer[5]);
 
   std::transform(
       boxes.begin(), boxes.end(), ious.begin(),
@@ -283,7 +284,7 @@ iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
                 boost::geometry::area(mpi) * (y_high - y_low);
 
             const T box_height =
-                boost::geometry::length(box_outer[1], box_outer[5]);
+                boost::geometry::distance(box_outer[1], box_outer[5]);
 
             const T boxes_union = boost::geometry::area(box_2d) * box_height +
                                   boost::geometry::area(gt_2d) * gt_box_height -
