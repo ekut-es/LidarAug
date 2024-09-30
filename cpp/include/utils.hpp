@@ -102,10 +102,10 @@ using point2d_t =
 using point3d_t =
     boost::geometry::model::point<float, 3, boost::geometry::cs::cartesian>;
 
-template <typename point_type,
-          typename = std::enable_if_t<std::is_same_v<point_type, point2d_t> ||
-                                      std::is_same_v<point_type, point3d_t>>>
-using polygon_t = boost::geometry::model::polygon<point_type, false>;
+template <typename point_t,
+          typename = std::enable_if_t<std::is_same_v<point_t, point2d_t> ||
+                                      std::is_same_v<point_t, point3d_t>>>
+using polygon_t = boost::geometry::model::polygon<point_t, false>;
 
 template <typename point_type,
           typename = std::enable_if_t<std::is_same_v<point_type, point2d_t> ||
