@@ -233,8 +233,8 @@ iou_2d(const polygon2d_t &gt_box, const std::vector<polygon2d_t> &boxes) {
 /**
  * Computes intersection over union between (a 3D) `gt_box` and `boxes`.
  *
- * @param box   is a polygon representing a bounding box.
- * @param boxes is a vector of polygons representing boxes.
+ * @param gt_box is a polygon representing a bounding box.
+ * @param boxes  is a vector of polygons representing boxes.
  *
  * @returns a vector of floats containing the ious of each box in `boxes` with
  * `box`.
