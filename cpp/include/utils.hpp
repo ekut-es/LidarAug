@@ -246,12 +246,14 @@ iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
   ious.resize(boxes.size());
 
   const auto gt_box_outer = gt_box.outer();
-  const polygon2d_t gt_2d{{
+  polygon2d_t gt_2d{{
       {gt_box_outer[0].get<0>(), gt_box.outer()[0].get<2>()},
       {gt_box_outer[1].get<0>(), gt_box.outer()[1].get<2>()},
       {gt_box_outer[2].get<0>(), gt_box.outer()[2].get<2>()},
       {gt_box_outer[3].get<0>(), gt_box.outer()[3].get<2>()},
   }};
+
+  boost::geometry::correct(gt_2d);
 
   const T gt_box_height =
       boost::geometry::distance(gt_box_outer[1], gt_box_outer[5]);
@@ -269,6 +271,8 @@ iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
             {box_outer[2].get<0>(), box_outer[2].get<2>()},
             {box_outer[3].get<0>(), box_outer[3].get<2>()},
         }};
+
+        boost::geometry::correct(box_2d);
 
         if (boost::geometry::intersects(gt_2d, box_2d)) {
           T y_high = fmin(box_outer[5].get<1>(), gt_box_outer[5].get<1>());
