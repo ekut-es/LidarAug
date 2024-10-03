@@ -245,7 +245,7 @@ iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
   std::vector<T> ious;
   ious.resize(boxes.size());
 
-  const auto gt_box_outer = gt_box.outer();
+  const auto &gt_box_outer = gt_box.outer();
   polygon2d_t gt_2d{{
       {gt_box_outer[0].get<0>(), gt_box.outer()[0].get<2>()},
       {gt_box_outer[1].get<0>(), gt_box.outer()[1].get<2>()},
@@ -262,7 +262,7 @@ iou_3d(const polygon3d_t &gt_box, const std::vector<polygon3d_t> &boxes) {
       boxes.begin(), boxes.end(), ious.begin(),
 
       [gt_2d, gt_box_outer, gt_box_height](const polygon3d_t &box) -> T {
-        const auto box_outer = box.outer();
+        const auto &box_outer = box.outer();
 
         // get base
         polygon2d_t box_2d{{
