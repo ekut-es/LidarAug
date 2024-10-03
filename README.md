@@ -51,3 +51,4 @@ simulations.
 4. **evaluation:**
 
 `evaluation` contains (C++) function to evaluate the accuracy of bounding boxes.
+This can be done for 2D and 3D bounding boxes.
