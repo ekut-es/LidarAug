@@ -108,11 +108,11 @@ template <typename point_t,
                                       std::is_same_v<point_t, point3d_t>>>
 using polygon_t = boost::geometry::model::polygon<point_t, false>;
 
-template <typename point_type,
-          typename = std::enable_if_t<std::is_same_v<point_type, point2d_t> ||
-                                      std::is_same_v<point_type, point3d_t>>>
+template <typename point_t,
+          typename = std::enable_if_t<std::is_same_v<point_t, point2d_t> ||
+                                      std::is_same_v<point_t, point3d_t>>>
 using multi_polygon_t =
-    boost::geometry::model::multi_polygon<polygon_t<point_type>>;
+    boost::geometry::model::multi_polygon<polygon_t<point_t>>;
 
 using polygon3d_t = polygon_t<point3d_t>;
 using multi_polygon3d_t = multi_polygon_t<point3d_t>;
