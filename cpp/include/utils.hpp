@@ -219,10 +219,9 @@ iou_2d(const polygon2d_t &gt_box, const std::vector<polygon2d_t> &boxes) {
 
                      return boost::geometry::area(mpi) /
                             boost::geometry::area(mpu);
-
-                   } else {
-                     return 0;
                    }
+
+                   return 0;
                  }
 
   );
