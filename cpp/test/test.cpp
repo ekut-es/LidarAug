@@ -6,7 +6,7 @@
 #include "../include/utils.hpp"
 #include "../include/weather.hpp"
 
-#include <cnpy.hpp>
+#include <cnpy/cnpy.hpp>
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <torch/types.h>
