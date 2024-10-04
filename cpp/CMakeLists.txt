@@ -1,14 +1,6 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 project(LidarAug)
 
-# Require at least GCC 13
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13.0)
-        message(FATAL_ERROR "GCC version must be at least 13.0!")
-    endif ()
-endif ()
-
-
 # GoogleTest requires at least C++14, but torch requires C++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
