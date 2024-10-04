@@ -174,7 +174,7 @@ def check_precision(val1: float, val2: float, precision: int) -> None:
     :param precision:  The number of significant digits after the comma.
     """
 
-    multiplier = 10 ** precision
+    multiplier = 10**precision
 
     assert int(val1 * multiplier) == int(val2 * multiplier)
 
@@ -294,7 +294,7 @@ def test_false_and_true_positive():
                     if len(gt) == 0 or len(boxes_lidar) == 0:
                         continue
 
-                    evaluation.calculate_false_and_true_positive(
+                    evaluation.calculate_false_and_true_positive_2d(
                         boxes_lidar, score, gt, threshold, result_stat)
 
                 expected = dump_dict["result_stat_tp_fp"][int(threshold * 10)]
