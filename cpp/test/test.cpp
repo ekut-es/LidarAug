@@ -626,6 +626,95 @@ TEST(Raytracing, SortNoiseFilterTest) {
                                               << result_si;
 }
 
+TEST(Evaluation, Iou3dTest) {
+
+  evaluation_utils::polygon3d_t gt_box{{
+      {1, 0, 1},
+      {1, 0, 0},
+      {0, 0, 0},
+      {0, 0, 1},
+      {1, 1, 1},
+      {1, 1, 0},
+      {0, 1, 0},
+      {0, 1, 1},
+      {1, 0, 1},
+  }};
+
+  // should have iou of 0
+  evaluation_utils::polygon3d_t box_above{{
+      {1, 3, 1},
+      {1, 3, 0},
+      {0, 3, 0},
+      {0, 3, 1},
+      {1, 4, 1},
+      {1, 4, 0},
+      {0, 4, 0},
+      {0, 4, 1},
+      {1, 3, 1},
+  }};
+
+  // should have iou of 0
+  evaluation_utils::polygon3d_t box_above_touching{{
+      {1, 1, 1},
+      {1, 1, 0},
+      {0, 1, 0},
+      {0, 1, 1},
+      {1, 2, 1},
+      {1, 2, 0},
+      {0, 2, 0},
+      {0, 2, 1},
+      {1, 1, 1},
+  }};
+
+  // should have iou of 0 (actually -0 for some technical reasons)
+  evaluation_utils::polygon3d_t box_to_side_touching{{
+      {1, 0, 2},
+      {1, 0, 1},
+      {0, 0, 1},
+      {0, 0, 2},
+      {1, 1, 2},
+      {1, 1, 1},
+      {0, 1, 1},
+      {0, 1, 2},
+      {1, 0, 2},
+  }};
+
+  // should have an iou of .5
+  evaluation_utils::polygon3d_t box_above_intersect{{
+      {1, 0, 1},
+      {1, 0, 0},
+      {0, 0, 0},
+      {0, 0, 1},
+      {1, 2, 1},
+      {1, 2, 0},
+      {0, 2, 0},
+      {0, 2, 1},
+      {1, 0, 1},
+  }};
+
+  // should have an iou of 1
+  evaluation_utils::polygon3d_t eq_box{{
+      {1, 0, 1},
+      {1, 0, 0},
+      {0, 0, 0},
+      {0, 0, 1},
+      {1, 1, 1},
+      {1, 1, 0},
+      {0, 1, 0},
+      {0, 1, 1},
+      {1, 0, 1},
+  }};
+
+  std::vector<evaluation_utils::polygon3d_t> boxes{
+      box_above, box_above_touching, box_to_side_touching, box_above_intersect,
+      eq_box};
+  std::vector<float> expected{0, 0, 0, .5, 1};
+
+  auto ious = evaluation_utils::iou_3d<float>(gt_box, boxes);
+
+  EXPECT_EQ(expected, ious);
+}
+
 // doing tests with controlled random number generation (no random seed)
 #ifdef TEST_RNG
 
