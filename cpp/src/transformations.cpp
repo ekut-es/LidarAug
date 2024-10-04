@@ -194,13 +194,14 @@ random_noise(const at::Tensor &points, const float sigma,
       case noise_type::MIN: {
         std::vector<float> noise_intensity;
         noise_intensity.reserve(num_points);
-        std::ranges::fill(noise_intensity, 0);
+        std::fill(noise_intensity.begin(), noise_intensity.end(), 0);
         return noise_intensity;
       }
       case noise_type::MAX: {
         std::vector<float> noise_intensity;
         noise_intensity.reserve(num_points);
-        std::ranges::fill(noise_intensity, static_cast<float>(max_intensity));
+        std::fill(noise_intensity.begin(), noise_intensity.end(),
+                  static_cast<float>(max_intensity));
         return noise_intensity;
       }
 

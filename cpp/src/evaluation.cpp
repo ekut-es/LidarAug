@@ -22,8 +22,8 @@ T calculate_average_precision(
     assert(false_positive.size() == true_positive.size() &&
            true_positive.size() == score.size());
 
-    std::ranges::sort(false_positive);
-    std::ranges::sort(true_positive);
+    std::sort(false_positive.begin(), false_positive.end());
+    std::sort(true_positive.begin(), true_positive.end());
 
   } else {
     assert(false_positive.size() == true_positive.size());
@@ -103,7 +103,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
     // NOTE(tom): This depends on the left condition being evaluated first!
     if (ground_truth_polygon_list.empty() ||
-        *std::ranges::max_element(ious) < iou_threshold) {
+        *std::max_element(ious.begin(), ious.end()) < iou_threshold) {
 
       false_positive.emplace_back(1);
       true_positive.emplace_back(0);
@@ -151,15 +151,15 @@ std::array<float, 3> evaluate_results(const result_dict &results,
   constexpr std::array<float, 3> iou_thresholds{.3, .5, .7};
   std::array<float, 3> aps;
 
-  std::ranges::transform(iou_thresholds, aps.begin(),
-                         [global_sort_detections, results](auto threshold) {
-                           auto ap = calculate_average_precision(
-                               threshold, global_sort_detections, results);
+  std::transform(iou_thresholds.begin(), iou_thresholds.end(), aps.begin(),
+                 [global_sort_detections, results](auto threshold) {
+                   auto ap = calculate_average_precision(
+                       threshold, global_sort_detections, results);
 
-                           std::printf("ap_%f: %f\n", threshold, ap);
+                   std::printf("ap_%f: %f\n", threshold, ap);
 
-                           return ap;
-                         });
+                   return ap;
+                 });
 
   return aps;
 }

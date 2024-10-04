@@ -3,7 +3,7 @@ from setuptools import setup
 
 MODULE_NAME = "LidarAug"
 
-CPP_VERSION = "-std=c++20"
+CPP_VERSION = "-std=c++17"
 COMPILER_OPTIMIZATION_LEVEL = "-O3"
 
 ext_modules = [
