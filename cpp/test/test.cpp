@@ -6,7 +6,7 @@
 #include "../include/utils.hpp"
 #include "../include/weather.hpp"
 
-#include <cnpy.hpp>
+#include <cnpy/cnpy.hpp>
 #include <filesystem>
 #include <gtest/gtest.h>
 #include <torch/types.h>
@@ -231,8 +231,9 @@ TEST(Transformation, RandomNoiseTest) {
   constexpr static distribution_ranges<float> ranges{
       {1, 2}, {1, 2}, {1, 2}, {1, 2}};
 
-  auto new_points = random_noise(points, sigma, ranges, noise_type::UNIFORM,
-                                 intensity_range::MAX_INTENSITY_255);
+  auto new_points =
+      random_noise(points, sigma, ranges, noise_type::UNIFORM,
+                   point_cloud_data::intensity_range::MAX_INTENSITY_255);
 
   EXPECT_GT(new_points.size(1), points.size(1)) << "No noise has been added...";
 }
@@ -623,6 +624,95 @@ TEST(Raytracing, SortNoiseFilterTest) {
   EXPECT_TRUE(torch::allclose(si, result_si)) << "expected:\n"
                                               << si << "\nactual:\n"
                                               << result_si;
+}
+
+TEST(Evaluation, Iou3dTest) {
+
+  evaluation_utils::polygon3d_t gt_box{{
+      {1, 0, 1},
+      {1, 0, 0},
+      {0, 0, 0},
+      {0, 0, 1},
+      {1, 1, 1},
+      {1, 1, 0},
+      {0, 1, 0},
+      {0, 1, 1},
+      {1, 0, 1},
+  }};
+
+  // should have iou of 0
+  evaluation_utils::polygon3d_t box_above{{
+      {1, 3, 1},
+      {1, 3, 0},
+      {0, 3, 0},
+      {0, 3, 1},
+      {1, 4, 1},
+      {1, 4, 0},
+      {0, 4, 0},
+      {0, 4, 1},
+      {1, 3, 1},
+  }};
+
+  // should have iou of 0
+  evaluation_utils::polygon3d_t box_above_touching{{
+      {1, 1, 1},
+      {1, 1, 0},
+      {0, 1, 0},
+      {0, 1, 1},
+      {1, 2, 1},
+      {1, 2, 0},
+      {0, 2, 0},
+      {0, 2, 1},
+      {1, 1, 1},
+  }};
+
+  // should have iou of 0 (actually -0 for some technical reasons)
+  evaluation_utils::polygon3d_t box_to_side_touching{{
+      {1, 0, 2},
+      {1, 0, 1},
+      {0, 0, 1},
+      {0, 0, 2},
+      {1, 1, 2},
+      {1, 1, 1},
+      {0, 1, 1},
+      {0, 1, 2},
+      {1, 0, 2},
+  }};
+
+  // should have an iou of .5
+  evaluation_utils::polygon3d_t box_above_intersect{{
+      {1, 0, 1},
+      {1, 0, 0},
+      {0, 0, 0},
+      {0, 0, 1},
+      {1, 2, 1},
+      {1, 2, 0},
+      {0, 2, 0},
+      {0, 2, 1},
+      {1, 0, 1},
+  }};
+
+  // should have an iou of 1
+  evaluation_utils::polygon3d_t eq_box{{
+      {1, 0, 1},
+      {1, 0, 0},
+      {0, 0, 0},
+      {0, 0, 1},
+      {1, 1, 1},
+      {1, 1, 0},
+      {0, 1, 0},
+      {0, 1, 1},
+      {1, 0, 1},
+  }};
+
+  std::vector<evaluation_utils::polygon3d_t> boxes{
+      box_above, box_above_touching, box_to_side_touching, box_above_intersect,
+      eq_box};
+  std::vector<float> expected{0, 0, 0, .5, 1};
+
+  auto ious = evaluation_utils::iou_3d<float>(gt_box, boxes);
+
+  EXPECT_EQ(expected, ious);
 }
 
 // doing tests with controlled random number generation (no random seed)
@@ -1068,8 +1158,8 @@ TEST(RNGTransformation, IntensityNoiseTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
 
     constexpr float SIGMA = 20;
-    constexpr intensity_range MAX_INTENSITY =
-        intensity_range::MAX_INTENSITY_255;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_255;
 
     // NOTE(tom): values of intensity_shift =
     //           {21.2925453, 0, 21.2925453, 6.91568279}
@@ -1090,7 +1180,8 @@ TEST(RNGTransformation, IntensityNoiseTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 0.95}}});
 
     constexpr float SIGMA = 0.2;
-    constexpr intensity_range MAX_INTENSITY = intensity_range::MAX_INTENSITY_1;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_1;
 
     // NOTE(tom): values of intensity_shift =
     //           {0.207830608, 0, 0.212925255, 0.0354648978}
@@ -1114,8 +1205,8 @@ TEST(RNGTransformation, IntensityShiftTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
 
     constexpr float SIGMA = 20;
-    constexpr intensity_range MAX_INTENSITY =
-        intensity_range::MAX_INTENSITY_255;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_255;
 
     // NOTE(tom): value of intensity_shift = 21.2925453
     const auto expected_points =
@@ -1135,7 +1226,8 @@ TEST(RNGTransformation, IntensityShiftTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 0.95}}});
 
     constexpr float SIGMA = 0.2;
-    constexpr intensity_range MAX_INTENSITY = intensity_range::MAX_INTENSITY_1;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_1;
 
     // NOTE(tom): value of intensity_shift = 0.212925255
     const auto expected_points =
@@ -1211,7 +1303,8 @@ TEST(Simulation, SnowTest) {
   auto points =
       torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
                      {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
-  const auto _ = snow(points[0], {-50, 50, -50, 50, -3, 1}, 1000, 5, 2, 1);
+  const auto _ = snow(points[0], {-50, 50, -50, 50, -3, 1}, 1000, 5, 2,
+                      point_cloud_data::intensity_range::MAX_INTENSITY_1);
 
   // NOTE(tom): currently just testing if the whether the function runs
   EXPECT_TRUE(true);

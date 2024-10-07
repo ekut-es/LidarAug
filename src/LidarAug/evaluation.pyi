@@ -35,9 +35,17 @@ def make_result_dict(input: dict[int, dict[str, list[float]]]) -> result_dict:
     ...
 
 
-def calculate_false_and_true_positive(detection_boxes: Tensor,
-                                      detection_score: Tensor,
-                                      ground_truth_box: Tensor,
-                                      iou_threshold: float,
-                                      results: result_dict):
+def calculate_false_and_true_positive_2d(detection_boxes: Tensor,
+                                         detection_score: Tensor,
+                                         ground_truth_box: Tensor,
+                                         iou_threshold: float,
+                                         results: result_dict):
+    ...
+
+
+def calculate_false_and_true_positive_3d(detection_boxes: Tensor,
+                                         detection_score: Tensor,
+                                         ground_truth_box: Tensor,
+                                         iou_threshold: float,
+                                         results: result_dict):
     ...

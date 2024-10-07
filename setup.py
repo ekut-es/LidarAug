@@ -2,7 +2,12 @@ from torch.utils.cpp_extension import BuildExtension, CppExtension
 from setuptools import setup
 import platform
 
-base_compile_args = ['-std=c++20', '-O3']
+MODULE_NAME = "LidarAug"
+
+CPP_VERSION = "-std=c++20"
+COMPILER_OPTIMIZATION_LEVEL = "-O3"
+
+base_compile_args = [CPP_VERSION, COMPILER_OPTIMIZATION_LEVEL]
 weather_compile_args = base_compile_args
 weather_compile_args.append('-I/usr/local/include')
 link_args = []
@@ -12,8 +17,6 @@ if platform.system() == 'Darwin':
 elif platform.system() == 'Linux':
     weather_compile_args.append('-fopenmp')
     link_args.append("-fopenmp")
-
-MODULE_NAME = "LidarAug"
 
 ext_modules = [
     CppExtension(

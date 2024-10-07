@@ -65,6 +65,7 @@ T calculate_average_precision(
   return calculate_voc_average_precision<T>(recall, precision);
 }
 
+template <typename point_t>
 void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
                                        const torch::Tensor &detection_score,
                                        const torch::Tensor &ground_truth_box,
@@ -73,7 +74,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
   assert(detection_score.is_contiguous());
 
-  const auto* const data = detection_score.const_data_ptr<float>();
+  const auto *const data = detection_score.const_data_ptr<float>();
 
   const std::vector<float> l_detection_score(
       data, data + static_cast<std::size_t>(detection_score.size(0)));
@@ -89,15 +90,16 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
   auto score_order_descend = cpp_utils::argsort(l_detection_score, true);
 
   const auto detection_polygon_list =
-      evaluation_utils::convert_format(detection_boxes);
+      evaluation_utils::convert_format<point_t>(detection_boxes);
   auto ground_truth_polygon_list =
-      evaluation_utils::convert_format(ground_truth_box);
+      evaluation_utils::convert_format<point_t>(ground_truth_box);
 
   // match prediction and ground truth bounding box
   for (const auto idx : score_order_descend) {
     const auto detection_polygon = detection_polygon_list[idx];
-    auto ious = evaluation_utils::iou<float>(detection_polygon,
-                                             ground_truth_polygon_list);
+
+    std::vector<float> ious = evaluation_utils::iou<float, point_t>(
+        detection_polygon, ground_truth_polygon_list);
 
     // NOTE(tom): This depends on the left condition being evaluated first!
     if (ground_truth_polygon_list.empty() ||
@@ -105,7 +107,6 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
       false_positive.emplace_back(1);
       true_positive.emplace_back(0);
-
     } else {
       false_positive.emplace_back(0);
       true_positive.emplace_back(1);
@@ -152,12 +153,12 @@ std::array<float, 3> evaluate_results(const result_dict &results,
 
   std::ranges::transform(iou_thresholds, aps.begin(),
                          [global_sort_detections, results](auto threshold) {
-                             auto ap = calculate_average_precision(
-                                 threshold, global_sort_detections, results);
+                           auto ap = calculate_average_precision(
+                               threshold, global_sort_detections, results);
 
-                             std::printf("ap_%f: %f\n", threshold, ap);
+                           std::printf("ap_%f: %f\n", threshold, ap);
 
-                             return ap;
+                           return ap;
                          });
 
   return aps;
