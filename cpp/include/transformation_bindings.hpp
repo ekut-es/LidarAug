@@ -54,10 +54,6 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       .value("MIN", noise_type::MIN)
       .value("MAX", noise_type::MAX)
       .export_values();
-  pybind11::enum_<intensity_range>(m, "IntensityRange")
-      .value("MAX_INTENSITY_1", intensity_range::MAX_INTENSITY_1)
-      .value("MAX_INTENSITY_255", intensity_range::MAX_INTENSITY_255)
-      .export_values();
 
   // NOTE(tom): Unfortunately it is necessary to export this with defined types,
   //            as PyBind does not appear to support generics/templates.

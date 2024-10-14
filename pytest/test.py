@@ -7,7 +7,8 @@ import torch
 from LidarAug import augmentations as aug
 from LidarAug import weather_simulations
 from LidarAug import evaluation
-from LidarAug.transformations import NoiseType, IntensityRange
+from LidarAug.transformations import NoiseType
+from LidarAug.point_cloud import IntensityRange
 
 import re
 
@@ -319,7 +320,8 @@ def test_fog():
     metric = weather_simulations.FogParameter.DIST
     viewing_dist = 100
 
-    result = weather_simulations.fog(points, metric, viewing_dist, 1)
+    result = weather_simulations.fog(points, metric, viewing_dist,
+                                     IntensityRange.MAX_INTENSITY_1)
 
     assert not result.equal(points)
 

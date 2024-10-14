@@ -2,6 +2,7 @@
 #include "../include/weather.hpp"
 #include "../include/stats.hpp"
 #include "../include/tensor.hpp"
+#include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
 #include <ATen/ops/from_blob.h>
 #include <ATen/ops/pow.h>
@@ -16,6 +17,7 @@
 #include <tuple>
 
 using namespace torch::indexing;
+using namespace torch_utils;
 
 [[nodiscard]] inline std::tuple<float, float, float>
 calculate_factors(fog_parameter metric, float viewing_dist) {
@@ -71,8 +73,9 @@ fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
   }
 }
 
-[[nodiscard]] torch::Tensor fog(torch::Tensor point_cloud, fog_parameter metric,
-                                float viewing_dist, float max_intensity) {
+[[nodiscard]] torch::Tensor
+fog(torch::Tensor point_cloud, fog_parameter metric, float viewing_dist,
+    point_cloud_data::intensity_range max_intensity) {
 
   const auto [extinction_factor, beta, delete_probability] =
       calculate_factors(metric, viewing_dist);
@@ -112,20 +115,25 @@ fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
 
     point_cloud.index_put_(
         {altered_points, 3},
-        torch::empty({num_altered_points}).uniform_(0, max_intensity * 0.3));
+        torch::empty({num_altered_points})
+            .uniform_(0, static_cast<float>(max_intensity) * 0.3));
   }
 
   // delete points
   return point_cloud.index({torch::logical_not(deleted), Slice()});
 }
 
-[[nodiscard]] torch::Tensor rain(torch::Tensor point_cloud,
-                                 std::array<float, 6> dims, uint32_t num_drops,
-                                 float precipitation, distribution d) {
+[[nodiscard]] torch::Tensor
+rain(torch::Tensor point_cloud, std::array<float, 6> dims, uint32_t num_drops,
+     float precipitation, distribution d,
+     point_cloud_data::intensity_range max_intensity) {
 
-  auto [nf, si] =
-      rt::generate_noise_filter(dims, num_drops, precipitation, 1, d);
-  return rt::trace(point_cloud, nf, si, 0.9);
+  point_cloud_data::max_intensity::set(max_intensity);
+
+  auto [nf, si] = rt::generate_noise_filter<float, F32>(dims, num_drops,
+                                                        precipitation, 1, d);
+
+  return rt::trace(point_cloud, nf, si, simulation_type::rain, 0.9);
 }
 
 [[nodiscard]] std::optional<torch::Tensor>
@@ -161,7 +169,7 @@ rain(torch::Tensor point_cloud, const std::string_view noise_filter_path,
     const auto si =
         torch::from_blob(si_array.data<tensor_size_t>(),
                          {static_cast<tensor_size_t>(si_array.num_vals())});
-    const auto result = rt::trace(point_cloud, nf, si);
+    const auto result = rt::trace(point_cloud, nf, si, simulation_type::rain);
     point_cloud = result;
     return result;
   }
@@ -204,7 +212,7 @@ snow(torch::Tensor point_cloud, const std::string_view noise_filter_path,
         torch::from_blob(si_array.data<tensor_size_t>(),
                          {static_cast<tensor_size_t>(si_array.num_vals())});
 
-    auto result = rt::trace(point_cloud, nf, si, 1.25);
+    auto result = rt::trace(point_cloud, nf, si, simulation_type::snow, 1.25);
     result.index_put_({result.index({Slice(), 3}) > 255, 3}, 255);
 
     point_cloud = result;
@@ -214,16 +222,22 @@ snow(torch::Tensor point_cloud, const std::string_view noise_filter_path,
   return std::nullopt;
 }
 
-[[nodiscard]] torch::Tensor snow(torch::Tensor point_cloud,
-                                 std::array<float, 6> dims, uint32_t num_drops,
-                                 float precipitation, int32_t scale,
-                                 float max_intensity) {
+[[nodiscard]] torch::Tensor
+snow(torch::Tensor point_cloud, std::array<float, 6> dims, uint32_t num_drops,
+     float precipitation, int32_t scale,
+     point_cloud_data::intensity_range max_intensity) {
 
-  auto [nf, si] = rt::generate_noise_filter(dims, num_drops, precipitation,
-                                            scale, distribution::gm);
-  point_cloud = rt::trace(point_cloud, nf, si, 1.25);
-  point_cloud.index({point_cloud.index({Slice(), 3}) > max_intensity, 3}) =
-      max_intensity;
+  point_cloud_data::max_intensity::set(max_intensity);
+
+  auto [nf, si] = rt::generate_noise_filter<float, F32>(
+      dims, num_drops, precipitation, scale, distribution::gm);
+
+  point_cloud = rt::trace(point_cloud, nf, si, simulation_type::snow, 1.25);
+
+  point_cloud.index(
+      {point_cloud.index({Slice(), 3}) > static_cast<float>(max_intensity),
+       3}) = static_cast<float>(max_intensity);
+
   return point_cloud;
 }
 

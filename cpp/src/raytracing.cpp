@@ -1,22 +1,21 @@
 
 #include "../include/raytracing.hpp"
 #include "../include/stats.hpp"
-#include "../include/utils.hpp"
+#include "../include/weather.hpp"
 #include <ATen/TensorIndexing.h>
-#include <ATen/ops/clone.h>
 #include <c10/core/TensorOptions.h>
-#include <cstdio>
-#include <omp.h>
 #include <torch/csrc/autograd/generated/variable_factories.h>
 
 using namespace torch_utils;
 using Slice = torch::indexing::Slice;
 
-constexpr auto nf_split_factor = 32;
+// Set minimum intersection distance to 1m
+constexpr tensor_size_t min_intersect_dist = 1;
 
 [[nodiscard]] torch::Tensor rt::trace(torch::Tensor point_cloud,
                                       const torch::Tensor &noise_filter,
                                       const torch::Tensor &split_index,
+                                      const simulation_type sim_t,
                                       const float intensity_factor /*= 0.9*/) {
 
   const auto num_points = point_cloud.size(0);
@@ -30,7 +29,7 @@ constexpr auto nf_split_factor = 32;
 
   rt::intersects(point_cloud, noise_filter, split_index, intersections,
                  distances, distance_count, most_intersect_count,
-                 most_intersect_dist, num_points, intensity_factor);
+                 most_intersect_dist, num_points, sim_t, intensity_factor);
 
   // select all points where any of x, y, z != 0
   const auto indices =
@@ -46,10 +45,10 @@ constexpr auto nf_split_factor = 32;
                                    const torch::Tensor &split_index) {
 
   const auto index =
-      static_cast<int>(
-          ((atan2(beam[1].item<float>(), beam[0].item<float>()) * 180 / M_PI) +
-           360) *
-          nf_split_factor) %
+      static_cast<int>(((torch::atan2(beam[1], beam[0]).item<float>() * 180 /
+                         math_utils::PI_RAD) +
+                        360) *
+                       nf_split_factor) %
       (360 * nf_split_factor);
 
   for (auto i = split_index[index].item<tensor_size_t>();
@@ -60,8 +59,9 @@ constexpr auto nf_split_factor = 32;
         {nf[0].item<float>(), nf[1].item<float>(), nf[2].item<float>()});
 
     if (const auto beam_dist = rt::vector_length(beam);
-        beam_dist < nf[3].item<float>())
+        beam_dist < nf[3].item<float>()) {
       return -1;
+    }
 
     if (const auto length_beam_sphere = rt::scalar(sphere, rt::normalize(beam));
         length_beam_sphere > 0.0) {
@@ -69,9 +69,10 @@ constexpr auto nf_split_factor = 32;
       if (const auto dist_beam_sphere =
               sqrt(nf[3].item<float>() * nf[3].item<float>() -
                    length_beam_sphere * length_beam_sphere);
-          dist_beam_sphere < nf[4].item<float>())
+          dist_beam_sphere < nf[4].item<float>()) {
 
         return nf[3].item<float>();
+      }
     }
   }
 
@@ -85,9 +86,16 @@ void rt::intersects(torch::Tensor point_cloud,
                     torch::Tensor distance_count,
                     torch::Tensor most_intersect_count,
                     torch::Tensor most_intersect_dist,
-                    const tensor_size_t num_points, float intensity_factor) {
+                    const tensor_size_t num_points, const simulation_type sim_t,
+                    float intensity_factor) {
 
   constexpr auto num_rays = 11;
+
+  const auto t = r_table.at(static_cast<size_t>(sim_t));
+
+  // for som reason I can't use structured bindings here with clang
+  const auto r_all_threshold = std::get<0>(t);
+  const auto r_most_threshold = std::get<1>(t);
 
 #pragma omp parallel for schedule(dynamic)
   for (tensor_size_t i = 0; i < num_points; i++) {
@@ -124,8 +132,11 @@ void rt::intersects(torch::Tensor point_cloud,
 
         intersection_dist = rt::trace_beam(noise_filter, beam, split_index);
 
-        if (intersection_dist > 0) {
+        if (intersection_dist > min_intersect_dist) {
           intersections.index_put_({i, idx_count}, intersection_dist);
+          idx_count += 1;
+        } else if (/* min_intersect_dist > */ intersection_dist > 0) {
+          intersections.index_put_({i, idx_count}, 1);
           idx_count += 1;
         }
         rot_vec = rt::rotate(rot_vec, rt::normalize(original_point),
@@ -171,15 +182,15 @@ void rt::intersects(torch::Tensor point_cloud,
     }
 
     if (const auto r_all = n_intersects / static_cast<double>(num_rays);
-        r_all > 0.15) {
+        r_all > r_all_threshold) {
       assert(n_intersects != 0);
       if (const auto r_most = max_count / static_cast<double>(n_intersects);
-          r_most > 0.8) { // set point towards sensor
+          r_most > r_most_threshold) { // set point towards sensor
 
         const auto dist = rt::vector_length(point_cloud[i]);
 
         point_cloud.index({i, Slice(0, 3)}) *= max_intersection_dist / dist;
-        point_cloud[i][3] *= 0.005;
+        point_cloud.index_put_({i, 3}, get_intensity(sim_t));
       } else { // delete point (filtered out later)
         point_cloud.index_put_({i, Slice(0, 4)}, 0);
       }
@@ -200,69 +211,5 @@ void rt::intersects(torch::Tensor point_cloud,
 
   const auto f = function_table.at(static_cast<size_t>(d));
 
-  return f(torch::rand({num_particles}), precipitation) * (1 / 2000);
-}
-
-// TODO(tom): Make dim a 'distribution_ranges' (found in transformations.hpp,
-// needs to go in utils or something)
-[[nodiscard]] std::pair<torch::Tensor, torch::Tensor> rt::generate_noise_filter(
-    const std::array<float, 6> &dim, const uint32_t drops_per_m3,
-    const float precipitation, const int32_t scale, const distribution d) {
-
-  const auto total_drops = static_cast<int>(
-      std::abs(dim[0] - dim[1]) * std::abs(dim[2] - dim[3]) *
-      std::abs(dim[4] - dim[5]) * static_cast<float>(drops_per_m3));
-
-  const auto x = torch::empty({total_drops}).uniform_(dim[0], dim[1]);
-  const auto y = torch::empty({total_drops}).uniform_(dim[2], dim[3]);
-  const auto z = torch::empty({total_drops}).uniform_(dim[4], dim[5]);
-
-  const auto dist =
-      torch::sqrt(torch::pow(x, 2) + torch::pow(y, 2) + torch::pow(z, 2));
-  const auto size = sample_particles(total_drops, precipitation, d) * scale;
-
-  const auto index =
-      (((torch::arctan2(y, x) * 180 / math_utils::PI_RAD) + 360) *
-       nf_split_factor)
-          .toType(I32) %
-      (360 * nf_split_factor);
-  const auto nf = torch::stack({x, y, z, dist, size, index}, -1);
-
-  return sort_noise_filter(nf);
-}
-
-[[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
-rt::sort_noise_filter(torch::Tensor nf) {
-
-  auto split_index = torch::zeros(360 * nf_split_factor + 1);
-
-  nf = nf.index({nf.index({Slice(), 3}).argsort()});
-  nf = nf.index({nf.index({Slice(), 5}).argsort(true)});
-
-  if (!nf.is_contiguous()) {
-    std::printf(
-        "for performance reasons, please make sure that 'nf' is contiguous!");
-    nf = torch::clone(nf, torch::MemoryFormat::Contiguous);
-  }
-
-  const auto *const nf_ptr = nf.const_data_ptr<float>();
-  const auto row_size = nf.size(1);
-
-#pragma omp parallel for
-  for (tensor_size_t i = 0; i < nf.size(0) - 1; i++) {
-
-    const auto idx = i * row_size + 5;
-
-    const auto val_at_i = nf_ptr[idx];
-    const auto val_at_i_plus_one = nf_ptr[idx + row_size];
-
-    if (val_at_i != val_at_i_plus_one) {
-      split_index.index_put_({static_cast<tensor_size_t>(val_at_i_plus_one)},
-                             i + 1);
-    }
-  }
-
-  split_index.index_put_({split_index.size(0) - 1}, nf.size(0) - 1);
-
-  return std::make_pair(nf, split_index);
+  return f(torch::rand({num_particles}), precipitation) * (1 / 2000.0);
 }

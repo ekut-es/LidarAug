@@ -231,8 +231,9 @@ TEST(Transformation, RandomNoiseTest) {
   constexpr static distribution_ranges<float> ranges{
       {1, 2}, {1, 2}, {1, 2}, {1, 2}};
 
-  auto new_points = random_noise(points, sigma, ranges, noise_type::UNIFORM,
-                                 intensity_range::MAX_INTENSITY_255);
+  auto new_points =
+      random_noise(points, sigma, ranges, noise_type::UNIFORM,
+                   point_cloud_data::intensity_range::MAX_INTENSITY_255);
 
   EXPECT_GT(new_points.size(1), points.size(1)) << "No noise has been added...";
 }
@@ -542,7 +543,7 @@ TEST(Raytracing, TraceTest) {
       torch::from_blob(si_array.data<tensor_size_t>(),
                        {static_cast<tensor_size_t>(si_array.num_vals())});
 
-  const auto result = rt::trace(points, nf, si);
+  const auto result = rt::trace(points, nf, si, simulation_type::rain);
 
   EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
                                          << expected << "\nactual:\n"
@@ -572,6 +573,57 @@ TEST(Raytracing, TraceBeamTest) {
   EXPECT_EQ(result, expected) << "expected:\n"
                               << expected << "\nactual:\n"
                               << result;
+}
+
+TEST(Raytracing, SortNoiseFilterTest) {
+
+  auto compute_median = [](torch::Tensor tensor) {
+    auto sorted_tensor = std::get<0>(tensor.sort());
+    int64_t size = sorted_tensor.size(0);
+
+    if (size % 2 == 0) {
+      return (sorted_tensor[size / 2 - 1].item<double>() +
+              sorted_tensor[size / 2].item<double>()) /
+             2.0;
+    } else {
+      return sorted_tensor[size / 2].item<double>();
+    }
+  };
+
+  auto npz_data = cnpy::npz_load(npz_dir);
+
+  auto nf_array = npz_data["nf"];
+  const auto nf =
+      torch::from_blob(nf_array.data<double>(),
+                       {static_cast<tensor_size_t>(nf_array.num_vals())}, F64)
+          .reshape({-1, 6});
+
+  auto si_array = npz_data["si"];
+  const auto si =
+      torch::from_blob(si_array.data<double>(),
+                       {static_cast<tensor_size_t>(si_array.num_vals())}, F64);
+
+  auto [result_nf, result_si] = rt::sort_noise_filter<double, F64>(nf);
+
+  EXPECT_TRUE(torch::equal(nf, result_nf)) << "expected:\n"
+                                           << nf << "\nactual:\n"
+                                           << result_nf;
+
+  EXPECT_EQ(si.size(0), result_si.size(0));
+
+  std::cout << "min comparison (expected, result): " << si.min().item<double>()
+            << " vs " << result_si.min().item<double>() << "\n";
+  std::cout << "max comparison (expected, result): " << si.max().item<double>()
+            << " vs " << result_si.max().item<double>() << "\n";
+  std::cout << "average comparison (expected, result): "
+            << si.sum().item<double>() / si.size(0) << " vs "
+            << result_si.sum().item<double>() / result_si.size(0) << "\n";
+  std::cout << "median comparison (expected, result): " << compute_median(si)
+            << " vs " << compute_median(result_si) << "\n";
+
+  EXPECT_TRUE(torch::allclose(si, result_si)) << "expected:\n"
+                                              << si << "\nactual:\n"
+                                              << result_si;
 }
 
 TEST(Evaluation, Iou3dTest) {
@@ -1106,8 +1158,8 @@ TEST(RNGTransformation, IntensityNoiseTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
 
     constexpr float SIGMA = 20;
-    constexpr intensity_range MAX_INTENSITY =
-        intensity_range::MAX_INTENSITY_255;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_255;
 
     // NOTE(tom): values of intensity_shift =
     //           {21.2925453, 0, 21.2925453, 6.91568279}
@@ -1128,7 +1180,8 @@ TEST(RNGTransformation, IntensityNoiseTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 0.95}}});
 
     constexpr float SIGMA = 0.2;
-    constexpr intensity_range MAX_INTENSITY = intensity_range::MAX_INTENSITY_1;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_1;
 
     // NOTE(tom): values of intensity_shift =
     //           {0.207830608, 0, 0.212925255, 0.0354648978}
@@ -1152,8 +1205,8 @@ TEST(RNGTransformation, IntensityShiftTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
 
     constexpr float SIGMA = 20;
-    constexpr intensity_range MAX_INTENSITY =
-        intensity_range::MAX_INTENSITY_255;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_255;
 
     // NOTE(tom): value of intensity_shift = 21.2925453
     const auto expected_points =
@@ -1173,7 +1226,8 @@ TEST(RNGTransformation, IntensityShiftTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 0.95}}});
 
     constexpr float SIGMA = 0.2;
-    constexpr intensity_range MAX_INTENSITY = intensity_range::MAX_INTENSITY_1;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_1;
 
     // NOTE(tom): value of intensity_shift = 0.212925255
     const auto expected_points =
@@ -1249,7 +1303,8 @@ TEST(Simulation, SnowTest) {
   auto points =
       torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
                      {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
-  const auto _ = snow(points[0], {-50, 50, -50, 50, -3, 1}, 1000, 5, 2, 1);
+  const auto _ = snow(points[0], {-50, 50, -50, 50, -3, 1}, 1000, 5, 2,
+                      point_cloud_data::intensity_range::MAX_INTENSITY_1);
 
   // NOTE(tom): currently just testing if the whether the function runs
   EXPECT_TRUE(true);

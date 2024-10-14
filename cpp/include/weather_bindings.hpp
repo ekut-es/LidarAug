@@ -1,4 +1,5 @@
 
+#include "../include/point_cloud.hpp"
 #include "../include/weather.hpp"
 #include <ATen/core/TensorBody.h>
 #include <pybind11/detail/common.h>
@@ -13,24 +14,36 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         pybind11::overload_cast<const torch::Tensor &, float, fog_parameter,
                                 float, int>(&fog),
         "fog weather simulation");
-  m.def(
-      "fog",
-      pybind11::overload_cast<torch::Tensor, fog_parameter, float, float>(&fog),
-      arg("point_cloud"), arg("metric"), arg("viewing_dist"),
-      arg("max_intensity") = 1, "fog weather simulation");
+  m.def("fog",
+        pybind11::overload_cast<torch::Tensor, fog_parameter, float,
+                                point_cloud_data::intensity_range>(&fog),
+        arg("point_cloud"), arg("metric"), arg("viewing_dist"),
+        arg("max_intensity") =
+            point_cloud_data::intensity_range::MAX_INTENSITY_1,
+        "fog weather simulation");
 
   m.def("snow",
         pybind11::overload_cast<torch::Tensor, std::array<float, 6>, uint32_t,
-                                float, int32_t, float>(&snow),
+                                float, int32_t,
+                                point_cloud_data::intensity_range>(&snow),
         arg("point_cloud"), arg("dims"), arg("num_drops"), arg("precipitation"),
-        arg("scale"), arg("max_intensity") = 1, "snow weather simulation");
+        arg("scale"),
+        arg("max_intensity") =
+            point_cloud_data::intensity_range::MAX_INTENSITY_1,
+        "snow weather simulation");
+
   m.def("snow",
         pybind11::overload_cast<torch::Tensor, std::string_view, uint32_t,
                                 float, int32_t, float>(&snow),
         "snow weather simulation");
   m.def("rain",
         pybind11::overload_cast<torch::Tensor, std::array<float, 6>, uint32_t,
-                                float, distribution>(&rain),
+                                float, distribution,
+                                point_cloud_data::intensity_range>(&rain),
+        arg("point_cloud"), arg("dims"), arg("num_drops"), arg("precipitation"),
+        arg("d"),
+        arg("max_intensity") =
+            point_cloud_data::intensity_range::MAX_INTENSITY_1,
         "rain weather simulation");
   m.def("rain",
         pybind11::overload_cast<torch::Tensor, std::string_view, uint32_t,

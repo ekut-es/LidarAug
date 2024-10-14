@@ -44,7 +44,7 @@ The required Python version is 3.11.
 
 #### Modules
 
-The library contains 4 modules:
+The library contains 5 modules:
 
 1. **transformations:**
 
@@ -63,3 +63,9 @@ simulations.
 
 `evaluation` contains (C++) function to evaluate the accuracy of bounding boxes.
 This can be done for 2D and 3D bounding boxes.
+
+5. **point_cloud:**
+
+`point_cloud` contains things that is specific to point clouds that is used across modules and functionally not
+specific to the task of one of those.
+Such as the `IntensityRange` enum that is used to set/determine the maximum intensity of the points in a point cloud.

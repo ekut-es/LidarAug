@@ -7,18 +7,81 @@
 
 #include "tensor.hpp"
 #include <ATen/ops/empty.h>
+#include <algorithm>
 #include <boost/math/distributions/normal.hpp>
 #include <c10/core/ScalarType.h>
+#include <cmath>
 #include <numbers>
 #include <random>
+#include <stdexcept>
 #include <torch/torch.h>
 #include <variant>
+#include <vector>
 
 #define HUNDRED_PERCENT 100
 
 // constants for `std::get` for `draw_values`
 #define VECTOR 0
 #define VALUE 1
+
+template <typename T = double, bool Interpolate = true>
+class SnowIntensityDistribution {
+public:
+  SnowIntensityDistribution(float min, float max, size_t resolution = 256)
+      : _min(min), _max(max), _d(0, 1) {
+    if (min >= max)
+      throw std::runtime_error(
+          "Invalid bounds (hint: min must be smaller than max)");
+
+    _sampled_cdf.resize(resolution + 1);
+
+    const T cdf_low = cdf(min);
+    const T cdf_high = cdf(max);
+
+    size_t i = 0;
+
+    std::generate(_sampled_cdf.begin(), _sampled_cdf.end(),
+                  [&i, resolution, max, min, this, cdf_low, cdf_high]() {
+                    const T x =
+                        static_cast<T>(i) / resolution * (max - min) + min;
+                    const T p = (cdf(x) - cdf_low) / (cdf_high - cdf_low);
+                    i++;
+                    return Sample{p, x};
+                  });
+  }
+  SnowIntensityDistribution(SnowIntensityDistribution &&) = default;
+  SnowIntensityDistribution(const SnowIntensityDistribution &) = default;
+  SnowIntensityDistribution &operator=(SnowIntensityDistribution &&) = default;
+  SnowIntensityDistribution &
+  operator=(const SnowIntensityDistribution &) = default;
+  template <typename Generator> T operator()(Generator &g) {
+
+    T cdf_val = _d(g);
+    auto s =
+        std::upper_bound(_sampled_cdf.begin(), _sampled_cdf.end(), cdf_val);
+    auto bs = s - 1;
+    if (Interpolate && bs >= _sampled_cdf.begin()) {
+      const T r = (cdf_val - bs->prob) / (s->prob - bs->prob);
+      return r * bs->value + (1 - r) * s->value;
+    }
+    return s->value;
+  }
+
+  [[nodiscard]] T cdf(const T x) {
+    return 0.5 * erf(1.08953 * log(4.90196 * (x - 0.105)));
+  }
+
+private:
+  const float _min, _max;
+
+  struct Sample {
+    T prob, value;
+    friend bool operator<(T p, const Sample &s) { return p < s.prob; }
+  };
+
+  std::vector<Sample> _sampled_cdf;
+  std::uniform_real_distribution<> _d;
+};
 
 /**
  * Returns a random number generator using `std::random_device` as a seed and
