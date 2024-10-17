@@ -22,6 +22,8 @@ system.
 
 After that, just run `make ctest` to compile the library and run google test.
 
+*Note that the tests written for the backend include some controlled RNG tests which might fail on different platforms with different architectures such as the Apple MX chips. The tests were developed for Linux x86 using GCC.*
+
 ### Python library
 
 To use the Python library, just run `make install` after cloning and entering the repository.
