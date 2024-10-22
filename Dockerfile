@@ -49,8 +49,10 @@ COPY . /opt/LidarAug
 # Set the working directory
 WORKDIR /opt/LidarAug
 
+RUN make clean
+
 # Build the library using cmake and run the c++ tests
-RUN export TORCH_PATH=$(python3.11 -c 'import torch; import os; print(os.path.join(torch.__path__[0], "share", "cmake"))'); make clean ctest
+RUN export TORCH_PATH=$(python3.11 -c 'import torch; import os; print(os.path.join(torch.__path__[0], "share", "cmake"))'); make ctest
 
 # Build and install the python module
 RUN make install
