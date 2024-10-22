@@ -8,20 +8,6 @@ RUN apt-get install -y software-properties-common
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test
 RUN apt-get update
 
-# # Install required packages
-# RUN apt-get install -y \
-#     curl \
-#     python3.11 \
-#     python3.11-distutils \
-#     python3.11-venv \
-#     python3.11-dev \
-#     && apt-get clean
-
-# # Install pip using get-pip.py
-# RUN curl -sS https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-#     python3.11 get-pip.py && \
-#     rm get-pip.py
-
 # Verify pip installation
 RUN python3.11 -m pip --version
 RUN python3.11 -m pip install --upgrade pip
