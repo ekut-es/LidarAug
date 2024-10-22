@@ -34,7 +34,7 @@ RUN cd cnpy && mkdir build && cd build && cmake .. -DCMAKE_CXX_FLAGS="-D_GLIBCXX
 RUN python3.11 -m pip install setuptools==69.5.1
 
 # Install dependencies
-RUN python3.11 -m pip install pytest pybind11 numpy==1.24.0
+RUN python3.11 -m pip install pytest pybind11 numpy==1.24.0 scipy
 # RUN python3.11 -m pip install torch==2.1.0 -f https://download.pytorch.org/whl/torch_stable.html
 RUN python3.11 -m pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
 
