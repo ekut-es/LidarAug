@@ -55,13 +55,13 @@ WORKDIR /opt/LidarAug
 RUN make clean
 
 # Build the library using cmake and run the c++ tests
-RUN if [ "${RUN_CTEST}" == "true" ]; then export TORCH_PATH=$(python3.11 -c 'import torch; import os; print(os.path.join(torch.__path__[0], "share", "cmake"))'); make ctest; fi
+RUN if [ "${RUN_CTEST}" = "true" ]; then export TORCH_PATH=$(python3.11 -c 'import torch; import os; print(os.path.join(torch.__path__[0], "share", "cmake"))'); make ctest; fi
 
 # Build and install the python module
 RUN make install
 
 # Test the python module
-RUN if [ "${RUN_PYTEST}" == "true" ]; then make testpy; fi
+RUN if [ "${RUN_PYTEST}" = "true" ]; then make testpy; fi
 
 # Provide entry point (I don't know if I should keep this)
 CMD [ "make", "testpy" ]
