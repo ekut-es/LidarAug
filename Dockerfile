@@ -10,7 +10,7 @@ ARG PYTHON_VERSION="3.11.0"
 RUN apt-get update && apt-get dist-upgrade -y
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata
 
-FROM base AS build
+FROM base AS python_builder
 RUN apt-get install -y \
   build-essential \
   libbz2-dev \
@@ -67,7 +67,7 @@ RUN find /usr/local -depth \
 # Cleaning up openSSL headers and doc
 RUN rm -rf /usr/local/ssl/share /usr/local/ssl/include
 
-FROM base
+FROM base AS python_base
 RUN apt-get install -y --no-install-recommends \
   bzip2 \
   ca-certificates \
@@ -85,7 +85,7 @@ RUN apt-get install -y --no-install-recommends \
   && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /usr/local/ /usr/local/
+COPY --from=python_builder /usr/local/ /usr/local/
 
 ARG PYTHON_VERSION
 ENV LD_LIBRARY_PATH="/usr/local/ssl/lib/:/usr/local/ssl/lib64/"
@@ -103,8 +103,9 @@ WORKDIR /usr/local/bin/
 RUN ln -sf python${PYTHON_VERSION%.*} python && ln -sf python${PYTHON_VERSION%.*} python3
 
 
-RUN apt-get update
-RUN apt-get install -y software-properties-common
+FROM python_base AS module_builder
+
+RUN apt-get update && apt-get install -y software-properties-common
 
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test
 RUN apt-get update
@@ -165,5 +166,23 @@ RUN make install
 # Test the python module
 RUN if [ "${RUN_PYTEST}" = "true" ]; then make testpy; fi
 
-# Provide entry point (I don't know if I should keep this)
-CMD [ "make", "testpy" ]
+# Clean up
+RUN python3.11 -m pip uninstall --yes pybind11 pytest
+
+FROM python_base AS final
+
+RUN apt-get update && apt-get install -y software-properties-common
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test && apt-get update
+RUN apt-get install --only-upgrade -y libstdc++6
+RUN apt-get install -y \
+  libgomp1 \
+  libx11-6 \
+  libgl1
+
+RUN python3.11 --version
+
+COPY --from=module_builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
+
+RUN python3.11 -c 'import torch; import LidarAug'
+
+CMD ["tail", "-f", "/dev/null"]
