@@ -128,8 +128,9 @@ RUN apt-get install -y libboost-all-dev
 RUN apt-get install -y libomp-dev
 
 # Install cnpy
-RUN git clone https://github.com/TomSchammo/cnpy
-RUN cd cnpy && mkdir build && cd build
+RUN git clone https://github.com/TomSchammo/cnpy /opt/cnpy
+RUN mkdir /opt/cnpy/build
+WORKDIR /opt/cnpy/build
 RUN cmake .. -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0"
 RUN make VERBOSE=1
 RUN make install
