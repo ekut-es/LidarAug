@@ -116,7 +116,7 @@ RUN python3.11 -m pip install --upgrade pip
 
 # Install C++ build tools & git
 RUN apt-get install -y build-essential git gcc-13 g++-13 cmake libstdc++-13-dev
-RUN apt-get install ffmpeg libsm6 libxext6  -y
+RUN apt-get install -y libgl1
 
 # Update alternatives for GCC
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 50
