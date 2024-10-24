@@ -183,5 +183,3 @@ RUN python3.11 --version
 COPY --from=module_builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
 
 RUN python3.11 -c 'import torch; import LidarAug'
-
-CMD ["tail", "-f", "/dev/null"]
