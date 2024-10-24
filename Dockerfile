@@ -102,6 +102,9 @@ WORKDIR /usr/local/bin/
 
 RUN ln -sf python${PYTHON_VERSION%.*} python && ln -sf python${PYTHON_VERSION%.*} python3
 
+# Verify pip installation
+RUN python3.11 -m pip --version
+RUN python3.11 -m pip install --upgrade pip
 
 FROM python_base AS module_builder
 
@@ -109,10 +112,6 @@ RUN apt-get update && apt-get install -y software-properties-common
 
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test
 RUN apt-get update
-
-# Verify pip installation
-RUN python3.11 -m pip --version
-RUN python3.11 -m pip install --upgrade pip
 
 # Install C++ build tools & git
 RUN apt-get install -y build-essential git gcc-13 g++-13 cmake libstdc++-13-dev
