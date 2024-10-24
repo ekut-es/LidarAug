@@ -31,7 +31,10 @@ RUN apt-get install -y libomp-dev
 
 # Install cnpy
 RUN git clone https://github.com/TomSchammo/cnpy
-RUN cd cnpy && mkdir build && cd build && cmake .. -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" && make VERBOSE=1 && make install
+RUN cd cnpy && mkdir build && cd build
+RUN cmake .. -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0"
+RUN make VERBOSE=1
+RUN make install
 
 # Install setuptools
 RUN python3.11 -m pip install setuptools==69.5.1
