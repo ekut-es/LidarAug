@@ -108,18 +108,11 @@ RUN python3.11 -m pip install --upgrade pip
 
 FROM python_base AS module_builder
 
-RUN apt-get update && apt-get install -y software-properties-common
-
-RUN add-apt-repository ppa:ubuntu-toolchain-r/test
 RUN apt-get update
 
 # Install C++ build tools & git
-RUN apt-get install -y build-essential git gcc-13 g++-13 cmake libstdc++-13-dev
+RUN apt-get install -y build-essential git cmake
 RUN apt-get install -y libgl1
-
-# Update alternatives for GCC
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 50
-RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 50
 
 # Install Boost
 RUN apt-get install -y libboost-all-dev
@@ -129,6 +122,8 @@ RUN apt-get install -y libomp-dev
 
 # Install cnpy
 RUN git clone https://github.com/TomSchammo/cnpy /opt/cnpy
+WORKDIR /opt/cnpy
+RUN git checkout cpp17
 RUN mkdir /opt/cnpy/build
 WORKDIR /opt/cnpy/build
 RUN cmake .. -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0"
@@ -170,8 +165,7 @@ RUN python3.11 -m pip uninstall --yes pybind11 pytest
 
 FROM python_base AS final
 
-RUN apt-get update && apt-get install -y software-properties-common
-RUN add-apt-repository ppa:ubuntu-toolchain-r/test && apt-get update
+RUN apt-get update
 RUN apt-get install --only-upgrade -y libstdc++6
 RUN apt-get install -y \
   libgomp1 \
