@@ -71,3 +71,11 @@ This can be done for 2D and 3D bounding boxes.
 `point_cloud` contains things that is specific to point clouds that is used across modules and functionally not
 specific to the task of one of those.
 Such as the `IntensityRange` enum that is used to set/determine the maximum intensity of the points in a point cloud.
+
+
+### Docker
+
+Alternatively the module can be run inside a [Docker](https://www.docker.com/) container.
+
+After installing [Docker](https://www.docker.com/) and cloning the repository, all you need to do is run `make docker`,
+which will start building the image and automatically run the tests during the build process.
