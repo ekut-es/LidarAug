@@ -38,6 +38,7 @@ FetchContent_MakeAvailable(googletest)
 include(FetchContent)
 FetchContent_Declare(cnpy
         GIT_REPOSITORY "https://github.com/TomSchammo/cnpy"
+        GIT_TAG cpp17
         GIT_SHALLOW True
 )
 FetchContent_MakeAvailable(cnpy)

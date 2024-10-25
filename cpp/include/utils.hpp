@@ -23,6 +23,7 @@ namespace math_utils {
 constexpr float PI_DEG = 180.0;
 constexpr float PI_RAD = static_cast<float>(M_PI);
 constexpr float TWO_PI_RAD = 2.0f * PI_RAD;
+constexpr double sqrt2 = 1.4142135623730951;
 
 /**
  * Generates a rotation matrix around the 'z' axis (yaw) from the provided

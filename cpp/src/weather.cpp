@@ -11,7 +11,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
-#include <format>
 #include <random>
 #include <torch/csrc/autograd/generated/variable_factories.h>
 #include <tuple>
@@ -153,7 +152,8 @@ rain(torch::Tensor point_cloud, const std::string_view noise_filter_path,
             get_truncated_normal_value(0, num_drops_sigma, 0, 6) + 1)) *
         200;
 
-    const auto filename = std::format("nf_N={}_R={}.npz", n, r);
+    const auto filename =
+        "nf_N=" + std::to_string(n) + "_R=" + std::to_string(r) + ".npz";
     std::filesystem::path noise_file(noise_filter_path);
     noise_file.append(filename);
 
@@ -194,7 +194,8 @@ snow(torch::Tensor point_cloud, const std::string_view noise_filter_path,
             get_truncated_normal_value(0, num_drops_sigma, 0, 12) + 1)) *
         100;
 
-    const auto filename = std::format("nf_N={}_R={}.npz", n, r);
+    const auto filename =
+        "nf_N=" + std::to_string(n) + "_R=" + std::to_string(r) + ".npz";
     std::filesystem::path noise_file(noise_filter_path);
     noise_file.append(filename);
     auto npz_data = cnpy::npz_load(noise_file);

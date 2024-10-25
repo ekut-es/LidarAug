@@ -6,12 +6,12 @@
 #define STATS_HPP
 
 #include "tensor.hpp"
+#include "utils.hpp"
 #include <ATen/ops/empty.h>
 #include <algorithm>
 #include <boost/math/distributions/normal.hpp>
 #include <c10/core/ScalarType.h>
 #include <cmath>
-#include <numbers>
 #include <random>
 #include <stdexcept>
 #include <torch/torch.h>
@@ -241,7 +241,7 @@ draw_unique_uniform_values(std::size_t size, std::size_t num_values) {
 [[nodiscard]] inline torch::Tensor
 inverted_lognormal_cdf(const torch::Tensor &d, const float r) {
   return std::pow(r, 0.23) *
-         torch::exp((std::numbers::sqrt2 * std::log(1.43 - (0.0003 * r)) *
+         torch::exp((math_utils::sqrt2 * std::log(1.43 - (0.0003 * r)) *
                      torch::erfinv((0.0116279 * d) / (std::pow(r, 0.22)))) -
                     0.328504);
 }
