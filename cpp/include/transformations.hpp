@@ -90,7 +90,7 @@ void rotate_rad(at::Tensor points, float angle);
 [[nodiscard]] torch::Tensor
 random_noise(const at::Tensor &points, float sigma,
              const distribution_ranges<float> &ranges, noise_type type,
-             intensity_range max_intensity);
+             point_cloud_data::intensity_range max_intensity);
 
 /**
  * Randomly genereates a percentage from a norma distribution, which determines
@@ -198,10 +198,10 @@ void random_point_noise(torch::Tensor points, float sigma);
 void transform_along_ray(torch::Tensor points, float sigma);
 
 void intensity_noise(torch::Tensor points, float sigma,
-                     intensity_range max_intensity);
+                     point_cloud_data::intensity_range max_intensity);
 
 void intensity_shift(torch::Tensor points, float sigma,
-                     intensity_range max_intensity);
+                     point_cloud_data::intensity_range max_intensity);
 
 /**
  * Creates a transformation matrix from the local system into the global

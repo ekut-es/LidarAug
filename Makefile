@@ -1,3 +1,15 @@
+ifeq ($(OS),Windows_NT)
+    CXXFLAGS += openmp
+    CFLAGS+= openmp
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Darwin)
+		CXXFLAGS += -Xpreprocessor
+		CFLAGS += -Xpreprocessor
+	endif
+	CXXFLAGS += -fopenmp
+	CFLAGS += -fopenmp
+endif
 
 all: install testpy build ctest
 
@@ -8,10 +20,10 @@ configure_test:
 	cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="$(TORCH_PATH)" -S ./cpp/ -B ./cpp/build_files
 
 build: configure_test
-	cmake --build ./cpp/build_files -j 4
+	cmake --build ./cpp/build_files -j 8
 
 release: configure
-	cmake --build ./cpp/build_files -j 4 --config
+	cmake --build ./cpp/build_files -j 8
 
 ctest: build
 	cd ./cpp/build_files && ctest
@@ -25,8 +37,13 @@ testpy: ./pytest/test.py
 rerun: ./cpp/build_files
 	cd ./cpp/build_files && ctest --rerun-failed --output-on-failure
 
+sim: release
+	cd ./cpp/build_files && ctest --output-on-failure -R 'Simulation.*'
+
 install:
-	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.11 -m pip install . && rm -rf ./tmp
+	@echo "CXXFLAGS: $(CXXFLAGS)"
+	@echo "CFLAGS: $(CFLAGS)"
+	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.11 -m pip install -v . && rm -rf ./tmp
 
 clean: ./cpp/build_files
 	rm -rfv ./cpp/build_files

@@ -35,11 +35,20 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+include(FetchContent)
+FetchContent_Declare(cnpy
+        GIT_REPOSITORY "https://github.com/TomSchammo/cnpy"
+        GIT_SHALLOW True
+)
+FetchContent_MakeAvailable(cnpy)
+
 
 find_package(Boost REQUIRED)
 
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+
+find_package(OpenMP)
 
 # Testing code
 enable_testing()
@@ -57,14 +66,34 @@ add_executable(
         src/utils.cpp
         include/evaluation.hpp
         src/evaluation.cpp
+        include/raytracing.hpp
+        src/raytracing.cpp
 )
-target_link_libraries(
+
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(
+        transformations_test
+        cnpy
+        "${TORCH_LIBRARIES}"
+        "${Boost_LIBRARIES}"
+        OpenMP::OpenMP_CXX
+        "${ZLIB_LIBRARIES}"
+        GTest::gtest_main
+        # GTest::gtest
+    )
+
+else ()
+    target_link_libraries(
         transformations_test
         "${TORCH_LIBRARIES}"
         "${Boost_LIBRARIES}"
+        "${ZLIB_LIBRARIES}"
         GTest::gtest_main
+        cnpy::cnpy
         # GTest::gtest
-)
+    )
+endif()
+
 
 # set_property(TARGET transformations_test PROPERTY CXX_STANDARD 17)
 

@@ -139,7 +139,7 @@ void flip_random(at::Tensor points, at::Tensor labels, const std::size_t prob) {
 [[nodiscard]] torch::Tensor
 random_noise(const at::Tensor &points, const float sigma,
              const distribution_ranges<float> &ranges, noise_type type,
-             intensity_range max_intensity) {
+             point_cloud_data::intensity_range max_intensity) {
 
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
@@ -406,7 +406,7 @@ void transform_along_ray(torch::Tensor points, const float sigma) {
 }
 
 void intensity_noise(torch::Tensor points, const float sigma,
-                     const intensity_range max_intensity) {
+                     const point_cloud_data::intensity_range max_intensity) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
@@ -424,7 +424,7 @@ void intensity_noise(torch::Tensor points, const float sigma,
 }
 
 void intensity_shift(torch::Tensor points, const float sigma,
-                     const intensity_range max_intensity) {
+                     const point_cloud_data::intensity_range max_intensity) {
   const float intensity_shift = get_truncated_normal_value(
       0, sigma, 0, static_cast<float>(max_intensity));
 

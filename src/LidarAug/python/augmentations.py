@@ -1,6 +1,7 @@
 from torch import Tensor
 from LidarAug import transformations
 from LidarAug import weather_simulations
+from LidarAug.point_cloud import IntensityRange
 
 
 def _check_points(points: Tensor) -> None:
@@ -13,7 +14,7 @@ def _check_points(points: Tensor) -> None:
         shape
     ) == 3, "Tensor is not of shape (B, N, F), where B is the batch-size, N is the number of points and F is the number of features!"
     assert shape[
-               2] == 4, "point is supposed to have 4 components (x, y, z, intensity)!"
+        2] == 4, "point is supposed to have 4 components (x, y, z, intensity)!"
 
 
 def _check_labels(labels: Tensor) -> None:
@@ -26,7 +27,7 @@ def _check_labels(labels: Tensor) -> None:
         shape
     ) == 3, "Tensor is not of shape (B, N, F), where B is the batch-size, N is the number of labels and F is the number of features!"
     assert shape[
-               2] == 7, "label is supposed to have 7 components (x, y, z, width, height, length, theta)!"
+        2] == 7, "label is supposed to have 7 components (x, y, z, width, height, length, theta)!"
 
 
 def _check_labels_and_points(points: Tensor, labels: Tensor) -> None:
@@ -151,7 +152,7 @@ def flip_random(points: Tensor, labels: Tensor, prob: int) -> None:
 def random_noise(points: Tensor, sigma: float,
                  ranges: list[float] | transformations.DistributionRanges,
                  noise_type: transformations.NoiseType,
-                 max_intensity: transformations.IntensityRange) -> None:
+                 max_intensity: IntensityRange) -> None:
     """
     Adds random amount of points (drawn using a normal distribution) at random coordinates
     (within predetermined ranges) with a random intensity according to specific noise type.
@@ -302,7 +303,7 @@ def transform_along_ray(points: Tensor, sigma: float) -> None:
 
 
 def intensity_noise(points: Tensor, sigma: float,
-                    max_intensity: transformations.IntensityRange) -> None:
+                    max_intensity: IntensityRange) -> None:
     """
     Shifts the intensity value of every point in the point cloud by a random amount drawn from a normal distribution.
 
@@ -317,7 +318,7 @@ def intensity_noise(points: Tensor, sigma: float,
 
 
 def intensity_shift(points: Tensor, sigma: float,
-                    max_intensity: transformations.IntensityRange) -> None:
+                    max_intensity: IntensityRange) -> None:
     """
     Shifts the intensity value of every point in the point cloud by a single value drawn from a normal distribution.
 
@@ -373,13 +374,3 @@ def apply_transformation(points: Tensor,
     _check_points(points)
 
     transformations.apply_transformation(points, transformation_matrix)
-
-
-def fog(point_cloud: Tensor, prob: float,
-        metric: weather_simulations.FogParameter, sigma: float,
-        mean: int) -> None:
-    result = weather_simulations.fog(point_cloud, prob, metric, sigma, mean)
-
-    if result:
-        # NOTE(tom): It is necessary to call `value()` here, since this is a C++ optional
-        point_cloud = result.value()  # pyright: ignore

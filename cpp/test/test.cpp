@@ -1,13 +1,18 @@
 
+#include "../include/raytracing.hpp"
 #include "../include/stats.hpp"
 #include "../include/tensor.hpp"
 #include "../include/transformations.hpp"
 #include "../include/utils.hpp"
 #include "../include/weather.hpp"
+
+#include <cnpy/cnpy.hpp>
+#include <filesystem>
 #include <gtest/gtest.h>
 #include <torch/types.h>
 
 using namespace torch_utils;
+const std::filesystem::path npz_dir{"../../pytest/data/npz/test.npz"};
 
 // NOLINTBEGIN
 
@@ -226,8 +231,9 @@ TEST(Transformation, RandomNoiseTest) {
   constexpr static distribution_ranges<float> ranges{
       {1, 2}, {1, 2}, {1, 2}, {1, 2}};
 
-  auto new_points = random_noise(points, sigma, ranges, noise_type::UNIFORM,
-                                 intensity_range::MAX_INTENSITY_255);
+  auto new_points =
+      random_noise(points, sigma, ranges, noise_type::UNIFORM,
+                   point_cloud_data::intensity_range::MAX_INTENSITY_255);
 
   EXPECT_GT(new_points.size(1), points.size(1)) << "No noise has been added...";
 }
@@ -358,6 +364,266 @@ TEST(Tensor, ChangeSparseRepresentationTest) {
   EXPECT_TRUE(result.equal(expected)) << "expected:\n"
                                       << expected << "\nactual:\n"
                                       << result;
+}
+
+TEST(Raytracing, MulTest) {
+  auto v = torch::tensor({{1, 2, 3}, {-1, -2, -3}});
+  auto v_o = torch::tensor({{1, 2, 3}, {-1, -2, -3}});
+  float c = 5;
+  auto expected = torch::tensor({{5, 10, 15}, {-5, -10, -15}});
+
+  auto result = rt::mul(v, c);
+
+  EXPECT_TRUE(result.equal(expected)) << "expected:\n"
+                                      << expected << "\nactual:\n"
+                                      << result;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+}
+
+TEST(Raytracing, AddTest) {
+  auto v = torch::tensor({1, 2, 3}, F32);
+  auto k = torch::tensor({1, 2, 3}, F32);
+  auto l = torch::tensor({1, 2, 3}, F32);
+
+  auto v_o = torch::tensor({1, 2, 3}, F32);
+  auto k_o = torch::tensor({1, 2, 3}, F32);
+  auto l_o = torch::tensor({1, 2, 3}, F32);
+
+  auto expected = torch::tensor({3, 6, 9}, F32);
+
+  auto result = rt::add(v, k, l);
+
+  EXPECT_TRUE(result.equal(expected)) << "expected:\n"
+                                      << expected << "\nactual:\n"
+                                      << result;
+
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k_o
+                            << " has changed unexpectidly!\nWas " << k;
+  EXPECT_TRUE(l.equal(l_o)) << "The original tensor " << l_o
+                            << " has changed unexpectidly!\nWas " << l;
+}
+
+TEST(Raytracing, ScalarTest) {
+  auto v = torch::tensor({1, 2, 3}, F32);
+  auto k = torch::tensor({1, 2, 3}, F32);
+
+  auto v_o = torch::tensor({1, 2, 3}, F32);
+  auto k_o = torch::tensor({1, 2, 3}, F32);
+
+  auto expected = 14.0f;
+
+  auto result = rt::scalar(v, k);
+
+  EXPECT_EQ(result, expected) << "expected:\n"
+                              << expected << "\nactual:\n"
+                              << result;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k_o
+                            << " has changed unexpectidly!\nWas " << k;
+}
+
+TEST(Raytracing, VectorLengthTest) {
+  auto v = torch::tensor({6, 2, 3}, F32);
+  auto v_o = torch::tensor({6, 2, 3}, F32);
+
+  auto expected = 7.0f;
+
+  auto result = rt::vector_length(v);
+
+  EXPECT_EQ(result, expected) << "expected:\n"
+                              << expected << "\nactual:\n"
+                              << result;
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+}
+
+TEST(Raytracing, NormalizeTest) {
+  auto v = torch::tensor({6, 2, 3}, F32);
+  auto v_o = torch::tensor({6, 2, 3}, F32);
+
+  auto expected = torch::tensor({6 / 7.0f, 2 / 7.0f, 3 / 7.0f}, F32);
+
+  auto result = rt::normalize(v);
+
+  EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << result;
+  EXPECT_TRUE(v.allclose(v_o)) << "The original tensor " << v_o
+                               << " has changed unexpectidly!\nWas " << v;
+}
+
+TEST(Raytracing, CrossTest) {
+  auto v = torch::tensor({1, 2, 3}, F32);
+  auto k = torch::tensor({4, 5, 6}, F32);
+
+  auto v_o = torch::tensor({1, 2, 3}, F32);
+  auto k_o = torch::tensor({4, 5, 6}, F32);
+
+  auto expected = torch::tensor(
+      {(2 * 6) - (3 * 5), (3 * 4) - (1 * 6), (1 * 5) - (2 * 4)}, F32);
+  auto result = rt::cross(v, k);
+
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k_o
+                            << " has changed unexpectidly!\nWas " << k;
+
+  EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << result;
+}
+
+TEST(Raytracing, RotateTest) {
+  auto v = torch::tensor({1, 2, 3}, F32);
+  auto k = torch::tensor({4, 5, 6}, F32);
+  float angle = 180;
+
+  auto v_o = torch::tensor({1, 2, 3}, F32);
+  auto k_o = torch::tensor({4, 5, 6}, F32);
+
+  auto expected = torch::tensor({206.40788, 249.74979, 307.5124}, F32);
+  auto result = rt::rotate(v, k, angle);
+
+  EXPECT_TRUE(v.equal(v_o)) << "The original tensor " << v_o
+                            << " has changed unexpectidly!\nWas " << v;
+  EXPECT_TRUE(k.equal(k_o)) << "The original tensor " << k_o
+                            << " has changed unexpectidly!\nWas " << k;
+  EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << result;
+}
+
+TEST(Raytracing, CheckNpzFile) {
+  ASSERT_TRUE(std::filesystem::exists(npz_dir))
+      << "File: " << npz_dir
+      << " could not be found in current working directory: "
+      << std::filesystem::current_path();
+}
+
+TEST(Raytracing, TraceTest) {
+
+  const auto points =
+      torch::tensor({{0.79115541, 0.00995717, 0.85223702, 0.86795932},
+                     {0.88936069, 0.73058396, 0.66369673, 0.15326185},
+                     {0.2041209, 0.27948176, 0.25410868, 0.68685306},
+                     {0.40355785, 0.58527619, 0.50859593, 0.19754277},
+                     {0.23363058, 0.17909182, 0.15318045, 0.99695834},
+                     {0.59422449, 0.95887209, 0.60752133, 0.34042509},
+                     {0.16007366, 0.66038575, 0.53459956, 0.00381125},
+                     {0.71638315, 0.85775223, 0.00237889, 0.32981742},
+                     {0.27168068, 0.18565797, 0.96313797, 0.32289272},
+                     {0.06261661, 0.82851678, 0.09892672, 0.0678927}});
+
+  const auto expected =
+      torch::tensor({{0.79115541, 0.00995717, 0.85223702, 0.78116338},
+                     {0.88936069, 0.73058396, 0.66369673, 0.13793567},
+                     {0.2041209, 0.27948176, 0.25410868, 0.61816775},
+                     {0.40355785, 0.58527619, 0.50859593, 0.1777885},
+                     {0.23363058, 0.17909182, 0.15318045, 0.8972625},
+                     {0.59422449, 0.95887209, 0.60752133, 0.30638258},
+                     {0.16007366, 0.66038575, 0.53459956, 0.00343013},
+                     {0.71638315, 0.85775223, 0.00237889, 0.29683568},
+                     {0.27168068, 0.18565797, 0.96313797, 0.29060345},
+                     {0.06261661, 0.82851678, 0.09892672, 0.06110343}});
+
+  auto npz_data = cnpy::npz_load(npz_dir);
+
+  auto nf_array = npz_data["nf"];
+  const auto nf =
+      torch::from_blob(nf_array.data<float>(),
+                       {static_cast<tensor_size_t>(nf_array.num_vals())})
+          .reshape({-1, 6});
+
+  auto si_array = npz_data["si"];
+  const auto si =
+      torch::from_blob(si_array.data<tensor_size_t>(),
+                       {static_cast<tensor_size_t>(si_array.num_vals())});
+
+  const auto result = rt::trace(points, nf, si, simulation_type::rain);
+
+  EXPECT_TRUE(result.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << result;
+}
+
+TEST(Raytracing, TraceBeamTest) {
+
+  const auto beam = torch::tensor({1, 2, 3});
+
+  auto npz_data = cnpy::npz_load(npz_dir);
+
+  auto nf_array = npz_data["nf"];
+  const auto nf =
+      torch::from_blob(nf_array.data<float>(),
+                       {static_cast<tensor_size_t>(nf_array.num_vals())})
+          .reshape({-1, 6});
+
+  auto si_array = npz_data["si"];
+  const auto si =
+      torch::from_blob(si_array.data<tensor_size_t>(),
+                       {static_cast<tensor_size_t>(si_array.num_vals())});
+
+  const auto expected = -1.0F;
+  const auto result = rt::trace_beam(nf, beam, si);
+
+  EXPECT_EQ(result, expected) << "expected:\n"
+                              << expected << "\nactual:\n"
+                              << result;
+}
+
+TEST(Raytracing, SortNoiseFilterTest) {
+
+  auto compute_median = [](torch::Tensor tensor) {
+    auto sorted_tensor = std::get<0>(tensor.sort());
+    int64_t size = sorted_tensor.size(0);
+
+    if (size % 2 == 0) {
+      return (sorted_tensor[size / 2 - 1].item<double>() +
+              sorted_tensor[size / 2].item<double>()) /
+             2.0;
+    } else {
+      return sorted_tensor[size / 2].item<double>();
+    }
+  };
+
+  auto npz_data = cnpy::npz_load(npz_dir);
+
+  auto nf_array = npz_data["nf"];
+  const auto nf =
+      torch::from_blob(nf_array.data<double>(),
+                       {static_cast<tensor_size_t>(nf_array.num_vals())}, F64)
+          .reshape({-1, 6});
+
+  auto si_array = npz_data["si"];
+  const auto si =
+      torch::from_blob(si_array.data<double>(),
+                       {static_cast<tensor_size_t>(si_array.num_vals())}, F64);
+
+  auto [result_nf, result_si] = rt::sort_noise_filter<double, F64>(nf);
+
+  EXPECT_TRUE(torch::equal(nf, result_nf)) << "expected:\n"
+                                           << nf << "\nactual:\n"
+                                           << result_nf;
+
+  EXPECT_EQ(si.size(0), result_si.size(0));
+
+  std::cout << "min comparison (expected, result): " << si.min().item<double>()
+            << " vs " << result_si.min().item<double>() << "\n";
+  std::cout << "max comparison (expected, result): " << si.max().item<double>()
+            << " vs " << result_si.max().item<double>() << "\n";
+  std::cout << "average comparison (expected, result): "
+            << si.sum().item<double>() / si.size(0) << " vs "
+            << result_si.sum().item<double>() / result_si.size(0) << "\n";
+  std::cout << "median comparison (expected, result): " << compute_median(si)
+            << " vs " << compute_median(result_si) << "\n";
+
+  EXPECT_TRUE(torch::allclose(si, result_si)) << "expected:\n"
+                                              << si << "\nactual:\n"
+                                              << result_si;
 }
 
 TEST(Evaluation, Iou3dTest) {
@@ -894,8 +1160,8 @@ TEST(RNGTransformation, IntensityNoiseTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
 
     constexpr float SIGMA = 20;
-    constexpr intensity_range MAX_INTENSITY =
-        intensity_range::MAX_INTENSITY_255;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_255;
 
     // NOTE(tom): values of intensity_shift =
     //           {21.2925453, 0, 21.2925453, 6.91568279}
@@ -916,7 +1182,8 @@ TEST(RNGTransformation, IntensityNoiseTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 0.95}}});
 
     constexpr float SIGMA = 0.2;
-    constexpr intensity_range MAX_INTENSITY = intensity_range::MAX_INTENSITY_1;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_1;
 
     // NOTE(tom): values of intensity_shift =
     //           {0.207830608, 0, 0.212925255, 0.0354648978}
@@ -940,8 +1207,8 @@ TEST(RNGTransformation, IntensityShiftTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
 
     constexpr float SIGMA = 20;
-    constexpr intensity_range MAX_INTENSITY =
-        intensity_range::MAX_INTENSITY_255;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_255;
 
     // NOTE(tom): value of intensity_shift = 21.2925453
     const auto expected_points =
@@ -961,7 +1228,8 @@ TEST(RNGTransformation, IntensityShiftTest) {
                        {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 0.95}}});
 
     constexpr float SIGMA = 0.2;
-    constexpr intensity_range MAX_INTENSITY = intensity_range::MAX_INTENSITY_1;
+    constexpr auto MAX_INTENSITY =
+        point_cloud_data::intensity_range::MAX_INTENSITY_1;
 
     // NOTE(tom): value of intensity_shift = 0.212925255
     const auto expected_points =
@@ -1027,7 +1295,29 @@ TEST(Simulation, FogTest) {
   auto points =
       torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
                      {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
-  const auto _ = fog(points, 10, DIST, 2, 0);
+  const auto _ = fog(points, 100, DIST, 2, 0);
+
+  // NOTE(tom): currently just testing if the whether the function runs
+  EXPECT_TRUE(true);
+}
+
+TEST(Simulation, SnowTest) {
+  auto points =
+      torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
+                     {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
+  const auto _ = snow(points[0], {-50, 50, -50, 50, -3, 1}, 1000, 5, 2,
+                      point_cloud_data::intensity_range::MAX_INTENSITY_1);
+
+  // NOTE(tom): currently just testing if the whether the function runs
+  EXPECT_TRUE(true);
+}
+
+TEST(Simulation, RainTest) {
+  auto points =
+      torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
+                     {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
+  const auto _ = rain(points[0], {-50, 50, -50, 50, -3, 1}, 1000, 5,
+                      distribution::exponential);
 
   // NOTE(tom): currently just testing if the whether the function runs
   EXPECT_TRUE(true);
