@@ -4,15 +4,21 @@ requires = [
     "pybind11>=2.10.0",
     "torch==2.1.0",
     "numpy==1.24.0",
+    "scipy",
+    "matplotlib",
+    "open3d"
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "LidarAug"
 version = "0.0.1"
+requires-python = "<3.12"
 dependencies = [
     "torch==2.1.0",
+    "matplotlib",
     "numpy==1.24.0",
+    "open3d"
 ]
 
 # target-version = "py37"

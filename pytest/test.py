@@ -5,8 +5,10 @@ import pytest
 
 import torch
 from LidarAug import augmentations as aug
+from LidarAug import weather_simulations
 from LidarAug import evaluation
-from LidarAug.transformations import NoiseType, IntensityRange
+from LidarAug.transformations import NoiseType
+from LidarAug.point_cloud import IntensityRange
 
 import re
 
@@ -208,7 +210,7 @@ def test_result_dict_factory():
 
 @pytest.mark.evaltest
 def test_evaluate():
-    data_path = "./pytest/data/"
+    data_path = "./pytest/data/pkl/"
 
     files = os.listdir(data_path)
 
@@ -262,7 +264,7 @@ def test_false_and_true_positive():
 
     thresholds = [.3, .5, .7]
 
-    data_path = "./pytest/data/"
+    data_path = "./pytest/data/pkl/"
 
     files = os.listdir(data_path)
 
@@ -310,3 +312,43 @@ def test_false_and_true_positive():
                 for result_score, expected_score in zip(
                         result['score'], expected['score']):
                     check_precision(result_score, expected_score, 2)
+
+
+@pytest.mark.weathertest
+def test_fog():
+    points = torch.randn([100, 4])
+    metric = weather_simulations.FogParameter.DIST
+    viewing_dist = 100
+
+    result = weather_simulations.fog(points, metric, viewing_dist,
+                                     IntensityRange.MAX_INTENSITY_1)
+
+    assert not result.equal(points)
+
+
+@pytest.mark.weathertest
+def test_fog_100():
+    points = torch.randn([1, 100, 4])
+    prob = 100.0
+    metric = weather_simulations.FogParameter.DIST
+    sigma = 1.0
+    mean = 5
+
+    result = weather_simulations.fog(points, prob, metric, sigma, mean)
+
+    assert result is not None
+
+    for i, tensor in enumerate(result):
+        assert not tensor.equal(points[i])
+
+
+def test_fog_0():
+    points = torch.randn([1, 100, 4])
+    prob = 0
+    metric = weather_simulations.FogParameter.DIST
+    sigma = 1.0
+    mean = 5
+
+    result = weather_simulations.fog(points, prob, metric, sigma, mean)
+
+    assert result == None

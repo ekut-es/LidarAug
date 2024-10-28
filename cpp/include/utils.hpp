@@ -23,6 +23,7 @@ namespace math_utils {
 constexpr float PI_DEG = 180.0;
 constexpr float PI_RAD = static_cast<float>(M_PI);
 constexpr float TWO_PI_RAD = 2.0f * PI_RAD;
+constexpr double sqrt2 = 1.4142135623730951;
 
 /**
  * Generates a rotation matrix around the 'z' axis (yaw) from the provided
@@ -68,6 +69,7 @@ namespace torch_utils {
 constexpr auto F32 = torch::kF32;
 constexpr auto F64 = torch::kF64;
 constexpr auto I32 = torch::kI32;
+constexpr auto I64 = torch::kI64;
 
 [[nodiscard]] torch::Tensor rotate_yaw_t(torch::Tensor points,
                                          torch::Tensor angle);
