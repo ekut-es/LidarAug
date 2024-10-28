@@ -209,16 +209,35 @@ TEST(MathUtils, AngleConversionTest) {
 }
 
 TEST(Stats, DrawUniformValuesTest) {
-  constexpr static auto size = 10;
-  constexpr static auto num_values = 3;
+  {
 
-  auto values = draw_unique_uniform_values<int>(size, num_values);
+    constexpr static auto size = 10;
+    constexpr static auto num_values = 3;
 
-  EXPECT_EQ(values.size(), num_values);
+    auto values = draw_unique_uniform_values<int>(size, num_values);
 
-  for (auto val : values) {
-    EXPECT_LT(val, size);
-    EXPECT_GE(val, 0);
+    EXPECT_EQ(values.size(), num_values);
+
+    for (auto val : values) {
+      EXPECT_LT(val, size);
+      EXPECT_GE(val, 0);
+    }
+  }
+
+  {
+    constexpr static auto size = 3;
+    constexpr static auto num_values = 10;
+
+    EXPECT_THROW(
+        {
+          try {
+            auto values = draw_unique_uniform_values<int>(size, num_values);
+          } catch (const std::invalid_argument &e) {
+            EXPECT_STREQ("num_values cannot exceed size.", e.what());
+            throw;
+          }
+        },
+        std::invalid_argument);
   }
 }
 
