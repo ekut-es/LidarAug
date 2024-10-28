@@ -4,42 +4,52 @@ on: [ push, pull_request ]
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
         compiler: [ gcc ]
+        python-version: [ "3.11" ]
 
     steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: setup google test
         uses: Bacondish2023/setup-googletest@v1
 
+      - name: Install C++ build tools & git
+        run: sudo apt-get update && sudo apt-get install -y build-essential git
       - name: Install CMake
         run: sudo apt-get update && sudo apt-get install -y cmake
-
       - name: Install Boost
         run: sudo apt-get update && sudo apt-get install -y libboost-all-dev
+      - name: Install OpenMP
+        run: sudo apt-get update && sudo apt-get install -y libomp-dev
 
+      - name: Install cnpy
+        run: |
+          git clone https://github.com/TomSchammo/cnpy/
+          cd cnpy
+          git checkout cpp17
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0"
+          make VERBOSE=1
+          sudo make install
       - name: Install libtorch
         run: |
-          wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.3.0%2Bcpu.zip
-          unzip libtorch-cxx11-abi-shared-with-deps-2.3.0+cpu.zip -d /opt/
-
-      - name: Create build directory
-        run: mkdir build
-        working-directory: ./cpp
-
-      - name: Configure and build
+          python3.11 -m pip install --upgrade pip
+          python3.11 -m pip install setuptools==69.5.1 numpy==1.24.0
+          python3.11 -m pip install torch==2.1.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+      - name: Find PyTorch cmake path
+        id: find-torch-cmake-path
         run: |
-          cd build
-          cmake -DBOOST_ROOT=/usr/include/boost -DCMAKE_PREFIX_PATH=/opt/libtorch ..
-          make
-        working-directory: ./cpp
+          echo "TORCH_PATH=$(python3.11 -c 'import torch; import os; print(os.path.join(torch.__path__[0], "share", "cmake"))')" >> $GITHUB_ENV
 
-      - name: Run Google Test
+      - name: Build and run Google Test
         run: |
-          cd build
-          ctest --output-on-failure
-        working-directory: ./cpp
+          make ctest
