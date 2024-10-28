@@ -212,9 +212,6 @@ draw_values(D &dist, tensor_size_t number_of_values = 1) {
 /**
  * Draws a fixed amount of values from a pool of potential values.
  *
- * NOTE: this can generate a lot of values and might be inefficient for big
- * `size`s but small `num_values`!
- *
  * @param size       defines the end of the range of total values: [0; size)
  * @param num_values is the number of values to be drawn
  *
@@ -225,15 +222,14 @@ template <typename T>
 draw_unique_uniform_values(std::size_t size, std::size_t num_values) {
   auto rng = get_rng();
 
-  std::vector<T> values(size);
-  std::iota(values.begin(), values.end(), 0);
+  if (size < num_values)
+    throw std::invalid_argument("num_values cannot exceed size.");
 
-  // TODO(tom): `sample` would work as well I think. It would replace the
-  //             `shuffle` + `resize`, but the `generate` still stays.
-  //             Maybe `sample` is a better option here.
-  std::shuffle(values.begin(), values.end(), rng);
+  std::vector<T> values(num_values);
+  std::vector<T> samples(size);
+  std::iota(samples.begin(), samples.end(), 0);
 
-  values.resize(num_values);
+  std::sample(samples.begin(), samples.end(), values.begin(), num_values, rng);
 
   return values;
 }
