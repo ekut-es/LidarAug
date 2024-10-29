@@ -71,29 +71,29 @@ add_executable(
         src/raytracing.cpp
 )
 
-if(OpenMP_CXX_FOUND)
+if (OpenMP_CXX_FOUND)
     target_link_libraries(
-        transformations_test
-        cnpy
-        "${TORCH_LIBRARIES}"
-        "${Boost_LIBRARIES}"
-        OpenMP::OpenMP_CXX
-        "${ZLIB_LIBRARIES}"
-        GTest::gtest_main
-        # GTest::gtest
+            transformations_test
+            cnpy
+            "${TORCH_LIBRARIES}"
+            "${Boost_LIBRARIES}"
+            OpenMP::OpenMP_CXX
+            "${ZLIB_LIBRARIES}"
+            GTest::gtest_main
+            # GTest::gtest
     )
 
 else ()
     target_link_libraries(
-        transformations_test
-        "${TORCH_LIBRARIES}"
-        "${Boost_LIBRARIES}"
-        "${ZLIB_LIBRARIES}"
-        GTest::gtest_main
-        cnpy::cnpy
-        # GTest::gtest
+            transformations_test
+            "${TORCH_LIBRARIES}"
+            "${Boost_LIBRARIES}"
+            "${ZLIB_LIBRARIES}"
+            GTest::gtest_main
+            cnpy::cnpy
+            # GTest::gtest
     )
-endif()
+endif ()
 
 
 # set_property(TARGET transformations_test PROPERTY CXX_STANDARD 17)
