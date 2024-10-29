@@ -40,13 +40,13 @@ fog(torch::Tensor point_cloud, fog_parameter metric, float viewing_dist,
         point_cloud_data::intensity_range::MAX_INTENSITY_1);
 
 [[nodiscard]] torch::Tensor
-rain(const torch::Tensor &point_cloud, const std::array<float, 6> &dims, uint32_t num_drops,
+rain(torch::Tensor point_cloud, std::array<float, 6> dims, uint32_t num_drops,
      float precipitation, distribution d,
      point_cloud_data::intensity_range max_intensity =
          point_cloud_data::intensity_range::MAX_INTENSITY_1);
 
 [[nodiscard]] torch::Tensor
-snow(torch::Tensor point_cloud, const std::array<float, 6> &dims, uint32_t num_drops,
+snow(torch::Tensor point_cloud, std::array<float, 6> dims, uint32_t num_drops,
      float precipitation, int32_t scale,
      point_cloud_data::intensity_range max_intensity =
          point_cloud_data::intensity_range::MAX_INTENSITY_1);

@@ -43,7 +43,8 @@ calculate_factors(const fog_parameter metric, const float viewing_dist) {
 
 [[nodiscard]] std::optional<std::vector<torch::Tensor>>
 fog(const torch::Tensor &point_cloud, const float prob,
-    const fog_parameter metric, const float sigma, const int mean) {
+    const fog_parameter metric,
+    const float sigma, const int mean) {
 
   auto rng = get_rng();
   std::uniform_real_distribution<float> distrib(0, HUNDRED_PERCENT - 1);
@@ -73,7 +74,8 @@ fog(const torch::Tensor &point_cloud, const float prob,
 
 [[nodiscard]] torch::Tensor
 fog(torch::Tensor point_cloud, const fog_parameter metric,
-    const float viewing_dist, point_cloud_data::intensity_range max_intensity) {
+    const float viewing_dist,
+    point_cloud_data::intensity_range max_intensity) {
 
   const auto [extinction_factor, beta, delete_probability] =
       calculate_factors(metric, viewing_dist);
@@ -122,7 +124,7 @@ fog(torch::Tensor point_cloud, const fog_parameter metric,
 }
 
 [[nodiscard]] torch::Tensor
-rain(const torch::Tensor &point_cloud, const std::array<float, 6> &dims,
+rain(torch::Tensor point_cloud, std::array<float, 6> dims,
      const uint32_t num_drops, const float precipitation, const distribution d,
      const point_cloud_data::intensity_range max_intensity) {
 
@@ -223,7 +225,7 @@ snow(torch::Tensor point_cloud, const std::string_view noise_filter_path,
 }
 
 [[nodiscard]] torch::Tensor
-snow(torch::Tensor point_cloud, const std::array<float, 6> &dims,
+snow(torch::Tensor point_cloud, std::array<float, 6> dims,
      const uint32_t num_drops, const float precipitation, const int32_t scale,
      point_cloud_data::intensity_range max_intensity) {
 
@@ -245,8 +247,8 @@ void universal_weather(torch::Tensor point_cloud, const float prob,
                        const float sigma, const int mean, const float ext_a,
                        const float ext_b, const float beta_a,
                        const float beta_b, const float del_a, const float del_b,
-                       const int int_a, const int int_b, const int mean_int,
-                       const int int_range) {
+                       const int int_a,
+                       const int int_b, const int mean_int, const int int_range) {
 
   auto rng = get_rng();
   std::uniform_real_distribution<float> distrib(0, HUNDRED_PERCENT - 1);

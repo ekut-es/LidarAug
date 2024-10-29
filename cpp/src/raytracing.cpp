@@ -12,7 +12,7 @@ using Slice = torch::indexing::Slice;
 // Set minimum intersection distance to 1m
 constexpr tensor_size_t min_intersect_dist = 1;
 
-[[nodiscard]] torch::Tensor rt::trace(const torch::Tensor &point_cloud,
+[[nodiscard]] torch::Tensor rt::trace(torch::Tensor point_cloud,
                                       const torch::Tensor &noise_filter,
                                       const torch::Tensor &split_index,
                                       const simulation_type sim_t,

@@ -25,7 +25,7 @@ constexpr std::array<std::pair<float, float>, 2> r_table = {{
 
 namespace rt {
 
-[[nodiscard]] torch::Tensor trace(const torch::Tensor &point_cloud,
+[[nodiscard]] torch::Tensor trace(torch::Tensor point_cloud,
                                   const torch::Tensor &noise_filter,
                                   const torch::Tensor &split_index,
                                   simulation_type sim_t,

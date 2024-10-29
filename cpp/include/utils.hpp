@@ -71,8 +71,8 @@ constexpr auto F64 = torch::kF64;
 constexpr auto I32 = torch::kI32;
 constexpr auto I64 = torch::kI64;
 
-[[nodiscard]] torch::Tensor rotate_yaw_t(const torch::Tensor &points,
-                                         const torch::Tensor &angle);
+[[nodiscard]] torch::Tensor rotate_yaw_t(torch::Tensor points,
+                                         torch::Tensor angle);
 
 /**
  * Converts bounding boxes tensor with shape (N, 7) to a different tensor with
