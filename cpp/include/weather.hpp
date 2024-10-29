@@ -5,12 +5,10 @@
 #include "../include/point_cloud.hpp"
 #include "../include/raytracing.hpp"
 #include "../include/stats.hpp"
-#include <ATen/core/List.h>
 #include <array>
 #include <cstdint>
 #include <optional>
 #include <string_view>
-#include <torch/serialize/tensor.h>
 #include <vector>
 
 typedef enum { DIST, CHAMFER } fog_parameter;

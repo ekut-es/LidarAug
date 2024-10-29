@@ -3,7 +3,6 @@
 #include <ATen/core/TensorAccessor.h>
 #include <ATen/ops/stack.h>
 #include <torch/torch.h>
-#include <utility>
 #include <vector>
 
 using size_t = std::size_t;

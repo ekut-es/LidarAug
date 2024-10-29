@@ -4,7 +4,6 @@
 #include "../include/tensor.hpp"
 #include "../include/utils.hpp"
 #include <ATen/TensorIndexing.h>
-#include <ATen/ops/from_blob.h>
 #include <ATen/ops/pow.h>
 #include <cmath>
 #include <cnpy/cnpy.hpp>
