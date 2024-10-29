@@ -28,12 +28,32 @@ class Distribution(Enum):
 @overload
 def fog(point_cloud: Tensor, prob: float, metric: FogParameter, sigma: float,
         mean: int) -> Optional[list[Tensor]]:
+    """
+    Applies a fog simulation to a point cloud with a chance of `prob`%.
+    The point cloud has the shape (B, P, F).
+
+    :param point_cloud: is the point cloud that the simulation is applied to.
+    :param prob: is the probability with which the simulation is applied.
+    :param metric: is a parameter used to control the simulation.
+    :param sigma: is the standard deviation used to draw the viewing distance in the fog.
+    :param mean: is the mean that is used to draw the viewing distance in the fog.
+    :return: A list of B tensors with P points that the simulation has been applied to or None.
+    """
     ...
 
 
 @overload
 def fog(point_cloud: Tensor, metric: FogParameter, viewing_dist: float,
         max_intensity: IntensityRange) -> Tensor:
+    """
+    Applies a fog simulation to a point cloud.
+
+    :param point_cloud: is the point cloud that the simulation is applied to.
+    :param metric: is a parameter used to control the simulation.
+    :param viewing_dist:  is the viewing distance in the fog.
+    :param max_intensity:  is the maximum intensity value of a point.
+    :return: a new point cloud with the old points as a base but after applying the simulation.
+    """
     ...
 
 
