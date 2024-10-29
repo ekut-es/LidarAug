@@ -17,11 +17,11 @@ template <typename T> struct distribution_ranges {
 
 enum struct noise_type { UNIFORM, SALT_PEPPER, MIN, MAX };
 
-void translate(at::Tensor points, const at::Tensor &translation);
-void scale_points(at::Tensor points, float factor);
-void scale_labels(at::Tensor labels, float factor);
+void translate(const at::Tensor &points, const at::Tensor &translation);
+void scale_points(const at::Tensor &points, float factor);
+void scale_labels(const at::Tensor &labels, float factor);
 
-void translate_random(at::Tensor points, at::Tensor labels, float sigma);
+void translate_random(const at::Tensor &points, const at::Tensor &labels, float sigma);
 
 /**
  * Scales the points and labels by a random factor.
@@ -37,7 +37,7 @@ void translate_random(at::Tensor points, at::Tensor labels, float sigma);
  * @param max_scale is the upper limit of the truncated normal distribution. The
  *                  lower limit is the inverse.
  */
-void scale_random(at::Tensor points, at::Tensor labels, float sigma,
+void scale_random(const at::Tensor &points, const at::Tensor &labels, float sigma,
                   float max_scale);
 /**
  * Scales the points that are part of a box and the corresponding labels by a
@@ -55,9 +55,9 @@ void scale_random(at::Tensor points, at::Tensor labels, float sigma,
  * @param max_scale   is the upper limit of the truncated normal distribution. The
  *                    lower limit is the inverse.
  */
-void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
+void scale_local(const at::Tensor &point_cloud, const at::Tensor &labels, float sigma,
                  float max_scale);
-void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
+void flip_random(const at::Tensor &points, const at::Tensor &labels, std::size_t prob);
 
 /**
  * Rotates a batch of points anlong the 'z' axis (yaw).
@@ -66,7 +66,7 @@ void flip_random(at::Tensor points, at::Tensor labels, std::size_t prob);
  * @param angle  is the angle (in degrees) by which the points are to be
  * rotated.
  */
-void rotate_deg(at::Tensor points, float angle);
+void rotate_deg(const at::Tensor &points, float angle);
 
 /**
  * Rotates a batch of points anlong the 'z' axis (yaw).
@@ -75,7 +75,7 @@ void rotate_deg(at::Tensor points, float angle);
  * @param angle  is the angle (in radians) by which the points are to be
  *               rotated.
  */
-void rotate_rad(at::Tensor points, float angle);
+void rotate_rad(const at::Tensor &points, float angle);
 
 /**
  * Introduces random noise to a point cloud.
@@ -106,7 +106,7 @@ random_noise(const at::Tensor &points, float sigma,
  *
  * @returns a new tensor containing the new data
  */
-[[nodiscard]] torch::Tensor thin_out(at::Tensor points, float sigma);
+[[nodiscard]] torch::Tensor thin_out(const at::Tensor &points, float sigma);
 
 void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
 
@@ -195,7 +195,7 @@ _delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
 
 void random_point_noise(torch::Tensor points, float sigma);
 
-void transform_along_ray(torch::Tensor points, float sigma);
+void transform_along_ray(const torch::Tensor &points, float sigma);
 
 void intensity_noise(torch::Tensor points, float sigma,
                      point_cloud_data::intensity_range max_intensity);
@@ -235,7 +235,7 @@ local_to_local_transform(const torch::Tensor &from_pose,
  *                              matrix is applied to.
  * @param transformation_matrix is the transformation matrix.
  */
-void apply_transformation(torch::Tensor points,
+void apply_transformation(const torch::Tensor &points,
                           const torch::Tensor &transformation_matrix);
 
 #endif // !TRANSFORMATIONS_HPP

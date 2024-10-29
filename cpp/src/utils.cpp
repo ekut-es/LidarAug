@@ -32,8 +32,8 @@ namespace torch_utils {
   return corners;
 }
 
-[[nodiscard]] torch::Tensor rotate_yaw_t(torch::Tensor points,
-                                         torch::Tensor angle) {
+[[nodiscard]] torch::Tensor rotate_yaw_t(const torch::Tensor &points,
+                                         const torch::Tensor &angle) {
 
   auto cos = torch::cos(angle);
   auto sin = torch::sin(angle);
