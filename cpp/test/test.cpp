@@ -1099,8 +1099,8 @@ TEST(RNGTransformation, ThinOutTest) {
   const auto points = torch::rand({BATCHES, ITEMS, 4}, F32);
   auto new_points = thin_out(points, 1);
 
-  // NOTE(tom): percent = 0.653750002, indices = {9, 4, 8, 0}
-  const auto indices = torch::tensor({9, 4, 8, 0});
+  // NOTE(tom): percent = 0.653750002, indices = {4, 6, 8, 9}
+  const auto indices = torch::tensor({4, 6, 8, 9});
 
   const auto expected_points = points.index_select(1, indices);
 
