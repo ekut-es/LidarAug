@@ -100,7 +100,7 @@ def snow(point_cloud: Tensor, dims: list[float], num_drops: int,
 
     :param point_cloud: is the point cloud that the simulation is applied to.
     :param dims: set the upper and lower bounds of the uniform distribution used to draw new points for the noise filter.
-    :param num_drops: is the number of snow flakes per m^3.
+    :param num_drops: is the number of snowflakes per m^3.
     :param precipitation: is the precipitation rate and determines the snowflake size distribution.
     :param scale: is used to scale the size of the sampled particles when generating the noise filter.
     :param max_intensity: is the maximum intensity of the points in the point cloud.
@@ -118,7 +118,7 @@ def snow(point_cloud: Tensor, noise_filter_path: str, num_drops_sigma: int,
 
     :param point_cloud: is the point cloud that the simulation is applied to.
     :param noise_filter_path: is the path to the directory containing the npz files with the noise filter data.
-    :param num_drops_sigma: is the standard deviation for the number of snow flakes (used to find the correct noise filter).
+    :param num_drops_sigma: is the standard deviation for the number of snowflakes (used to find the correct noise filter).
     :param precipitation_sigma: is the standard deviation for the precipitation rate (used to find the correct noise filter).
     :param scale: is used to scale the size of the sampled particles when generating the noise filter.
     :param prob: is the probability that the simulation will be executed.
