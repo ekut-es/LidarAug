@@ -153,9 +153,10 @@ template <typename DataType, c10::ScalarType TensorType>
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 // TODO(tom): Make dim a 'distribution_ranges' (found in transformations.hpp,
 // needs to go in utils or something)
-generate_noise_filter(const std::array<float, 6> &dim, uint32_t drops_per_m3,
-                      float precipitation = 5.0, int32_t scale = 1,
-                      distribution d = distribution::exponential) {
+generate_noise_filter(const std::array<float, 6> &dim,
+                      const uint32_t drops_per_m3,
+                      const float precipitation = 5.0, const int32_t scale = 1,
+                      const distribution d = distribution::exponential) {
 
   const auto total_drops = static_cast<int>(
       std::abs(dim[0] - dim[1]) * std::abs(dim[2] - dim[3]) *

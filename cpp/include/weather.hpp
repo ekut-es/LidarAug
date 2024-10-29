@@ -15,7 +15,7 @@
 
 typedef enum { DIST, CHAMFER } fog_parameter;
 
-[[nodiscard]] inline auto get_intensity(simulation_type sim_t) {
+[[nodiscard]] inline auto get_intensity(const simulation_type sim_t) {
 
   auto rng = get_rng();
 

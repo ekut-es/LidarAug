@@ -483,8 +483,8 @@ local_to_world_transform(const torch::Tensor &lidar_pose) {
 local_to_local_transform(const torch::Tensor &from_pose,
                          const torch::Tensor &to_pose) {
 
-  auto local_to_world = local_to_world_transform(from_pose);
-  auto world_to_local = torch::linalg_inv(local_to_world_transform(to_pose));
+  const auto local_to_world = local_to_world_transform(from_pose);
+  const auto world_to_local = torch::linalg_inv(local_to_world_transform(to_pose));
 
   return world_to_local.mm(local_to_world);
 }

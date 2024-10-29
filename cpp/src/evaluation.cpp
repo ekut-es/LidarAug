@@ -87,7 +87,7 @@ void calculate_false_and_true_positive(const torch::Tensor &detection_boxes,
 
   auto ground_truth = ground_truth_box.size(0);
 
-  auto score_order_descend = cpp_utils::argsort(l_detection_score, true);
+  const auto score_order_descend = cpp_utils::argsort(l_detection_score, true);
 
   const auto detection_polygon_list =
       evaluation_utils::convert_format<point_t>(detection_boxes);

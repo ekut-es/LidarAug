@@ -87,7 +87,7 @@ void rt::intersects(torch::Tensor point_cloud,
                     torch::Tensor most_intersect_count,
                     torch::Tensor most_intersect_dist,
                     const tensor_size_t num_points, const simulation_type sim_t,
-                    float intensity_factor) {
+                    const float intensity_factor) {
 
   constexpr auto num_rays = 11;
 

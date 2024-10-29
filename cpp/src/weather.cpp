@@ -19,7 +19,7 @@ using namespace torch::indexing;
 using namespace torch_utils;
 
 [[nodiscard]] inline std::tuple<float, float, float>
-calculate_factors(fog_parameter metric, float viewing_dist) {
+calculate_factors(const fog_parameter metric, const float viewing_dist) {
   switch (metric) {
   case DIST: {
     const float extinction_factor = 0.32 * exp(-0.022 * viewing_dist);
@@ -43,7 +43,8 @@ calculate_factors(fog_parameter metric, float viewing_dist) {
 }
 
 [[nodiscard]] std::optional<std::vector<torch::Tensor>>
-fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
+fog(const torch::Tensor &point_cloud, const float prob,
+    const fog_parameter metric,
     const float sigma, const int mean) {
 
   auto rng = get_rng();
@@ -73,7 +74,8 @@ fog(const torch::Tensor &point_cloud, const float prob, fog_parameter metric,
 }
 
 [[nodiscard]] torch::Tensor
-fog(torch::Tensor point_cloud, fog_parameter metric, float viewing_dist,
+fog(torch::Tensor point_cloud, const fog_parameter metric,
+    const float viewing_dist,
     point_cloud_data::intensity_range max_intensity) {
 
   const auto [extinction_factor, beta, delete_probability] =
@@ -104,7 +106,7 @@ fog(torch::Tensor point_cloud, fog_parameter metric, float viewing_dist,
       point_cloud.index({altered_points, Slice(None, 3)}).size(0);
 
   if (num_altered_points > 0) {
-    auto newdist =
+    const auto newdist =
         torch::empty(num_altered_points).exponential_(1 / beta) + 1.3;
 
     point_cloud.index_put_(
@@ -123,9 +125,9 @@ fog(torch::Tensor point_cloud, fog_parameter metric, float viewing_dist,
 }
 
 [[nodiscard]] torch::Tensor
-rain(torch::Tensor point_cloud, std::array<float, 6> dims, uint32_t num_drops,
-     float precipitation, distribution d,
-     point_cloud_data::intensity_range max_intensity) {
+rain(torch::Tensor point_cloud, std::array<float, 6> dims,
+     const uint32_t num_drops, const float precipitation, const distribution d,
+     const point_cloud_data::intensity_range max_intensity) {
 
   point_cloud_data::max_intensity::set(max_intensity);
 
@@ -201,7 +203,7 @@ snow(torch::Tensor point_cloud, const std::string_view noise_filter_path,
     auto npz_data = cnpy::npz_load(noise_file);
 
     auto nf_array = npz_data["nf"];
-    auto nf =
+    const auto nf =
         torch::from_blob(nf_array.data<float>(),
                          {static_cast<tensor_size_t>(nf_array.num_vals())})
             .reshape({-1, 6});
@@ -224,8 +226,8 @@ snow(torch::Tensor point_cloud, const std::string_view noise_filter_path,
 }
 
 [[nodiscard]] torch::Tensor
-snow(torch::Tensor point_cloud, std::array<float, 6> dims, uint32_t num_drops,
-     float precipitation, int32_t scale,
+snow(torch::Tensor point_cloud, std::array<float, 6> dims,
+     const uint32_t num_drops, const float precipitation, const int32_t scale,
      point_cloud_data::intensity_range max_intensity) {
 
   point_cloud_data::max_intensity::set(max_intensity);
@@ -242,14 +244,16 @@ snow(torch::Tensor point_cloud, std::array<float, 6> dims, uint32_t num_drops,
   return point_cloud;
 }
 
-void universal_weather(torch::Tensor point_cloud, float prob, float sigma,
-                       int mean, float ext_a, float ext_b, float beta_a,
-                       float beta_b, float del_a, float del_b, int int_a,
-                       int int_b, int mean_int, int int_range) {
+void universal_weather(torch::Tensor point_cloud, const float prob,
+                       const float sigma, const int mean, const float ext_a,
+                       const float ext_b, const float beta_a,
+                       const float beta_b, const float del_a, const float del_b,
+                       const int int_a,
+                       const int int_b, const int mean_int, const int int_range) {
 
   auto rng = get_rng();
   std::uniform_real_distribution<float> distrib(0, HUNDRED_PERCENT - 1);
-  auto rand = distrib(rng);
+  const auto rand = distrib(rng);
 
   if (prob > rand) {
     const auto viewing_dist = get_truncated_normal_value(mean, sigma, 0, mean);
@@ -282,7 +286,7 @@ void universal_weather(torch::Tensor point_cloud, float prob, float sigma,
         point_cloud.index({altered_points, Slice(None, 3)}).size(0);
     if (num_altered_points > 0) {
 
-      auto newdist =
+      const auto newdist =
           torch::empty(num_altered_points).exponential_(1 / beta) + 1.3;
 
       point_cloud.index_put_(

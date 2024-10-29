@@ -157,7 +157,7 @@ _delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
   const tensor_size_t label_features = labels.size(1);
   const tensor_size_t name_features = names.size(1);
 
-  auto point_indices = torch::zeros({num_labels, num_points}, torch::kI32);
+  const auto point_indices = torch::zeros({num_labels, num_points}, torch::kI32);
   points_in_boxes_cpu(
       labels.contiguous(),
       points.index({torch::indexing::Slice(), torch::indexing::Slice(0, 3)})
@@ -166,7 +166,7 @@ _delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
 
   assert(point_indices.size(0) == num_labels);
 
-  auto not_deleted_indices = point_indices.sum(1).ge(min_points);
+  const auto not_deleted_indices = point_indices.sum(1).ge(min_points);
 
   const auto not_deleted_labels =
       labels.index({not_deleted_indices.nonzero().squeeze()})
