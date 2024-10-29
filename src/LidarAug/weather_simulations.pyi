@@ -37,6 +37,7 @@ def fog(point_cloud: Tensor, metric: FogParameter, viewing_dist: float,
     ...
 
 
+@overload
 def rain(point_cloud: Tensor, dims: list[float], num_drops: int,
          precipitation: float, d: Distribution,
          max_intensity: IntensityRange) -> Tensor:
@@ -54,6 +55,23 @@ def rain(point_cloud: Tensor, dims: list[float], num_drops: int,
     ...
 
 
+@overload
+def rain(point_cloud: Tensor, noise_filter_path: str, num_drops_sigma: int,
+         precipitation_sigma: float, prob: float) -> Optional[Tensor]:
+    """
+    Applies a rain simulation to a point cloud with a chance of `prob`%.
+
+    :param point_cloud: is the point cloud that the simulation is applied to.
+    :param noise_filter_path: is the path to the directory containing the npz files with the noise filter data.
+    :param num_drops_sigma: is the standard deviation for the number of drops (used to find the correct noise filter).
+    :param precipitation_sigma: is the standard deviation for the precipitation rate (used to find the correct noise filter).
+    :param prob: is the probability that the simulation will be executed.
+    :return: a new point cloud with the old points as a base but after applying the simulation.
+    """
+    ...
+
+
+@overload
 def snow(point_cloud: Tensor, dims: list[float], num_drops: int,
          precipitation: float, scale: int,
          max_intensity: IntensityRange) -> Tensor:
@@ -66,6 +84,24 @@ def snow(point_cloud: Tensor, dims: list[float], num_drops: int,
     :param precipitation: is the precipitation rate and determines the snowflake size distribution.
     :param scale: is used to scale the size of the sampled particles when generating the noise filter.
     :param max_intensity: is the maximum intensity of the points in the point cloud.
+    :return: a new point cloud with the old points as a base but after applying the simulation.
+    """
+    ...
+
+
+@overload
+def snow(point_cloud: Tensor, noise_filter_path: str, num_drops_sigma: int,
+         precipitation_sigma: float, scale: int,
+         prob: float) -> Optional[Tensor]:
+    """
+    Applies a snow simulation to a point cloud with a chance of `prob`%.
+
+    :param point_cloud: is the point cloud that the simulation is applied to.
+    :param noise_filter_path: is the path to the directory containing the npz files with the noise filter data.
+    :param num_drops_sigma: is the standard deviation for the number of snow flakes (used to find the correct noise filter).
+    :param precipitation_sigma: is the standard deviation for the precipitation rate (used to find the correct noise filter).
+    :param scale: is used to scale the size of the sampled particles when generating the noise filter.
+    :param prob: is the probability that the simulation will be executed.
     :return: a new point cloud with the old points as a base but after applying the simulation.
     """
     ...
