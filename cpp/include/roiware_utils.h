@@ -6,7 +6,7 @@
  */
 
 #include <ATen/core/TensorBody.h>
-#include <math.h>
+#include <cmath>
 
 inline void lidar_to_local_coords_cpu(float shift_x, float shift_y,
                                       float rot_angle, float &local_x,
