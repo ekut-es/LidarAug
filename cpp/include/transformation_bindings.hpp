@@ -63,5 +63,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   pybind11::class_<cpp_utils::distribution_ranges<float>>(m,
                                                           "DistributionRanges")
       .def(pybind11::init<cpp_utils::range<float>, cpp_utils::range<float>,
-                          cpp_utils::range<float>, cpp_utils::range<float>>());
+                          cpp_utils::range<float>, cpp_utils::range<float>>())
+      .def(pybind11::init<cpp_utils::range<float>, cpp_utils::range<float>,
+                          cpp_utils::range<float>>());
 }

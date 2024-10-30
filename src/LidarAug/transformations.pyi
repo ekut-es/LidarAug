@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Tuple
+from typing import Tuple, overload
 from torch import Tensor
 
 
@@ -32,9 +32,15 @@ class DistributionRanges:
     z_range: DistributionRange
     uniform_range: DistributionRange
 
+    @overload
     def __init__(self, x_range: DistributionRange, y_range: DistributionRange,
                  z_range: DistributionRange,
                  uniform_range: DistributionRange) -> None:
+        ...
+
+    @overload
+    def __init__(self, x_range: DistributionRange, y_range: DistributionRange,
+                 z_range: DistributionRange) -> None:
         ...
 
 

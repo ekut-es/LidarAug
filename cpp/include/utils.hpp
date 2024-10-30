@@ -330,6 +330,14 @@ template <typename T> struct range {
 
 template <typename T> struct distribution_ranges {
   range<T> x_range, y_range, z_range, uniform_range;
+
+  distribution_ranges<T>(range<T> x_range, range<T> y_range, range<T> z_range,
+                         range<T> uniform_range)
+      : x_range(x_range), y_range(y_range), z_range(z_range),
+        uniform_range(uniform_range){};
+  distribution_ranges<T>(range<T> x_range, range<T> y_range, range<T> z_range)
+      : x_range(x_range), y_range(y_range), z_range(z_range),
+        uniform_range(0, 0){};
 };
 
 /**
