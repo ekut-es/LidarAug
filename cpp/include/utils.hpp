@@ -337,7 +337,7 @@ template <typename T> struct distribution_ranges {
         uniform_range(uniform_range){};
   distribution_ranges<T>(range<T> x_range, range<T> y_range, range<T> z_range)
       : x_range(x_range), y_range(y_range), z_range(z_range),
-        uniform_range(0, 0){};
+        uniform_range(range<T>{0, 0}){};
 };
 
 /**
