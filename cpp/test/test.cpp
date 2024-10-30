@@ -1324,8 +1324,10 @@ TEST(Simulation, SnowTest) {
   auto points =
       torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
                      {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
-  const auto _ = snow(points[0], {-50, 50, -50, 50, -3, 1}, 1000, 5, 2,
-                      point_cloud_data::intensity_range::MAX_INTENSITY_1);
+  const auto _ =
+      snow(points[0],
+           cpp_utils::distribution_ranges<float>({-50, 50}, {-50, 50}, {-3, 1}),
+           1000, 5, 2, point_cloud_data::intensity_range::MAX_INTENSITY_1);
 
   // NOTE(tom): currently just testing if the whether the function runs
   EXPECT_TRUE(true);
@@ -1335,8 +1337,10 @@ TEST(Simulation, RainTest) {
   auto points =
       torch::tensor({{{1.0, 2.0, 3.0, 4.5}, {-1.0, -2.0, -3.0, 255.0}},
                      {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 245.1}}});
-  const auto _ = rain(points[0], {-50, 50, -50, 50, -3, 1}, 1000, 5,
-                      distribution::exponential);
+  const auto _ =
+      rain(points[0],
+           cpp_utils::distribution_ranges<float>({-50, 50}, {-50, 50}, {-3, 1}),
+           1000, 5, distribution::exponential);
 
   // NOTE(tom): currently just testing if the whether the function runs
   EXPECT_TRUE(true);
