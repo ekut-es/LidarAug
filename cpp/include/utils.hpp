@@ -323,6 +323,15 @@ iou(const polygon_t<point_t> &gt_box, std::vector<polygon_t<point_t>> &boxes) {
 } // namespace evaluation_utils
 
 namespace cpp_utils {
+
+template <typename T> struct range {
+  T min, max;
+};
+
+template <typename T> struct distribution_ranges {
+  range<T> x_range, y_range, z_range, uniform_range;
+};
+
 /**
  * Returns the indices that sort a stl Container in ascending order by value.
  *

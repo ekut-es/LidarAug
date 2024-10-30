@@ -247,7 +247,7 @@ TEST(Transformation, RandomNoiseTest) {
 
   constexpr static float sigma = 2;
 
-  constexpr static distribution_ranges<float> ranges{
+  constexpr static cpp_utils::distribution_ranges<float> ranges{
       {1, 2}, {1, 2}, {1, 2}, {1, 2}};
 
   auto new_points =

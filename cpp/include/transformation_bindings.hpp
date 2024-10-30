@@ -1,6 +1,7 @@
 
 #include "../include/tensor.hpp"
 #include "../include/transformations.hpp"
+#include "../include/utils.hpp"
 #include <pybind11/pybind11.h>
 #include <torch/extension.h>
 
@@ -57,9 +58,10 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
 
   // NOTE(tom): Unfortunately it is necessary to export this with defined types,
   //            as PyBind does not appear to support generics/templates.
-  pybind11::class_<range<float>>(m, "DistributionRange")
+  pybind11::class_<cpp_utils::range<float>>(m, "DistributionRange")
       .def(pybind11::init<float, float>());
-  pybind11::class_<distribution_ranges<float>>(m, "DistributionRanges")
-      .def(pybind11::init<range<float>, range<float>, range<float>,
-                          range<float>>());
+  pybind11::class_<cpp_utils::distribution_ranges<float>>(m,
+                                                          "DistributionRanges")
+      .def(pybind11::init<cpp_utils::range<float>, cpp_utils::range<float>,
+                          cpp_utils::range<float>, cpp_utils::range<float>>());
 }

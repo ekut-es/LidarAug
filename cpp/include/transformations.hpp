@@ -5,15 +5,8 @@
 #include "../include/point_cloud.hpp"
 #include "../include/roiware_utils.h"
 #include "../include/tensor.hpp"
+#include "../include/utils.hpp"
 #include <torch/serialize/tensor.h>
-
-template <typename T> struct range {
-  T min, max;
-};
-
-template <typename T> struct distribution_ranges {
-  range<T> x_range, y_range, z_range, uniform_range;
-};
 
 enum struct noise_type { UNIFORM, SALT_PEPPER, MIN, MAX };
 
@@ -89,8 +82,8 @@ void rotate_rad(at::Tensor points, float angle);
  */
 [[nodiscard]] torch::Tensor
 random_noise(const at::Tensor &points, float sigma,
-             const distribution_ranges<float> &ranges, noise_type type,
-             point_cloud_data::intensity_range max_intensity);
+             const cpp_utils::distribution_ranges<float> &ranges,
+             noise_type type, point_cloud_data::intensity_range max_intensity);
 
 /**
  * Randomly genereates a percentage from a norma distribution, which determines
