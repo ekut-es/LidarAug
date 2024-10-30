@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Optional, overload
 from torch import Tensor
+from LidarAug.transformations import DistributionRanges
 from point_cloud import IntensityRange
 
 
@@ -58,7 +59,7 @@ def fog(point_cloud: Tensor, metric: FogParameter, viewing_dist: float,
 
 
 @overload
-def rain(point_cloud: Tensor, dims: list[float], num_drops: int,
+def rain(point_cloud: Tensor, dims: DistributionRanges, num_drops: int,
          precipitation: float, d: Distribution,
          max_intensity: IntensityRange) -> Tensor:
     """
@@ -92,7 +93,7 @@ def rain(point_cloud: Tensor, noise_filter_path: str, num_drops_sigma: int,
 
 
 @overload
-def snow(point_cloud: Tensor, dims: list[float], num_drops: int,
+def snow(point_cloud: Tensor, dims: DistributionRanges, num_drops: int,
          precipitation: float, scale: int,
          max_intensity: IntensityRange) -> Tensor:
     """

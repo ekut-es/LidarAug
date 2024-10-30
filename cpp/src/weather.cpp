@@ -124,7 +124,7 @@ fog(torch::Tensor point_cloud, const fog_parameter metric,
 }
 
 [[nodiscard]] torch::Tensor
-rain(torch::Tensor point_cloud, std::array<float, 6> dims,
+rain(torch::Tensor point_cloud, cpp_utils::distribution_ranges<float> dims,
      const uint32_t num_drops, const float precipitation, const distribution d,
      const point_cloud_data::intensity_range max_intensity) {
 
@@ -225,7 +225,7 @@ snow(torch::Tensor point_cloud, const std::string_view noise_filter_path,
 }
 
 [[nodiscard]] torch::Tensor
-snow(torch::Tensor point_cloud, std::array<float, 6> dims,
+snow(torch::Tensor point_cloud, cpp_utils::distribution_ranges<float> dims,
      const uint32_t num_drops, const float precipitation, const int32_t scale,
      point_cloud_data::intensity_range max_intensity) {
 
