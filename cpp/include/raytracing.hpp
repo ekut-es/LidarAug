@@ -151,23 +151,23 @@ sort_noise_filter(torch::Tensor nf) {
 
 template <typename DataType, c10::ScalarType TensorType>
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
-// TODO(tom): Make dim a 'distribution_ranges' (found in transformations.hpp,
-// needs to go in utils or something)
-generate_noise_filter(const std::array<float, 6> &dim,
+generate_noise_filter(const cpp_utils::distribution_ranges<float> &dim,
                       const uint32_t drops_per_m3,
                       const float precipitation = 5.0, const int32_t scale = 1,
                       const distribution d = distribution::exponential) {
 
-  const auto total_drops = static_cast<int>(
-      std::abs(dim[0] - dim[1]) * std::abs(dim[2] - dim[3]) *
-      std::abs(dim[4] - dim[5]) * static_cast<float>(drops_per_m3));
+  const auto total_drops =
+      static_cast<int>(std::abs(dim.x_range.min - dim.x_range.max) *
+                       std::abs(dim.y_range.min - dim.y_range.max) *
+                       std::abs(dim.z_range.min - dim.z_range.max) *
+                       static_cast<float>(drops_per_m3));
 
-  const auto x =
-      torch::empty({total_drops}, TensorType).uniform_(dim[0], dim[1]);
-  const auto y =
-      torch::empty({total_drops}, TensorType).uniform_(dim[2], dim[3]);
-  const auto z =
-      torch::empty({total_drops}, TensorType).uniform_(dim[4], dim[5]);
+  const auto x = torch::empty({total_drops}, TensorType)
+                     .uniform_(dim.x_range.min, dim.x_range.max);
+  const auto y = torch::empty({total_drops}, TensorType)
+                     .uniform_(dim.y_range.min, dim.y_range.max);
+  const auto z = torch::empty({total_drops}, TensorType)
+                     .uniform_(dim.y_range.min, dim.z_range.max);
 
   const auto dist =
       torch::sqrt(torch::pow(x, 2) + torch::pow(y, 2) + torch::pow(z, 2));
