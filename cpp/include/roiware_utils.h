@@ -16,8 +16,8 @@ inline void lidar_to_local_coords_cpu(float shift_x, float shift_y,
   local_y = shift_x * sina + shift_y * cosa;
 }
 
-inline int check_pt_in_box3d_cpu(const float *pt, const float *box3d,
-                                 float &local_x, float &local_y) {
+inline bool check_pt_in_box3d_cpu(const float *pt, const float *box3d,
+                                  float &local_x, float &local_y) {
   // param pt: (x, y, z)
   // param box3d: [x, y, z, dx, dy, dz, heading], (x, y, z) is the box center
   const float MARGIN = 1e-2;
@@ -28,8 +28,8 @@ inline int check_pt_in_box3d_cpu(const float *pt, const float *box3d,
   if (fabsf(z - cz) > dz / 2.0)
     return 0;
   lidar_to_local_coords_cpu(x - cx, y - cy, rz, local_x, local_y);
-  float in_flag =
-      (fabs(local_x) < dx / 2.0 + MARGIN) & (fabs(local_y) < dy / 2.0 + MARGIN);
+  auto in_flag = (fabs(local_x) < dx / 2.0 + MARGIN) &&
+                 (fabs(local_y) < dy / 2.0 + MARGIN);
   return in_flag;
 }
 
@@ -54,9 +54,9 @@ inline int points_in_boxes_cpu(at::Tensor boxes_tensor, at::Tensor pts_tensor,
   float local_x = 0, local_y = 0;
   for (int i = 0; i < boxes_num; i++) {
     for (int j = 0; j < pts_num; j++) {
-      int cur_in_flag =
+      auto cur_in_flag =
           check_pt_in_box3d_cpu(pts + j * 3, boxes + i * 7, local_x, local_y);
-      pts_indices[i * pts_num + j] = cur_in_flag;
+      pts_indices[i * pts_num + j] = static_cast<int>(cur_in_flag);
     }
   }
 
