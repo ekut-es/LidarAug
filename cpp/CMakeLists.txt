@@ -4,7 +4,17 @@ project(LidarAug)
 # GoogleTest requires at least C++14, but torch requires C++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=-*,readability-*,clang-analyzer-*,boost-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-pass-by-value,-modernize-use-trailing-return-type,-bugprone-easily-swappable-parameters,-bugprone-suspicious-include,-readability-identifier-length)
+
+# Try to find clang-tidy
+find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+
+if (CLANG_TIDY_EXE)
+    message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
+    set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}" -checks=-*,readability-*,clang-analyzer-*,boost-*,cppcoreguidelines-*,bugprone-*,modernize-*,-modernize-pass-by-value,-modernize-use-trailing-return-type,-bugprone-easily-swappable-parameters,-bugprone-suspicious-include,-readability-identifier-length)
+else ()
+    message(STATUS "clang-tidy not found")
+endif ()
+
 
 add_compile_definitions(_GLIBCXX_USE_CXX11_ABI=0)
 
