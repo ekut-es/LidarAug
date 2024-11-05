@@ -18,7 +18,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "function to apply a yaw rotation to points of a point cloud in C++");
   m.def("scale_random", &scale_random,
         "function to randomly scale point clouds and bounding boxes in C++");
-  m.def("scale_local", &scale_local, "TODO");
+  m.def("scale_local", &scale_local);
   m.def("flip_random", &flip_random,
         "function to randomly flip point clouds and bounding boxes in C++");
   m.def("rotate_random", &rotate_random,
