@@ -1,0 +1,11 @@
+This project uses PyTorch (https://pytorch.org), licensed under the BSD-style license.
+
+This project uses Boost (https://www.boost.org), licensed under the Boost Software License.
+
+This project uses `cnpy` (original at https://github.com/rogersce/cnpy, with modifications at https://github.com/TomSchammo/cnpy),
+licensed under the MIT license:
+Copyright (c) 2011 Carl Rogers, with modifications by Tom Schammo
+
+This project uses Google Test (https://github.com/google/googletest), which is licensed under the BSD 3-Clause License.
+
+This project uses `pytest` (https://pytest.org), licensed under the MIT License.
