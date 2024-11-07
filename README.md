@@ -16,7 +16,6 @@ The following dependencies are necessary to build and test the C++ library for d
 - [google test](https://github.com/google/googletest)
 - [boost](https://www.boost.org/)
 - [OpenMP](https://www.openmp.org/resources/openmp-compilers-tools/)
-- GCC 13 or higher
 
 It is also necessary to set the environment variable `TORCH_PATH` to point to where `libtorch` is installed on your
 system.
@@ -32,6 +31,7 @@ The following dependencies are necessary to install the Python module:
 - [PyTorch/libtorch](https://pytorch.org/get-started/locally/)
 - [boost](https://www.boost.org/)
 - [OpenMP](https://www.openmp.org/resources/openmp-compilers-tools/)
+- [cnpy](https://github.com/TomSchammo/cnpy)
 
 To use the Python module, just run `make install` after cloning and entering the repository.
 
