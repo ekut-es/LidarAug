@@ -144,10 +144,10 @@ ENV CXXFLAGS="-fopenmp"
 ENV CFLAGS="-fopenmp"
 
 # Copy the source/project files
-COPY . /opt/LidarAug
+COPY . /opt/lidar_aug
 
 # Set the working directory
-WORKDIR /opt/LidarAug
+WORKDIR /opt/lidar_aug
 
 RUN if [ -d ./cpp/build_files ]; then make clean; fi
 
@@ -176,4 +176,4 @@ RUN python3.11 --version
 
 COPY --from=module_builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
 
-RUN python3.11 -c 'import torch; import LidarAug'
+RUN python3.11 -c 'import torch; import lidar_aug'

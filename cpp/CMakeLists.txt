@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
-project(LidarAug)
+project(lidar_aug)
 
 # GoogleTest requires at least C++14, but torch requires C++17
 set(CMAKE_CXX_STANDARD 17)

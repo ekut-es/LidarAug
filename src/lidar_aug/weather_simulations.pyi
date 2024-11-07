@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional, overload
 from torch import Tensor
-from LidarAug.transformations import DistributionRanges
+from lidar_aug.transformations import DistributionRanges
 from point_cloud import IntensityRange
 
 

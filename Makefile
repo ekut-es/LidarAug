@@ -43,10 +43,10 @@ sim: release
 install:
 	@echo "CXXFLAGS: $(CXXFLAGS)"
 	@echo "CFLAGS: $(CFLAGS)"
-	rm -rf ./build ./src/LidarAug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.11 -m pip install -v . && rm -rf ./tmp
+	rm -rf ./build ./src/lidar_aug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.11 -m pip install -v . && rm -rf ./tmp
 
 docker:
-	docker build -t lidaraug:0.0.1 .
+	docker build -t lidar_aug:0.0.1 .
 
 clean: ./cpp/build_files
 	rm -rfv ./cpp/build_files

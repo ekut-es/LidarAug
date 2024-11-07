@@ -4,11 +4,11 @@ import pickle
 import pytest
 
 import torch
-from LidarAug import augmentations as aug
-from LidarAug import weather_simulations
-from LidarAug import evaluation
-from LidarAug.transformations import NoiseType
-from LidarAug.point_cloud import IntensityRange
+from lidar_aug import augmentations as aug
+from lidar_aug import weather_simulations
+from lidar_aug import evaluation
+from lidar_aug.transformations import NoiseType
+from lidar_aug.point_cloud import IntensityRange
 
 import re
 

@@ -7,7 +7,7 @@ link_args = ['-lz']
 if platform.system() == 'Darwin':
     link_args.append("-lomp")
 
-MODULE_NAME = "LidarAug"
+MODULE_NAME = "lidar_aug"
 
 CPP_VERSION = "-std=c++17"
 COMPILER_OPTIMIZATION_LEVEL = "-O3"

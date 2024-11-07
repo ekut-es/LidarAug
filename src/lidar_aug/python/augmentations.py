@@ -1,7 +1,7 @@
 from torch import Tensor
-from LidarAug import transformations
-from LidarAug import weather_simulations
-from LidarAug.point_cloud import IntensityRange
+from lidar_aug import transformations
+from lidar_aug import weather_simulations
+from lidar_aug.point_cloud import IntensityRange
 
 
 def _check_points(points: Tensor) -> None:
