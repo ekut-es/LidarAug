@@ -75,3 +75,6 @@ Alternatively the module can be run inside a [Docker](https://www.docker.com/) c
 
 After installing [Docker](https://www.docker.com/) and cloning the repository, all you need to do is run `make docker`,
 which will start building the image and automatically run the tests during the build process.
+
+NOTE: If you're running the docker image on ARM it is important to disable google tests.
+For this run `docker build -t lidaraug:0.0.1 --build-arg RUN_CTEST=false .`
