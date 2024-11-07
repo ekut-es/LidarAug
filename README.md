@@ -25,7 +25,7 @@ After that, just run `make ctest` to compile the library and run google test.
 
 *Note that the tests written for the backend include some controlled RNG tests which might fail on different platforms with different architectures such as the Apple MX chips. The tests were developed for Linux x86 using GCC.*
 
-### Python library
+### Python module
 
 The following dependencies are necessary to install the Python module:
 
@@ -33,20 +33,16 @@ The following dependencies are necessary to install the Python module:
 - [boost](https://www.boost.org/)
 - [OpenMP](https://www.openmp.org/resources/openmp-compilers-tools/)
 
-To use the Python library, just run `make install` after cloning and entering the repository.
-Currently, this branch does not work with Python 3.12, as there is no official release for [open3d](https://github.com/isl-org/Open3D/issues/6433) yet, which is used for visualization.
-Open3d is waiting for the full release of TensorFlow 2.16.0, which adds Python 3.12 support.
-
-On Linux at least TensorFlow 2.16.0-rc0 is available, but open3d is waiting for a full release before adding 3.12 support.
+To use the Python module, just run `make install` after cloning and entering the repository.
 
 To test the python functions/wrappers, install [pytest](https://docs.pytest.org/en/8.0.x/) (`pip install pytest`) and
 run `make testpy`.
 
 The required Python version is 3.11.
 
-#### Modules
+#### Submodules
 
-The library contains 5 modules:
+The `lidar_aug` Python module contains 5 submodules:
 
 1. **transformations:**
 
