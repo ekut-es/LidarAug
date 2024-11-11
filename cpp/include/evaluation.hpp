@@ -46,7 +46,7 @@ template <typename T>
  * @tparam T        is the (numeric) type of the average precision.
  * @param recall    are the recall values used to calculte the mean recall.
  * @param precision are the precision values used to calculate mean precision.
- * @return          the average precision.
+ * @returns          the average precision.
  */
 template <typename T>
 [[nodiscard]] inline T

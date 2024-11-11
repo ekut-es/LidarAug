@@ -352,7 +352,7 @@ template <typename T> struct distribution_ranges {
  *                      ascending or descending order.
  *                      Optional and defaults to false.
  *
- * @return              a `Container` with the indices sorted by value.
+ * @returns             a `Container` with the indices sorted by value.
  */
 template <template <typename...> class Container, typename T>
 [[nodiscard]] Container<std::size_t> argsort(const Container<T> &c,
