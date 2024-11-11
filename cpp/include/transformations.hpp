@@ -73,11 +73,14 @@ void rotate_rad(at::Tensor points, float angle);
 /**
  * Introduces random noise to a point cloud.
  *
- * @param points          is a (n, 4) tensor representing the point cloud
- * @param sigma           TODO
- * @param ranges          TODO
- * @param type            is the type of noise that is to be introduced
- * @param max_intensity   is the maximum intensity value in the dataset
+ * @param points          is a (n, 4) tensor representing the point cloud.
+ * @param sigma           is the standard deviation of the normal distribution
+ *                        that is used to draw the number of points to be added.
+ * @param ranges          are the boundaries in (min and max (x, y, z) values)
+ *                        in which the new points can be created.
+ * @param type            is the type of noise that is to be introduced.
+ * @param max_intensity   is the maximum intensity value in the dataset.
+ *
  * @returns a new tensor with the new points added.
  */
 [[nodiscard]] torch::Tensor

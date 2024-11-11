@@ -44,8 +44,8 @@ template <typename T>
  * TODO(tom): This needs performance testing.
  *
  * @tparam T        is the (numeric) type of the average precision.
- * @param recall    TODO
- * @param precision TODO
+ * @param recall    are the recall values used to calculte the mean recall.
+ * @param precision are the precision values used to calculate mean precision.
  * @return          the average precision.
  */
 template <typename T>
