@@ -48,7 +48,8 @@ change_sparse_representation(const torch::Tensor &input,
       };
 
   auto gather_tensors = [num_tensors, num_features](
-                            const torch::Tensor &in, const tensor_size_t batch_idx_,
+                            const torch::Tensor &in,
+                            const tensor_size_t batch_idx_,
                             const size_t num_batches, tensor_size_t max_count) {
     std::vector<torch::Tensor> batch;
     batch.reserve(num_batches);

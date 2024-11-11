@@ -42,11 +42,12 @@ void scale_random(at::Tensor points, at::Tensor labels, float sigma,
  *
  * @param point_cloud is the point cloud that contains the points that will be
  *                    scaled.
- * @param labels      are the labels belonging to the aforementioned point cloud.
+ * @param labels      are the labels belonging to the aforementioned point
+ *                    cloud.
  * @param sigma       is the the standard deviation of the truncated normal
  *                    distribution.
- * @param max_scale   is the upper limit of the truncated normal distribution. The
- *                    lower limit is the inverse.
+ * @param max_scale   is the upper limit of the truncated normal distribution.
+ *                    The lower limit is the inverse.
  */
 void scale_local(at::Tensor point_cloud, at::Tensor labels, float sigma,
                  float max_scale);
@@ -122,8 +123,7 @@ void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
  */
 [[nodiscard]] std::pair<torch::Tensor, torch::Tensor>
 delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
-                            const at::Tensor &names,
-                            tensor_size_t min_points);
+                            const at::Tensor &names, tensor_size_t min_points);
 
 /**
  * Checks the amount of points for each bounding box.
@@ -144,7 +144,8 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
  */
 [[nodiscard]] inline std::pair<torch::Tensor, torch::Tensor>
 _delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
-                             const at::Tensor &names, const tensor_size_t min_points,
+                             const at::Tensor &names,
+                             const tensor_size_t min_points,
                              const tensor_size_t batch_idx) {
 
   const tensor_size_t num_labels = labels.size(0);
@@ -153,7 +154,8 @@ _delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
   const tensor_size_t label_features = labels.size(1);
   const tensor_size_t name_features = names.size(1);
 
-  const auto point_indices = torch::zeros({num_labels, num_points}, torch::kI32);
+  const auto point_indices =
+      torch::zeros({num_labels, num_points}, torch::kI32);
   points_in_boxes_cpu(
       labels.contiguous(),
       points.index({torch::indexing::Slice(), torch::indexing::Slice(0, 3)})

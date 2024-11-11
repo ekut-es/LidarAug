@@ -43,8 +43,7 @@ calculate_factors(const fog_parameter metric, const float viewing_dist) {
 
 [[nodiscard]] std::optional<std::vector<torch::Tensor>>
 fog(const torch::Tensor &point_cloud, const float prob,
-    const fog_parameter metric,
-    const float sigma, const int mean) {
+    const fog_parameter metric, const float sigma, const int mean) {
 
   auto rng = get_rng();
   std::uniform_real_distribution<float> distrib(0, HUNDRED_PERCENT - 1);
@@ -74,8 +73,7 @@ fog(const torch::Tensor &point_cloud, const float prob,
 
 [[nodiscard]] torch::Tensor
 fog(torch::Tensor point_cloud, const fog_parameter metric,
-    const float viewing_dist,
-    point_cloud_data::intensity_range max_intensity) {
+    const float viewing_dist, point_cloud_data::intensity_range max_intensity) {
 
   const auto [extinction_factor, beta, delete_probability] =
       calculate_factors(metric, viewing_dist);
@@ -247,8 +245,8 @@ void universal_weather(torch::Tensor point_cloud, const float prob,
                        const float sigma, const int mean, const float ext_a,
                        const float ext_b, const float beta_a,
                        const float beta_b, const float del_a, const float del_b,
-                       const int int_a,
-                       const int int_b, const int mean_int, const int int_range) {
+                       const int int_a, const int int_b, const int mean_int,
+                       const int int_range) {
 
   auto rng = get_rng();
   std::uniform_real_distribution<float> distrib(0, HUNDRED_PERCENT - 1);

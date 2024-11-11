@@ -25,6 +25,7 @@ using dimensions = struct {
  * @returns a new tensor with 0 padding.
  */
 [[nodiscard]] torch::Tensor
-change_sparse_representation(const torch::Tensor &input, tensor_size_t batch_idx);
+change_sparse_representation(const torch::Tensor &input,
+                             tensor_size_t batch_idx);
 
 #endif // !TENSOR_HPP
