@@ -1148,17 +1148,16 @@ TEST(RNGTransformation, RandomPointNoiseTest) {
 TEST(RNGTransformation, TransformAlongRayTest) {
   constexpr float sigma = 1;
 
+  torch::manual_seed(123u);
+
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 4.0}, {-1.0, -2.0, -3.0, -4.0}},
                                {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 1.0}}});
 
-  // noise_value = 1.08580697, 1.00174832;
-  // NOTE(tom): The RNG is not reset after each iteration of the inner loop.
-  //            It only resets after each iteration of the outer loop.
   const auto expected_points =
-      torch::tensor({{{2.08580697, 3.08580697, 4.08580697, 4.0},
-                      {0.00174832, -0.99825168, -1.99825168, -4.0}},
-                     {{2.08580697, 2.08580697, 2.08580697, 0.0},
-                      {1.00174832, 1.00174832, 2.00174832, 1.0}}});
+      torch::tensor({{{0.888533, 1.88853, 2.88853, 4.0},
+                      {-0.879637, -1.87964, -2.87964, -4.0}},
+                     {{0.630365, 0.630365, 0.630365, 0.0},
+                      {-0.240418, -0.240418, 0.759582, 1.0}}});
 
   transform_along_ray(points, sigma);
   EXPECT_TRUE(points.allclose(expected_points))
