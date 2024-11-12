@@ -18,6 +18,10 @@
 #include <variant>
 #include <vector>
 
+namespace constants {
+constexpr auto seed = 123u;
+}
+
 #define HUNDRED_PERCENT 100
 
 // constants for `std::get` for `draw_values`
@@ -92,8 +96,7 @@ private:
 [[nodiscard]] inline std::mt19937 get_rng() noexcept {
 
 #ifdef TEST_RNG
-  constexpr auto seed = 123u;
-  std::mt19937 rng(seed);
+  std::mt19937 rng(constants::seed);
 #else
   std::random_device seed;
   std::mt19937 rng(seed());

@@ -1125,7 +1125,7 @@ TEST(RNGTransformation, ThinOutTest) {
 TEST(RNGTransformation, RandomPointNoiseTest) {
   constexpr float sigma = 1;
 
-  torch::manual_seed(123u);
+  torch::manual_seed(constants::seed);
 
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 4.0}, {-1.0, -2.0, -3.0, -4.0}},
                                {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 1.0}}});
@@ -1148,7 +1148,7 @@ TEST(RNGTransformation, RandomPointNoiseTest) {
 TEST(RNGTransformation, TransformAlongRayTest) {
   constexpr float sigma = 1;
 
-  torch::manual_seed(123u);
+  torch::manual_seed(constants::seed);
 
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 4.0}, {-1.0, -2.0, -3.0, -4.0}},
                                {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 1.0}}});
