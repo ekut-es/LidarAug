@@ -1,6 +1,15 @@
 import numpy as np
 from scipy import spatial
 import torch
+from lidar_aug.transformations import DistributionRanges, DistributionRange
+
+
+def create_distribution_ranges(input: list) -> DistributionRanges:
+    x_range = DistributionRange(input[0], input[1])
+    y_range = DistributionRange(input[2], input[3])
+    z_range = DistributionRange(input[4], input[5])
+
+    return DistributionRanges(x_range, y_range, z_range)
 
 
 def get_objects_from_label(label_file):
