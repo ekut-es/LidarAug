@@ -366,22 +366,9 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
 void random_point_noise(torch::Tensor points, const float sigma) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
-  std::normal_distribution<float> dist(0, sigma);
-
-  // TODO(tom): perf measure this
-  for (tensor_size_t i = 0; i < dims.batch_size; i++) {
-    for (tensor_size_t j = 0; j < dims.num_items; j++) {
-      auto *const v = points[i][j].data_ptr<float>();
-      const auto values = std::get<VECTOR>(draw_values<float>(dist, 3));
-
-      // NOLINTBEGIN
-      // Allow pointer arithmetic for accessing tensor contents
-      v[0] += values[0];
-      v[1] += values[1];
-      v[2] += values[2];
-      // NOLINTEND
-    }
-  }
+  auto noise = torch::normal(0, sigma, {dims.batch_size, dims.num_items, 3});
+  points.index({torch::indexing::Slice(), torch::indexing::Slice(),
+                torch::indexing::Slice(0, 3)}) += noise;
 }
 
 void transform_along_ray(torch::Tensor points, const float sigma) {
