@@ -41,8 +41,6 @@ template <typename T>
 /**
  * Calculates the Visual Object Classes (VOC) Challenge 2010 average precision.
  *
- * TODO(tom): This needs performance testing.
- *
  * @tparam T        is the (numeric) type of the average precision.
  * @param recall    are the recall values used to calculte the mean recall.
  * @param precision are the precision values used to calculate mean precision.
