@@ -1125,21 +1125,16 @@ TEST(RNGTransformation, ThinOutTest) {
 TEST(RNGTransformation, RandomPointNoiseTest) {
   constexpr float sigma = 1;
 
+  torch::manual_seed(123u);
+
   auto points = torch::tensor({{{1.0, 2.0, 3.0, 4.0}, {-1.0, -2.0, -3.0, -4.0}},
                                {{1.0, 1.0, 1.0, 0.0}, {0.0, 0.0, 1.0, 1.0}}});
 
-  // noise_vector = {{1.08580697, 1.00174832, -0.566087246},
-  //                {-1.69251204, 0.729757607, -1.04425383}};
-  // NOTE(tom): The RNG is not reset as expected. There is some weird
-  //            1-2-3-4-1-2 pattern that then repeats.
-  //            So the test is adjusted to fit that but not necessarily what is
-  //            expected.
   const auto expected_points =
-      torch::tensor({{{2.08580697, 3.00174832, 2.433912754, 4.0},
-                      {-2.69251204, -0.91419303, -1.99825168, -4.0}},
-
-                     {{2.08580697, 2.00174832, 0.433912754, 0.0},
-                      {-1.69251204, 1.08580697, 2.00174832, 1.0}}});
+      torch::tensor({{{0.888533, 2.12036, 2.63037, 4.0},
+                      {-1.24042, -3.19692, -2.79073, -4.0}},
+                     {{0.027645, 0.244955, 1.3239, 0.0},
+                      {-0.108523, 0.210331, 0.609157, 1.0}}});
 
   random_point_noise(points, sigma);
 
