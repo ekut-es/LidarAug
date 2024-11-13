@@ -44,6 +44,9 @@ constexpr tensor_size_t min_intersect_dist = 1;
                                    const torch::Tensor &beam,
                                    const torch::Tensor &split_index) {
 
+  const auto beam_length = rt::vector_length(beam);
+  const auto beam_normalized = rt::normalize(beam);
+
   const auto index =
       static_cast<int>(((torch::atan2(beam[1], beam[0]).item<float>() * 180 /
                          math_utils::PI_RAD) +
@@ -58,12 +61,11 @@ constexpr tensor_size_t min_intersect_dist = 1;
     const auto sphere = torch::tensor(
         {nf[0].item<float>(), nf[1].item<float>(), nf[2].item<float>()});
 
-    if (const auto beam_dist = rt::vector_length(beam);
-        beam_dist < nf[3].item<float>()) {
+    if (const auto beam_dist = beam_length; beam_dist < nf[3].item<float>()) {
       return -1;
     }
 
-    if (const auto length_beam_sphere = rt::scalar(sphere, rt::normalize(beam));
+    if (const auto length_beam_sphere = rt::scalar(sphere, beam_normalized);
         length_beam_sphere > 0.0) {
 
       if (const auto dist_beam_sphere =
