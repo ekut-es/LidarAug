@@ -61,7 +61,7 @@ constexpr tensor_size_t min_intersect_dist = 1;
     const auto sphere = torch::tensor(
         {nf[0].item<float>(), nf[1].item<float>(), nf[2].item<float>()});
 
-    if (const auto beam_dist = beam_length; beam_dist < nf[3].item<float>()) {
+    if (beam_length < nf[3].item<float>()) {
       return -1;
     }
 
