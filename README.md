@@ -1,6 +1,7 @@
 # LidarAug
 
-TODO
+A toolbox for LiDAR point cloud data, providing point cloud transformations, point cloud augmentation, realistic weather simulation and 2D & 3D AP evaluation, with an easy-to-use Python API.
+This module supports several essential tasks for the development of LiDAR-based perception methods in automated driving.
 
 ## Installation
 
