@@ -571,7 +571,7 @@ TEST(Raytracing, TraceTest) {
 
 TEST(Raytracing, TraceBeamTest) {
 
-  const auto beam = torch::tensor({1, 2, 3});
+  const auto beam = torch::tensor({1, 2, 3}, F32);
 
   auto npz_data = cnpy::npz_load(npz_dir);
 
