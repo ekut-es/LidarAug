@@ -102,9 +102,13 @@ void rt::intersects(torch::Tensor point_cloud,
 
 #pragma omp parallel
   {
-    const auto nthreads = std::thread::hardware_concurrency();
-    std::cout << "Setting OpenMP to use " << nthreads << " threads!\n";
-    omp_set_num_threads(nthreads);
+#pragma omp single
+    {
+
+      const auto nthreads = std::thread::hardware_concurrency();
+      std::cout << "Setting OpenMP to use " << nthreads << " threads!\n";
+      omp_set_num_threads(nthreads);
+    }
 #pragma omp parallel for schedule(dynamic)
     for (tensor_size_t i = 0; i < num_points; i++) {
 
