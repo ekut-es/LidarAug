@@ -62,7 +62,9 @@ constexpr tensor_size_t min_intersect_dist = 1;
     const auto sphere = torch::tensor(
         {nf[0].item<float>(), nf[1].item<float>(), nf[2].item<float>()});
 
-    if (beam_length < nf[3].item<float>()) {
+    const auto nf3_val = nf[3].item<float>();
+
+    if (beam_length < nf3_val) {
       return -1;
     }
 
@@ -70,11 +72,10 @@ constexpr tensor_size_t min_intersect_dist = 1;
         length_beam_sphere > 0.0) {
 
       if (const auto dist_beam_sphere =
-              sqrt(nf[3].item<float>() * nf[3].item<float>() -
-                   length_beam_sphere * length_beam_sphere);
+              sqrt(nf3_val * nf3_val - length_beam_sphere * length_beam_sphere);
           dist_beam_sphere < nf[4].item<float>()) {
 
-        return nf[3].item<float>();
+        return nf3_val;
       }
     }
   }
