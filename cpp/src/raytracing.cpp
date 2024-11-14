@@ -55,13 +55,17 @@ constexpr tensor_size_t min_intersect_dist = 1;
                        nf_split_factor) %
       (360 * nf_split_factor);
 
-  for (auto i = split_index[index].item<tensor_size_t>();
-       i < split_index[index + 1].item<tensor_size_t>(); i++) {
+  const auto si_ptr = split_index.data_ptr<float>();
+
+  // NOLINTBEGIN (*-pro-bounds-pointer-arithmetic)
+  for (auto i = static_cast<tensor_size_t>(si_ptr[index]);
+       i < static_cast<tensor_size_t>(si_ptr[index + 1]); i++) {
     const auto nf = noise_filter[i];
+    const auto nf_ptr = nf.data_ptr<float>();
 
     const auto sphere = nf.index({Slice(0, 3)});
 
-    const auto nf3_val = nf[3].item<float>();
+    const auto nf3_val = nf_ptr[3];
 
     if (beam_length < nf3_val) {
       return -1;
@@ -72,12 +76,13 @@ constexpr tensor_size_t min_intersect_dist = 1;
 
       if (const auto dist_beam_sphere =
               sqrt(nf3_val * nf3_val - length_beam_sphere * length_beam_sphere);
-          dist_beam_sphere < nf[4].item<float>()) {
+          dist_beam_sphere < nf_ptr[4]) {
 
         return nf3_val;
       }
     }
   }
+  // NOLINTEND (*-pro-bounds-pointer-arithmetic)
 
   return -1;
 }
