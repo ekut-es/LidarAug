@@ -59,8 +59,7 @@ constexpr tensor_size_t min_intersect_dist = 1;
        i < split_index[index + 1].item<tensor_size_t>(); i++) {
     const auto nf = noise_filter[i];
 
-    const auto sphere = torch::tensor(
-        {nf[0].item<float>(), nf[1].item<float>(), nf[2].item<float>()});
+    const auto sphere = nf.index({Slice(0, 3)});
 
     const auto nf3_val = nf[3].item<float>();
 
