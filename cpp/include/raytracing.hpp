@@ -167,7 +167,7 @@ generate_noise_filter(const cpp_utils::distribution_ranges<float> &dim,
   const auto y = torch::empty({total_drops}, TensorType)
                      .uniform_(dim.y_range.min, dim.y_range.max);
   const auto z = torch::empty({total_drops}, TensorType)
-                     .uniform_(dim.y_range.min, dim.z_range.max);
+                     .uniform_(dim.z_range.min, dim.z_range.max);
 
   const auto dist =
       torch::sqrt(torch::pow(x, 2) + torch::pow(y, 2) + torch::pow(z, 2));
