@@ -6,7 +6,9 @@
 #include <array>
 #include <cstdint>
 #include <omp.h>
+#include <stdexcept>
 #include <torch/serialize/tensor.h>
+#include <type_traits>
 
 constexpr auto nf_split_factor = 32;
 
@@ -24,6 +26,46 @@ constexpr std::array<std::pair<float, float>, 2> r_table = {{
 }};
 
 namespace rt {
+
+template <typename T> struct vec3 {
+  T x, y, z;
+
+  vec3<T>(torch::Tensor v)
+      : x(v[0].item<T>()), y(v[1].item<T>()), z(v[2].item<T>()){};
+  vec3<T>(T _x, T _y, T _z) : x(_x), y(_y), z(_z){};
+
+  [[nodiscard]] torch::Tensor get_tensor() {
+    return torch::tensor({this->x, this->y, this->z});
+  }
+  vec3<T> &operator/=(const T rhs) {
+    if (std::is_arithmetic_v<T> && rhs == 0)
+      throw std::invalid_argument("Cannot divide by 0!");
+
+    this->x /= rhs;
+    this->y /= rhs;
+    this->z /= rhs;
+    return *this;
+  }
+  friend vec3<T> operator*(const vec3 &lhs, const T rhs) {
+    return vec3<T>(lhs.x * rhs, lhs.y * rhs, lhs.z * rhs);
+  }
+  friend vec3<T> operator/(const vec3 &lhs, const T rhs) {
+    if (std::is_arithmetic_v<T> && rhs == 0)
+      throw std::invalid_argument("Cannot divide by 0!");
+
+    return vec3<T>(lhs.x / rhs, lhs.y / rhs, lhs.z / rhs);
+  }
+  friend vec3<T> operator+(const vec3 &lhs, const vec3 &rhs) {
+    return vec3<T>(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z);
+  }
+
+  friend bool operator==(const vec3 &lhs, const vec3 &rhs) {
+    return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
+  }
+  friend std::ostream &operator<<(std::ostream &outs, const vec3 &v) {
+    return outs << "{" << v.x << ", " << v.y << ", " << v.z << "}";
+  }
+};
 
 [[nodiscard]] torch::Tensor trace(torch::Tensor point_cloud,
                                   const torch::Tensor &noise_filter,
