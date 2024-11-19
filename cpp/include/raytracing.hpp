@@ -80,22 +80,20 @@ void intersects(torch::Tensor point_cloud, const torch::Tensor &noise_filter,
                 torch::Tensor most_intersect_dist, tensor_size_t num_points,
                 simulation_type sim_t, float intensity_factor);
 
-[[nodiscard]] inline torch::Tensor mul(const torch::Tensor &v, const float c) {
-  // NOTE(tom): This is almost the same as `scale_points`
+template <typename T>
+[[nodiscard]] inline auto mul(const vec3<T> &v, const float c) {
   return v * c;
 }
 
-[[nodiscard]] inline torch::Tensor
-add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
-  const auto *const v_ptr = v.data_ptr<float>();
-  const auto *const k_ptr = k.data_ptr<float>();
-  const auto *const l_ptr = l.data_ptr<float>();
+template <typename T>
+[[nodiscard]] inline auto add(const vec3<T> &v, const vec3<T> &k,
+                              const vec3<T> &l) {
+  return v + k + l;
+}
 
-  // NOLINTBEGIN (*-pro-bounds-pointer-arithmetic)
-  return torch::tensor({v_ptr[0] + k_ptr[0] + l_ptr[0],
-                        v_ptr[1] + k_ptr[1] + l_ptr[1],
-                        v_ptr[2] + k_ptr[2] + l_ptr[2]});
-  // NOLINTEND (*-pro-bounds-pointer-arithmetic)
+template <typename T>
+[[nodiscard]] inline float scalar(const vec3<T> &v, const vec3<T> &k) {
+  return v.x * k.x + v.y * k.y + v.z * k.z;
 }
 
 [[nodiscard]] inline float scalar(const torch::Tensor &v,
@@ -108,6 +106,11 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
   // NOLINTEND (*-pro-bounds-pointer-arithmetic)
 }
 
+template <typename T>
+[[nodiscard]] inline float vector_length(const vec3<T> &v) {
+  return sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
 [[nodiscard]] inline float vector_length(const torch::Tensor &v) {
   const auto *const v_ptr = v.data_ptr<float>();
 
@@ -117,37 +120,32 @@ add(const torch::Tensor &v, const torch::Tensor &k, const torch::Tensor &l) {
   // NOLINTEND (*-pro-bounds-pointer-arithmetic)
 }
 
-[[nodiscard]] inline torch::Tensor normalize(const torch::Tensor &v) {
+template <typename T> [[nodiscard]] inline auto normalize(const vec3<T> &v) {
   const auto length = vector_length(v);
-  const auto *const v_ptr = v.data_ptr<float>();
-
-  // TODO(tom): maybe do this in place? or use different datastructure?
-  // NOLINTBEGIN (*-pro-bounds-pointer-arithmetic)
-  return torch::tensor(
-      {v_ptr[0] / length, v_ptr[1] / length, v_ptr[2] / length});
-  // NOLINTEND (*-pro-bounds-pointer-arithmetic)
+  return v / length;
 }
 
-[[nodiscard]] inline torch::Tensor cross(const torch::Tensor &v,
-                                         const torch::Tensor &k) {
-  const auto *const v_ptr = v.data_ptr<float>();
-  const auto *const k_ptr = k.data_ptr<float>();
-
-  // NOLINTBEGIN (*-pro-bounds-pointer-arithmetic)
-  return torch::tensor({(v_ptr[1] * k_ptr[2]) - (v_ptr[2] * k_ptr[1]),
-                        (v_ptr[2] * k_ptr[0]) - (v_ptr[0] * k_ptr[2]),
-                        (v_ptr[0] * k_ptr[1]) - (v_ptr[1] * k_ptr[0])});
-  // NOLINTEND (*-pro-bounds-pointer-arithmetic)
+template <typename T> inline auto normalize_in_place(vec3<T> &v) {
+  const auto length = vector_length(v);
+  return v /= length;
 }
 
-[[nodiscard]] inline torch::Tensor
-rotate(const torch::Tensor &v, const torch::Tensor &k, const float angle) {
-  return add(mul(v, cos(angle)), mul(rt::cross(v, k), sin(angle)),
+template <typename T>
+[[nodiscard]] inline auto cross(const vec3<T> &v, const vec3<T> &k) {
+
+  return vec3<T>(v.y * k.z - v.z * k.y, v.z * k.x - v.x * k.z,
+                 v.x * k.y - v.y * k.x);
+}
+
+template <typename T>
+[[nodiscard]] inline auto rotate(const vec3<T> &v, const vec3<T> &k,
+                                 const float angle) {
+  return add(mul(v, cos(angle)), mul(cross(v, k), sin(angle)),
              mul(k, scalar(k, v) * (1 - cos(angle))));
 }
 
 [[nodiscard]] float trace_beam(const torch::Tensor &noise_filter,
-                               const torch::Tensor &beam,
+                               const vec3<float> &beam,
                                const torch::Tensor &split_index);
 
 [[nodiscard]] torch::Tensor

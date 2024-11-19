@@ -42,17 +42,16 @@ constexpr tensor_size_t min_intersect_dist = 1;
 }
 
 [[nodiscard]] float rt::trace_beam(const torch::Tensor &noise_filter,
-                                   const torch::Tensor &beam,
+                                   const vec3<float> &beam,
                                    const torch::Tensor &split_index) {
 
   const auto beam_length = rt::vector_length(beam);
   const auto beam_normalized = rt::normalize(beam);
 
   const auto index =
-      static_cast<int>(((torch::atan2(beam[1], beam[0]).item<float>() * 180 /
-                         math_utils::PI_RAD) +
-                        360) *
-                       nf_split_factor) %
+      static_cast<int>(
+          ((std::atan2(beam.y, beam.x) * 180 / math_utils::PI_RAD) + 360) *
+          nf_split_factor) %
       (360 * nf_split_factor);
 
   const auto si_ptr = split_index.data_ptr<float>();
@@ -63,7 +62,7 @@ constexpr tensor_size_t min_intersect_dist = 1;
     const auto nf = noise_filter[i];
     const auto nf_ptr = nf.data_ptr<float>();
 
-    const auto sphere = nf.index({Slice(0, 3)});
+    const auto sphere = vec3<float>(nf_ptr[0], nf_ptr[1], nf_ptr[2]);
 
     const auto nf3_val = nf_ptr[3];
 
@@ -117,7 +116,9 @@ void rt::intersects(torch::Tensor point_cloud,
       for (tensor_size_t i = 0; i < num_points; i++) {
 
         const auto original_point = point_cloud.index({i, Slice(0, 3)});
-        auto beam = point_cloud.index({i, Slice(0, 3)});
+        const auto original_point_vec =
+            vec3<float>(point_cloud.index({i, Slice(0, 3)}));
+        auto beam = vec3<float>(point_cloud.index({i, Slice(0, 3)}));
 
         tensor_size_t idx_count = 0;
 
@@ -134,14 +135,15 @@ void rt::intersects(torch::Tensor point_cloud,
         constexpr auto divergence_angle = 2e-4;
         constexpr auto vector_rotation_angle = M_PI / 5;
         constexpr auto num_streaks = 5;
-        const auto z_axis = torch::tensor({0.0, 0.0, 1.0});
+
+        const auto z_axis = vec3<float>(0.0, 0.0, 1.0);
 
         auto rot_vec = rt::normalize(rt::cross(beam, z_axis));
 
         for (auto j = 0; j < num_streaks; j++) {
           for (auto k = 1; k < num_points_per_streak + 1; k++) {
 
-            beam = rt::rotate(original_point, rot_vec,
+            beam = rt::rotate(original_point_vec, rot_vec,
                               (k <= num_points_per_streak / 2)
                                   ? k * divergence_angle
                                   : (k - (num_points_per_streak / 2.0f)) *
@@ -156,7 +158,7 @@ void rt::intersects(torch::Tensor point_cloud,
               intersections.index_put_({i, idx_count}, 1);
               idx_count += 1;
             }
-            rot_vec = rt::rotate(rot_vec, rt::normalize(original_point),
+            rot_vec = rt::rotate(rot_vec, rt::normalize(original_point_vec),
                                  vector_rotation_angle);
           }
         }
