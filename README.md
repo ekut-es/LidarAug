@@ -33,6 +33,7 @@ The following dependencies are necessary to install the Python module:
 - [boost](https://www.boost.org/)
 - [OpenMP](https://www.openmp.org/resources/openmp-compilers-tools/)
 - [cnpy](https://github.com/TomSchammo/cnpy)
+- [pybind11](https://github.com/pybind/pybind11)
 
 To use the Python module, just run `make install` after cloning and entering the repository.
 

@@ -9,3 +9,5 @@ Copyright (c) 2011 Carl Rogers, with modifications by Tom Schammo
 This project uses Google Test (https://github.com/google/googletest), which is licensed under the BSD 3-Clause License.
 
 This project uses `pytest` (https://pytest.org), licensed under the MIT License.
+
+This poroject uses `pybind11` (https://github.com/pybind/pybind11), licensed under a BSD-style license.
