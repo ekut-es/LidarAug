@@ -136,7 +136,7 @@ def scale_local(points: Tensor, labels: Tensor, sigma: float,
 
 def flip_random(points: Tensor, labels: Tensor, prob: int) -> None:
     """
-    Flips all the points in the point cloud with a probability of `prob`% in the direction of the y-axis.
+    Flips all the points in the point cloud with a probability of `prob` % in the direction of the y-axis.
 
     :param points:  is the point cloud containing the points that will be flipped.
     :param labels:  are the corresponding labels.

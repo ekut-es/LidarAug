@@ -115,6 +115,8 @@ def boxes_to_corners_3d(boxes3d):
     """
     Creates a box representation using its corners like this:
 
+    .. code-block:: text
+
         7 -------- 4
        /|         /|
       6 -------- 5 .
