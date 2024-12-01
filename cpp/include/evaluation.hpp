@@ -17,9 +17,9 @@ using result_dict =
  * Calculates the false and true positive numbers of the current frames.
  *
  * @param detection_boxes  are the detection bounding box.
- *                         Their shape is either (N, 8, 3) or (N, 4, 2).
+ *                         The expected tensor shape is (N, 7).
  * @param detection_score  is the confidence score for each predicted bounding
- * box.
+ *                         box.
  * @param ground_truth_box is the ground truth bounding box.
  * @param iou_threshold    is the minimum 'intersection over union' threshold.
  * @param results          is an unordered map containing the false- & true

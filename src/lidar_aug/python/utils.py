@@ -113,6 +113,8 @@ def check_numpy_to_torch(x):
 
 def boxes_to_corners_3d(boxes3d):
     """
+    Creates a box representation using its corners like this:
+
         7 -------- 4
        /|         /|
       6 -------- 5 .
@@ -120,9 +122,9 @@ def boxes_to_corners_3d(boxes3d):
       . 3 -------- 0
       |/         |/
       2 -------- 1
-    Args:
-        boxes3d:  (N, 7) [x, y, z, dx, dy, dz, heading], (x, y, z) is the box center
-    Returns:
+
+    :param boxes3d:  (N, 7) [x, y, z, dx, dy, dz, heading], (x, y, z) is the box center
+    :return: a new tensor representing the box by its eight corners
     """
 
     def rotate_points_along_z(points, angle):
@@ -165,7 +167,7 @@ def in_hull(p, hull):
     """
     :param p: (N, K) test points
     :param hull: (M, K) M corners of a box
-    :return (N) bool
+    :return: (N) bool
     """
     try:
         if not isinstance(hull, spatial.Delaunay):
