@@ -2,6 +2,8 @@ from enum import Enum
 from typing import Tuple, overload
 from torch import Tensor
 
+from lidar_aug.point_cloud import IntensityRange
+
 
 class NoiseType(Enum):
     """
