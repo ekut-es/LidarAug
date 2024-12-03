@@ -113,7 +113,7 @@ def scale_local(points: Tensor, labels: Tensor, sigma: float,
 
 def flip_random(points: Tensor, labels: Tensor, prob: int) -> None:
     """
-    Flips all the points in the point cloud with a probability of `prob`% in the direction of the y-axis.
+    Flips all the points in the point cloud with a probability of `prob` % in the direction of the y-axis.
 
     :param points:  is the point cloud containing the points that will be flipped.
     :param labels:  are the corresponding labels.
@@ -134,19 +134,19 @@ def random_noise(points: Tensor, sigma: float,
     :param sigma:          is the standard deviation of the normal distribution that is used to draw the number of points to be added.
     :param ranges:         are the boundaries in (min and max (x, y, z) values) in which the new points can be created.
     :param noise_type:     is one of a number of 'patterns' that can be used to generate the points.
-    :param max_intensity:  is the maximum intensity value in the dataset
+    :param max_intensity:  is the maximum intensity value in the dataset.
     """
     ...
 
 
 def thin_out(points: Tensor, sigma: float) -> Tensor:
     """
-     Randomly generates a percentage from a norma distribution, which determines
-     how many items should be 'thinned out'. From that percentage random indices
-     are uniformly drawn (in a random order, where each index is unique).
+    Randomly generates a percentage from a norma distribution, which determines
+    how many items should be 'thinned out'. From that percentage random indices
+    are uniformly drawn (in a random order, where each index is unique).
 
-     Finally, a new tensor is created containing the items present at those
-     indices.
+    Finally, a new tensor is created containing the items present at those
+    indices.
 
     :param points: is the point cloud.
     :param sigma:  is the standard deviation of the distribution that generates the percentage.
@@ -190,9 +190,9 @@ def rotate_random(points: Tensor, labels: Tensor, sigma: float) -> None:
 def delete_labels_by_min_points(points: Tensor, labels: Tensor, names: Tensor,
                                 min_points: int) -> Tuple[Tensor, Tensor]:
     """
-     Checks the amount of points for each bounding box.
-     If the number of points is smaller than a given threshold, the box is removed
-     along with its label.
+    Checks the amount of points for each bounding box.
+    If the number of points is smaller than a given threshold, the box is removed
+    along with its label.
 
     :param points:     is the point_cloud.
     :param labels:     are the bounding boxes of objects.
