@@ -34,6 +34,20 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         calculate_false_and_true_positive<evaluation_utils::point2d_t>);
   m.def("calculate_false_and_true_positive_3d",
         calculate_false_and_true_positive<evaluation_utils::point3d_t>);
-  m.def("make_result_dict", &make_result_dict);
-  pybind11::bind_map<result_dict>(m, "result_dict");
+
+  m.def("make_result_dict", &make_result_dict,
+        "Create a `result_dict` aka `std::map<std::uint8_t, "
+        "std::map<std::string, std::vector<float>>>` from a `dict[int, "
+        "dict[str, list[float]]]`.\n"
+        "\n"
+        ":param input: A Python `dict[int, dict[str, list[float]]]`.\n"
+        ":return: A `ResultDict` (C++ `std::map<std::uint8_t, "
+        "std::map<std::string, std::vector<float>>>`).\n");
+
+  pybind11::bind_map<result_dict>(
+      m, "ResultDict",
+      "Wrapping type around a C++ `std::map<std::uint8_t, "
+      "std::map<std::string, std::vector<float>>>`.\n"
+      "\n"
+      "Converts into a Python `dict[int, dict[str, list[float]]]`.\n");
 }
