@@ -9,10 +9,9 @@ def evaluate(results: result_dict,
 class result_dict:
     """
     Wrapping type around a
-    C++ `std::map<std::uint8_t, std::map<std::string, std::vector<float>>>`
+    C++ `std::map<std::uint8_t, std::map<std::string, std::vector<float>>>`.
 
-    converts into a
-    Python `dict[int, dict[str, list[float]]]`
+    Converts into a Python `dict[int, dict[str, list[float]]]`.
     """
 
     def __init__(self):
