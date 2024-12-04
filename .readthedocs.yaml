@@ -9,10 +9,35 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
-    # You can also specify other tool versions:
-    # nodejs: "20"
-    # rust: "1.70"
-    # golang: "1.20"
+
+  apt_packages:
+    - cmake
+    - build-essential
+    - git
+    - libboost-all-dev
+    - libomp-dev
+    - make
+
+  jobs:
+      post_system_dependencies:
+        - |
+          mkdir /tmp/lib
+          git clone https://github.com/TomSchammo/cnpy/ /tmp/cnpy
+          cd /tmp/cnpy
+          git checkout cpp17
+          mkdir build && cd build
+          cmake .. -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" -DCMAKE_INSTALL_PREFIX=/tmp/lib
+          make VERBOSE=1
+          make install
+      post_install:
+        - |
+          export CXXFLAGS="-fopenmp -I/tmp/lib/include"
+          export CFLAGS="-fopenmp -I/tmp/lib/include"
+          export LD_LIBRARY_PATH="/tmp/lib/lib"
+          export LIBRARY_PATH="/tmp/lib/lib"
+          export CMAKE_PREFIX_PATH=/tmp/lib
+          pip install .
+
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
