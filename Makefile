@@ -48,5 +48,8 @@ install:
 docker:
 	docker build -t lidar_aug:0.0.1 .
 
+doc:
+	cd docs && make html
+
 clean: ./cpp/build_files
 	rm -rfv ./cpp/build_files
