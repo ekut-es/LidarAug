@@ -16,8 +16,6 @@ lidar_aug.evaluation.KeysView = MockClass
 lidar_aug.evaluation.ItemsView = MockClass
 lidar_aug.evaluation.ValuesView = MockClass
 
-# sys.path.insert(0, os.path.abspath('/opt/homebrew/lib/python3.11/site-packages/lidar_aug/'))
-
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
