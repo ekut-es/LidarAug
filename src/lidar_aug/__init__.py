@@ -7,6 +7,8 @@ num_threads = multiprocessing.cpu_count(
 if platform.system() == 'Darwin':
     os.environ['OMP_NUM_THREADS'] = '1'
 
+import torch
+
 from . import point_cloud
 from . import transformations
 from . import weather_simulations

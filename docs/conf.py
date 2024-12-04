@@ -3,8 +3,6 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../src/lidar_aug'))
 
-import torch
-
 
 class MockClass():
     pass
