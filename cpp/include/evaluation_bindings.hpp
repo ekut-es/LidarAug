@@ -5,6 +5,8 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
+using arg = pybind11::arg;
+
 PYBIND11_MAKE_OPAQUE(result_dict);
 
 result_dict make_result_dict(const pybind11::dict &dict) {
@@ -29,13 +31,20 @@ result_dict make_result_dict(const pybind11::dict &dict) {
 }
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
-  m.def("evaluate", &evaluate_results);
-  m.def("calculate_false_and_true_positive_2d",
-        calculate_false_and_true_positive<evaluation_utils::point2d_t>);
-  m.def("calculate_false_and_true_positive_3d",
-        calculate_false_and_true_positive<evaluation_utils::point3d_t>);
+  m.def("evaluate", &evaluate_results, arg("results"),
+        arg("global_sort_detections"));
 
-  m.def("make_result_dict", &make_result_dict,
+  m.def("calculate_false_and_true_positive_2d",
+        calculate_false_and_true_positive<evaluation_utils::point2d_t>,
+        arg("detection_boxes"), arg("detection_score"), arg("ground_truth_box"),
+        arg("iou_threshold"), arg("results"));
+
+  m.def("calculate_false_and_true_positive_3d",
+        calculate_false_and_true_positive<evaluation_utils::point3d_t>,
+        arg("detection_boxes"), arg("detection_score"), arg("ground_truth_box"),
+        arg("iou_threshold"), arg("results"));
+
+  m.def("make_result_dict", &make_result_dict, arg("input"),
         "Create a `result_dict` aka `std::map<std::uint8_t, "
         "std::map<std::string, std::vector<float>>>` from a `dict[int, "
         "dict[str, list[float]]]`.\n"

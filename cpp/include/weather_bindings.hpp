@@ -14,6 +14,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       "fog",
       pybind11::overload_cast<const torch::Tensor &, float, fog_parameter,
                               float, int>(&fog),
+      arg("point_cloud"), arg("prob"), arg("metric"), arg("sigma"), arg("mean"),
       "Applies a fog simulation to a point cloud with a chance of `prob` %.\n"
       "The point cloud has the shape (B, P, F).\n"
       "\n"
@@ -72,6 +73,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       "snow",
       pybind11::overload_cast<torch::Tensor, std::string_view, uint32_t, float,
                               int32_t, float>(&snow),
+      arg("point_cloud"), arg("noise_filter_path"), arg("num_drops_sigma"),
+      arg("precipitation_sigma"), arg("scale"), arg("prob"),
       "Applies a snow simulation to a point cloud with a chance of `prob` %.\n"
       "\n"
       ":param point_cloud: is the point cloud that the simulation is applied "
@@ -116,6 +119,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       "rain",
       pybind11::overload_cast<torch::Tensor, std::string_view, uint32_t, float,
                               float>(&rain),
+      arg("point_cloud"), arg("noise_filter_path"), arg("num_drops_sigma"),
+      arg("precipitation_sigma"), arg("prob"),
       "Applies a rain simulation to a point cloud with a chance of `prob` %.\n"
       "\n"
       ":param point_cloud: is the point cloud that the simulation is applied "

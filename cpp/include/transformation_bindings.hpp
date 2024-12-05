@@ -5,8 +5,10 @@
 #include <pybind11/pybind11.h>
 #include <torch/extension.h>
 
+using arg = pybind11::arg;
+
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
-  m.def("translate", &translate,
+  m.def("translate", &translate, arg("points"), arg("translation"),
         "Moves points by a specific amount.\n"
         "\n"
         ":param points:      is the point cloud with the points are to be "
@@ -15,7 +17,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "much they points are moved.\n");
 
   m.def(
-      "translate_random", &translate_random,
+      "translate_random", &translate_random, arg("points"), arg("labels"),
+      arg("sigma"),
       "Generates a random (3D) translation vector using a normal distribution "
       "and applies it to all the points and labels.\n"
       "\n"
@@ -24,7 +27,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       "cloud.\n"
       ":param sigma:  is the standard deviation of the normal distribution.\n");
 
-  m.def("scale_points", &scale_points,
+  m.def("scale_points", &scale_points, arg("points"), arg("scaling_factor"),
         "Scales points by a constant factor.\n"
         "Point cloud is expected to be of shape (b, n, f), where `b` is the "
         "number of batches, `n` is the number of points and `f` is the number "
@@ -35,21 +38,22 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         ":param scaling_factor: is the factor that the (x, y, z) coordinates "
         "are multiplied by.\n");
 
-  m.def("rotate_deg", &rotate_deg,
+  m.def("rotate_deg", &rotate_deg, arg("points"), arg("angle"),
         "Rotates a batch of points along the 'z' axis (yaw).\n"
         "\n"
         ":param points: is the point cloud that the rotation is applied to.\n"
         ":param angle:  is the angle (in degrees) by which the points are to "
         "be rotated.\n");
 
-  m.def("rotate_rad", &rotate_rad,
+  m.def("rotate_rad", &rotate_rad, arg("points"), arg("angle"),
         "Rotates a batch of points along the 'z' axis (yaw).\n"
         "\n"
         ":param points: is the point cloud that the rotation is applied to.\n"
         ":param angle:  is the angle (in radians) by which the points are to "
         "be rotated.\n");
 
-  m.def("scale_random", &scale_random,
+  m.def("scale_random", &scale_random, arg("points"), arg("labels"),
+        arg("sigma"), arg("max_scale"),
         "Scales the points and labels by a random factor.\n"
         "This factor is drawn from a truncated normal distribution.\n"
         "The truncated normal distribution has a mean of 1. The standard "
@@ -66,7 +70,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         ":param max_scale: is the upper limit of the truncated normal "
         "distribution. The lower limit is the inverse.\n");
 
-  m.def("scale_local", &scale_local,
+  m.def("scale_local", &scale_local, arg("points"), arg("labels"), arg("sigma"),
+        arg("max_scale"),
         "Scales the points that are part of a box and the corresponding labels "
         "by a\n"
         "random factor.\n"
@@ -87,7 +92,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "distribution. The lower limit is the inverse.\n");
 
   m.def(
-      "flip_random", &flip_random,
+      "flip_random", &flip_random, arg("points"), arg("labels"), arg("prob"),
       "Flips all the points in the point cloud with a probability of `prob` % "
       "in the direction of the y-axis.\n"
       "\n"
@@ -98,7 +103,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       "flipped.\n");
 
   m.def(
-      "rotate_random", &rotate_random,
+      "rotate_random", &rotate_random, arg("points"), arg("labels"),
+      arg("sigma"),
       "Rotates points and labels.\n"
       "The number of degrees that they are rotated by is determined by a "
       "randomly generated value from a normal distribution.\n"
@@ -109,7 +115,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       ":param sigma:  is the standard deviation of the normal distribution.\n");
 
   m.def(
-      "thin_out", &thin_out,
+      "thin_out", &thin_out, arg("points"), arg("sigma"),
       "Randomly generates a percentage from a norma distribution, which "
       "determines\n"
       "how many items should be 'thinned out'. From that percentage random "
@@ -124,7 +130,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       "generates the percentage.\n"
       ":return: a new tensor containing the new set of points.\n");
 
-  m.def("random_noise", &random_noise,
+  m.def("random_noise", &random_noise, arg("points"), arg("sigma"),
+        arg("ranges"), arg("noise_type"), arg("max_intensity"),
         "Adds random amount of points (drawn using a normal distribution) at "
         "random coordinates\n"
         "(within predetermined ranges) with a random intensity according to "
@@ -142,6 +149,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "dataset.\n");
 
   m.def("delete_labels_by_min_points", &delete_labels_by_min_points,
+        arg("points"), arg("labels"), arg("names"), arg("min_points"),
         "Checks the amount of points for each bounding box.\n"
         "If the number of points is smaller than a given threshold, the box is "
         "removed\n"
@@ -156,7 +164,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         pybind11::return_value_policy::reference_internal);
 
   m.def(
-      "random_point_noise", &random_point_noise,
+      "random_point_noise", &random_point_noise, arg("points"), arg("sigma"),
       "Moves each point in the point cloud randomly.\n"
       "How much each coordinate is changed is decided by values drawn from a "
       "normal distribution.\n"
@@ -165,7 +173,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       ":param sigma:  is the standard deviation of the normal distribution.\n");
 
   m.def(
-      "transform_along_ray", &transform_along_ray,
+      "transform_along_ray", &transform_along_ray, arg("points"), arg("sigma"),
       "Moves each point in the point cloud randomly along a ray.\n"
       "How much it is moved is decided by a value drawn from a normal "
       "distribution.\n"
@@ -173,7 +181,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       ":param points: is the point cloud from which each point is moved.\n"
       ":param sigma:  is the standard deviation of the normal distribution.\n");
 
-  m.def("intensity_noise", &intensity_noise,
+  m.def("intensity_noise", &intensity_noise, arg("points"), arg("sigma"),
+        arg("max_intensity"),
         "Shifts the intensity value of every point in the point cloud by a "
         "random amount drawn from a normal distribution.\n"
         "\n"
@@ -183,7 +192,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         ":param max_intensity: is the maximum intensity value (either 1 or "
         "255, depending on the dataset).\n");
 
-  m.def("intensity_shift", &intensity_shift,
+  m.def("intensity_shift", &intensity_shift, arg("points"), arg("sigma"),
+        arg("max_intensity"),
         "Shifts the intensity value of every point in the point cloud by a "
         "single value drawn from a normal distribution.\n"
         "\n"
@@ -194,6 +204,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "255, depending on the dataset).\n");
 
   m.def("local_to_world_transform", &local_to_world_transform,
+        arg("lidar_pose"),
         "Creates a transformation matrix from the local system into the global "
         "coordinate frame.\n"
         "\n"
@@ -202,7 +213,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         ":return: the homogeneous transformation matrix into the global "
         "coordinate frame.\n");
 
-  m.def("local_to_local_transform", &local_to_local_transform,
+  m.def("local_to_local_transform", &local_to_local_transform, arg("from_pose"),
+        arg("to_pose"),
         "Creates a transformation matrix from the local system into a 'target' "
         "coordinate frame.\n"
         "\n"
@@ -214,7 +226,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         "coordinate frame.\n");
 
   m.def(
-      "apply_transformation", &apply_transformation,
+      "apply_transformation", &apply_transformation, arg("points"),
+      arg("transformation_matrix"),
       "Applies a transformation matrix to an entire point cloud with the shape "
       "(B,\n"
       "N, F), where B is the number of batches and N is the number of points.\n"
@@ -225,6 +238,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       ":param transformation_matrix: is the transformation matrix.\n");
 
   m.def("change_sparse_representation", &change_sparse_representation,
+        arg("input"), arg("batch_idx"),
         "Changes the representation of a sparse tensor from a flat 2D tensor "
         "(N, F),\n"
         "where F is the number of features to a 3D tensor (B, n, f), where B "
@@ -255,11 +269,14 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   // NOTE(tom): Unfortunately it is necessary to export this with defined types,
   //            as PyBind does not appear to support generics/templates.
   pybind11::class_<cpp_utils::range<float>>(m, "DistributionRange")
-      .def(pybind11::init<float, float>());
+      .def(pybind11::init<float, float>(), arg("min"), arg("max"));
+
   pybind11::class_<cpp_utils::distribution_ranges<float>>(m,
                                                           "DistributionRanges")
       .def(pybind11::init<cpp_utils::range<float>, cpp_utils::range<float>,
-                          cpp_utils::range<float>, cpp_utils::range<float>>())
+                          cpp_utils::range<float>, cpp_utils::range<float>>(),
+           arg("x_range"), arg("y_range"), arg("z_range"), arg("uniform_range"))
       .def(pybind11::init<cpp_utils::range<float>, cpp_utils::range<float>,
-                          cpp_utils::range<float>>());
+                          cpp_utils::range<float>>(),
+           arg("x_range"), arg("y_range"), arg("z_range"));
 }
