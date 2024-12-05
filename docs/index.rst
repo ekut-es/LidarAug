@@ -16,4 +16,4 @@ perception methods in automated driving.
    :maxdepth: 2
    :caption: Contents:
 
-   sources/modules
+   sources/api/modules
