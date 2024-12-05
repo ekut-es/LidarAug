@@ -131,11 +131,11 @@ RUN make VERBOSE=1
 RUN make install
 
 # Install setuptools
-RUN python3.11 -m pip install setuptools==69.5.1
+RUN python3.11 -m pip install setuptools==70.0.0
 
 # Install dependencies
 RUN python3.11 -m pip install pytest pybind11 numpy==1.24.0 scipy
-RUN python3.11 -m pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
+RUN python3.11 -m pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cpu
 
 
 # Set CXX flags
