@@ -6,11 +6,12 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         python-version: [ "3.11" ]
+        os: [ubuntu-latest, ubuntu-20.04]
 
     steps:
       - uses: actions/checkout@v4
