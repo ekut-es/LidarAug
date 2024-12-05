@@ -48,6 +48,9 @@ install:
 docker:
 	docker build -t lidar_aug:0.0.1 .
 
+docker-arm:
+	docker build -t lidar_aug:0.0.1 --build-arg RUN_CTEST=false .
+
 doc:
 	cd docs && make html
 
