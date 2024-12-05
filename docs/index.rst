@@ -6,9 +6,11 @@
 LidarAug documentation
 ======================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+A toolbox for LiDAR point cloud data, providing point cloud
+transformations, point cloud augmentation, realistic weather simulation
+and 2D & 3D AP evaluation, with an easy-to-use Python API. This module
+supports several essential tasks for the development of LiDAR-based
+perception methods in automated driving.
 
 .. toctree::
    :maxdepth: 2
