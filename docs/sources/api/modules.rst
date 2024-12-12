@@ -1,5 +1,5 @@
-lidar_aug
-=========
+LidarAug
+========
 
 .. toctree::
    :maxdepth: 4
