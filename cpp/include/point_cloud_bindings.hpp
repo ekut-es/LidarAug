@@ -4,16 +4,6 @@
 using arg = pybind11::arg;
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
-  m.def("set_max_intensity", &point_cloud_data::max_intensity::set, arg("val"),
-        "Set the global state tracker for the maximum intensity.\n\n\
-\
-:param val: is the new maximum intensity (member of `IntensityRange`).");
-
-  m.def(
-      "get_max_intensity", &point_cloud_data::max_intensity::get,
-      "Get the current value of the maximum intensity global state tracker.\n\n\
-\
-:return: an int representing the maximum intensity value.");
 
   pybind11::enum_<point_cloud_data::intensity_range>(
       m, "IntensityRange",
@@ -24,4 +14,15 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       .value("MAX_INTENSITY_255",
              point_cloud_data::intensity_range::MAX_INTENSITY_255)
       .export_values();
+
+  m.def("set_max_intensity", &point_cloud_data::max_intensity::set, arg("val"),
+        "Set the global state tracker for the maximum intensity.\n\n\
+\
+:param val: is the new maximum intensity (member of `IntensityRange`).");
+
+  m.def(
+      "get_max_intensity", &point_cloud_data::max_intensity::get,
+      "Get the current value of the maximum intensity global state tracker.\n\n\
+\
+:return: an int representing the maximum intensity value.");
 }
