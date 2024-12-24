@@ -8,6 +8,34 @@
 using arg = pybind11::arg;
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+
+  pybind11::enum_<noise_type>(m, "NoiseType",
+                              "Indicates how the noise is added:")
+      .value("UNIFORM", noise_type::UNIFORM,
+             "The noise values are drawn from a uniform distribution.")
+      .value("SALT_PEPPER", noise_type::SALT_PEPPER,
+             "Half of the added values have the maximum intensity, the other "
+             "half the minimum intensity.")
+      .value("MIN", noise_type::MIN,
+             "The noise values are equal to the minimum intensity.")
+      .value("MAX", noise_type::MAX,
+             "The noise values are equal to the maximum intensity.")
+      .export_values();
+
+  // NOTE(tom): Unfortunately it is necessary to export this with defined types,
+  //            as PyBind does not appear to support generics/templates.
+  pybind11::class_<cpp_utils::range<float>>(m, "DistributionRange")
+      .def(pybind11::init<float, float>(), arg("min"), arg("max"));
+
+  pybind11::class_<cpp_utils::distribution_ranges<float>>(m,
+                                                          "DistributionRanges")
+      .def(pybind11::init<cpp_utils::range<float>, cpp_utils::range<float>,
+                          cpp_utils::range<float>, cpp_utils::range<float>>(),
+           arg("x_range"), arg("y_range"), arg("z_range"), arg("uniform_range"))
+      .def(pybind11::init<cpp_utils::range<float>, cpp_utils::range<float>,
+                          cpp_utils::range<float>>(),
+           arg("x_range"), arg("y_range"), arg("z_range"));
+
   m.def("translate", &translate, arg("points"), arg("translation"),
         "Moves batches of points by a specific amount.\n"
         "The `points` are expected to have the shape `(B, N, F)`, where `B` is "
@@ -314,31 +342,4 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
         ":param batch_idx: is the index of the batch index.\n"
         "\n"
         ":return: a new tensor with 0s for padding.\n");
-
-  pybind11::enum_<noise_type>(m, "NoiseType",
-                              "Indicates how the noise is added:")
-      .value("UNIFORM", noise_type::UNIFORM,
-             "The noise values are drawn from a uniform distribution.")
-      .value("SALT_PEPPER", noise_type::SALT_PEPPER,
-             "Half of the added values have the maximum intensity, the other "
-             "half the minimum intensity.")
-      .value("MIN", noise_type::MIN,
-             "The noise values are equal to the minimum intensity.")
-      .value("MAX", noise_type::MAX,
-             "The noise values are equal to the maximum intensity.")
-      .export_values();
-
-  // NOTE(tom): Unfortunately it is necessary to export this with defined types,
-  //            as PyBind does not appear to support generics/templates.
-  pybind11::class_<cpp_utils::range<float>>(m, "DistributionRange")
-      .def(pybind11::init<float, float>(), arg("min"), arg("max"));
-
-  pybind11::class_<cpp_utils::distribution_ranges<float>>(m,
-                                                          "DistributionRanges")
-      .def(pybind11::init<cpp_utils::range<float>, cpp_utils::range<float>,
-                          cpp_utils::range<float>, cpp_utils::range<float>>(),
-           arg("x_range"), arg("y_range"), arg("z_range"), arg("uniform_range"))
-      .def(pybind11::init<cpp_utils::range<float>, cpp_utils::range<float>,
-                          cpp_utils::range<float>>(),
-           arg("x_range"), arg("y_range"), arg("z_range"));
 }
