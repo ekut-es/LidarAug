@@ -5,7 +5,6 @@
 #include "../include/point_cloud.hpp"
 #include "../include/raytracing.hpp"
 #include "../include/stats.hpp"
-#include <array>
 #include <cstdint>
 #include <optional>
 #include <string_view>

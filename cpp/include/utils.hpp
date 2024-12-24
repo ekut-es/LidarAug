@@ -13,11 +13,9 @@
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
-#include <cmath>
 #include <numeric>
 #include <stdexcept>
 #include <torch/serialize/tensor.h>
-#include <type_traits>
 #include <vector>
 
 namespace rt {
