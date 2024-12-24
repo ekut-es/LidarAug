@@ -10,6 +10,25 @@
 using arg = pybind11::arg;
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+
+  pybind11::enum_<fog_parameter>(
+      m, "FogParameter", "Different parameters for the fog model/simulation.")
+      .value("DIST", fog_parameter::DIST,
+             "Optimization of the distance distribution between the points.")
+      .value("CHAMFER", fog_parameter::CHAMFER,
+             "Optimization of the chamfer distance.")
+      .export_values();
+
+  pybind11::enum_<distribution>(
+      m, "Distribution",
+      "Different options to determine which statistical distribution should"
+      "be used to sample the particles for some weather simulations.")
+      .value("EXPONENTIAL", distribution::exponential,
+             "Exponential distribution.")
+      .value("LOG_NORMAL", distribution::log_normal, "Log normal distribution.")
+      .value("GM", distribution::gm, "GM distribution.")
+      .export_values();
+
   m.def(
       "fog",
       pybind11::overload_cast<const torch::Tensor &, float, fog_parameter,
@@ -134,22 +153,4 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       ":param prob: is the probability that the simulation will be executed.\n"
       ":return: a new point cloud with the old points as a base but after "
       "applying the simulation.\n");
-
-  pybind11::enum_<fog_parameter>(
-      m, "FogParameter", "Different parameters for the fog model/simulation.")
-      .value("DIST", fog_parameter::DIST,
-             "Optimization of the distance distribution between the points.")
-      .value("CHAMFER", fog_parameter::CHAMFER,
-             "Optimization of the chamfer distance.")
-      .export_values();
-
-  pybind11::enum_<distribution>(
-      m, "Distribution",
-      "Different options to determine which statistical distribution should"
-      "be used to sample the particles for some weather simulations.")
-      .value("EXPONENTIAL", distribution::exponential,
-             "Exponential distribution.")
-      .value("LOG_NORMAL", distribution::log_normal, "Log normal distribution.")
-      .value("GM", distribution::gm, "GM distribution.")
-      .export_values();
 }
