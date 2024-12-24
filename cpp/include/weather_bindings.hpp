@@ -16,8 +16,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       .value("DIST", fog_parameter::DIST,
              "Optimization of the distance distribution between the points.")
       .value("CHAMFER", fog_parameter::CHAMFER,
-             "Optimization of the chamfer distance.")
-      .export_values();
+             "Optimization of the chamfer distance.");
 
   pybind11::enum_<distribution>(
       m, "Distribution",
