@@ -34,7 +34,9 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
                               float, int>(&fog),
       arg("point_cloud"), arg("prob"), arg("metric"), arg("sigma"), arg("mean"),
       "Applies a fog simulation to a point cloud with a chance of `prob` %.\n"
-      "The point cloud has the shape (B, P, F).\n"
+      "The point cloud has the shape `(B, N, F)` where `B` is the number of "
+      "batches, `N` is the number of points and `F` is the number of "
+      "features, which is 4; `(x, y, z, i)`.\n"
       "\n"
       ":param point_cloud: is the point cloud that the simulation is applied "
       "to.\n"
@@ -47,45 +49,49 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       ":return: A list of B tensors with P points that the simulation has been "
       "applied to or None.");
 
-  m.def("fog",
-        pybind11::overload_cast<torch::Tensor, fog_parameter, float,
-                                point_cloud_data::intensity_range>(&fog),
-        arg("point_cloud"), arg("metric"), arg("viewing_dist"),
-        arg("max_intensity") =
-            point_cloud_data::intensity_range::MAX_INTENSITY_1,
-        "Applies a fog simulation to a point cloud.\n"
-        "\n"
-        ":param point_cloud: is the point cloud that the simulation is applied "
-        "to.\n"
-        ":param metric: is a parameter used to control the simulation.\n"
-        ":param viewing_dist:  is the viewing distance in the fog.\n"
-        ":param max_intensity:  is the maximum intensity value of a point.\n"
-        ":return: a new point cloud with the old points as a base but after "
-        "applying the simulation.\n");
+  m.def(
+      "fog",
+      pybind11::overload_cast<torch::Tensor, fog_parameter, float,
+                              point_cloud_data::intensity_range>(&fog),
+      arg("point_cloud"), arg("metric"), arg("viewing_dist"),
+      arg("max_intensity") = point_cloud_data::intensity_range::MAX_INTENSITY_1,
+      "Applies a fog simulation to a point cloud.\n"
+      "\n"
+      ":param point_cloud: is the point cloud that the simulation is applied "
+      "to.\n"
+      "The point cloud has the shape `(N, F)` where `N` is the number of "
+      "points and `F` is the number of features, which is 4; `(x, y, z, i)`.\n"
+      ":param metric: is a parameter used to control the simulation.\n"
+      ":param viewing_dist:  is the viewing distance in the fog.\n"
+      ":param max_intensity:  is the maximum intensity value of a point.\n"
+      ":return: a new point cloud with the old points as a base but after "
+      "applying the simulation.\n");
 
-  m.def("snow",
-        pybind11::overload_cast<
-            torch::Tensor, cpp_utils::distribution_ranges<float>, uint32_t,
-            float, int32_t, point_cloud_data::intensity_range>(&snow),
-        arg("point_cloud"), arg("dims"), arg("num_drops"), arg("precipitation"),
-        arg("scale"),
-        arg("max_intensity") =
-            point_cloud_data::intensity_range::MAX_INTENSITY_1,
-        "Applies a snow simulation to a point cloud.\n"
-        "\n"
-        ":param point_cloud: is the point cloud that the simulation is applied "
-        "to.\n"
-        ":param dims: set the upper and lower bounds of the uniform "
-        "distribution used to draw new points for the noise filter.\n"
-        ":param num_drops: is the number of snowflakes per m^3.\n"
-        ":param precipitation: is the precipitation rate and determines the "
-        "snowflake size distribution.\n"
-        ":param scale: is used to scale the size of the sampled particles when "
-        "generating the noise filter.\n"
-        ":param max_intensity: is the maximum intensity of the points in the "
-        "point cloud.\n"
-        ":return: a new point cloud with the old points as a base but after "
-        "applying the simulation.\n");
+  m.def(
+      "snow",
+      pybind11::overload_cast<
+          torch::Tensor, cpp_utils::distribution_ranges<float>, uint32_t, float,
+          int32_t, point_cloud_data::intensity_range>(&snow),
+      arg("point_cloud"), arg("dims"), arg("num_drops"), arg("precipitation"),
+      arg("scale"),
+      arg("max_intensity") = point_cloud_data::intensity_range::MAX_INTENSITY_1,
+      "Applies a snow simulation to a point cloud.\n"
+      "The point cloud has the shape `(N, F)` where `N` is the number of "
+      "points and `F` is the number of features, which is 4; `(x, y, z, i)`.\n"
+      "\n"
+      ":param point_cloud: is the point cloud that the simulation is applied "
+      "to.\n"
+      ":param dims: set the upper and lower bounds of the uniform "
+      "distribution used to draw new points for the noise filter.\n"
+      ":param num_drops: is the number of snowflakes per m^3.\n"
+      ":param precipitation: is the precipitation rate and determines the "
+      "snowflake size distribution.\n"
+      ":param scale: is used to scale the size of the sampled particles when "
+      "generating the noise filter.\n"
+      ":param max_intensity: is the maximum intensity of the points in the "
+      "point cloud.\n"
+      ":return: a new point cloud with the old points as a base but after "
+      "applying the simulation.\n");
 
   m.def(
       "snow",
@@ -94,6 +100,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       arg("point_cloud"), arg("noise_filter_path"), arg("num_drops_sigma"),
       arg("precipitation_sigma"), arg("scale"), arg("prob"),
       "Applies a snow simulation to a point cloud with a chance of `prob` %.\n"
+      "The point cloud has the shape `(N, F)` where `N` is the number of "
+      "points and `F` is the number of features, which is 4; `(x, y, z, i)`.\n"
       "\n"
       ":param point_cloud: is the point cloud that the simulation is applied "
       "to.\n"
@@ -109,29 +117,31 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       ":return: a new point cloud with the old points as a base but after "
       "applying the simulation.\n");
 
-  m.def("rain",
-        pybind11::overload_cast<
-            torch::Tensor, cpp_utils::distribution_ranges<float>, uint32_t,
-            float, distribution, point_cloud_data::intensity_range>(&rain),
-        arg("point_cloud"), arg("dims"), arg("num_drops"), arg("precipitation"),
-        arg("d"),
-        arg("max_intensity") =
-            point_cloud_data::intensity_range::MAX_INTENSITY_1,
-        "Applies a rain simulation to a point cloud.\n"
-        "\n"
-        ":param point_cloud: is the point cloud that the simulation is applied "
-        "to.\n"
-        ":param dims: set the upper and lower bounds of the uniform "
-        "distribution used to draw new points for the noise filter.\n"
-        ":param num_drops: is the number of rain drops per m^3.\n"
-        ":param precipitation: is the precipitation rate and determines the "
-        "raindrop size distribution.\n"
-        ":param d: is the distribution function used when sampling the "
-        "particles.\n"
-        ":param max_intensity: is the maximum intensity of the points in the "
-        "point cloud.\n"
-        ":return: a new point cloud with the old points as a base but after "
-        "applying the simulation.\n");
+  m.def(
+      "rain",
+      pybind11::overload_cast<
+          torch::Tensor, cpp_utils::distribution_ranges<float>, uint32_t, float,
+          distribution, point_cloud_data::intensity_range>(&rain),
+      arg("point_cloud"), arg("dims"), arg("num_drops"), arg("precipitation"),
+      arg("d"),
+      arg("max_intensity") = point_cloud_data::intensity_range::MAX_INTENSITY_1,
+      "Applies a rain simulation to a point cloud.\n"
+      "The point cloud has the shape `(N, F)` where `N` is the number of "
+      "points and `F` is the number of features, which is 4; `(x, y, z, i)`.\n"
+      "\n"
+      ":param point_cloud: is the point cloud that the simulation is applied "
+      "to.\n"
+      ":param dims: set the upper and lower bounds of the uniform "
+      "distribution used to draw new points for the noise filter.\n"
+      ":param num_drops: is the number of rain drops per m^3.\n"
+      ":param precipitation: is the precipitation rate and determines the "
+      "raindrop size distribution.\n"
+      ":param d: is the distribution function used when sampling the "
+      "particles.\n"
+      ":param max_intensity: is the maximum intensity of the points in the "
+      "point cloud.\n"
+      ":return: a new point cloud with the old points as a base but after "
+      "applying the simulation.\n");
 
   m.def(
       "rain",
@@ -140,6 +150,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       arg("point_cloud"), arg("noise_filter_path"), arg("num_drops_sigma"),
       arg("precipitation_sigma"), arg("prob"),
       "Applies a rain simulation to a point cloud with a chance of `prob` %.\n"
+      "The point cloud has the shape `(N, F)` where `N` is the number of "
+      "points and `F` is the number of features, which is 4; `(x, y, z, i)`.\n"
       "\n"
       ":param point_cloud: is the point cloud that the simulation is applied "
       "to.\n"
