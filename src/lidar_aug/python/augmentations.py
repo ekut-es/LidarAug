@@ -1,6 +1,5 @@
 from torch import Tensor
 from lidar_aug import transformations
-from lidar_aug import weather_simulations
 from lidar_aug.point_cloud import IntensityRange
 
 
@@ -87,6 +86,7 @@ def scale(points: Tensor, scaling_factor: float) -> None:
     :param points:         is the point cloud whose points are scaled. Expected shape is `(B, N, 4)`.
     :param scaling_factor: is the factor that the (x, y, z) coordinates are multiplied by.
     """
+
     _check_points(points)
 
     transformations.scale_points(points, scaling_factor)
