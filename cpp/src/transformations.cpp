@@ -308,7 +308,8 @@ void rotate_random(at::Tensor points, at::Tensor labels, const float sigma) {
   // NOTE(tom): coop boxes not implemented
 }
 
-[[nodiscard]] torch::Tensor thin_out(at::Tensor points, const float sigma) {
+[[nodiscard]] torch::Tensor thin_out(const at::Tensor &points,
+                                     const float sigma) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   const auto percent = get_truncated_normal_value(0, sigma, 0, 1);
