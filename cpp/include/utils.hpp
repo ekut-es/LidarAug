@@ -23,7 +23,7 @@ namespace rt {
 template <typename T> struct vec3 {
   T x, y, z;
 
-  vec3<T>(const torch::Tensor &v)
+  explicit vec3<T>(const torch::Tensor &v)
       : x(v[0].item<T>()), y(v[1].item<T>()), z(v[2].item<T>()){};
   vec3<T>(T _x, T _y, T _z) : x(_x), y(_y), z(_z){};
 
