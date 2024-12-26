@@ -12,8 +12,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       .value("MAX_INTENSITY_1",
              point_cloud_data::intensity_range::MAX_INTENSITY_1)
       .value("MAX_INTENSITY_255",
-             point_cloud_data::intensity_range::MAX_INTENSITY_255)
-      .export_values();
+             point_cloud_data::intensity_range::MAX_INTENSITY_255);
 
   m.def("set_max_intensity", &point_cloud_data::max_intensity::set, arg("val"),
         "Set the global state tracker for the maximum intensity.\n\n\

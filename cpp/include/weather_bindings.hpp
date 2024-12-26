@@ -25,8 +25,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       .value("EXPONENTIAL", distribution::exponential,
              "Exponential distribution.")
       .value("LOG_NORMAL", distribution::log_normal, "Log normal distribution.")
-      .value("GM", distribution::gm, "GM distribution.")
-      .export_values();
+      .value("GM", distribution::gm, "GM distribution.");
 
   m.def(
       "fog",

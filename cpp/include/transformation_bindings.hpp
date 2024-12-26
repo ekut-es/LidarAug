@@ -19,8 +19,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       .value("MIN", noise_type::MIN,
              "The noise values are equal to the minimum intensity.")
       .value("MAX", noise_type::MAX,
-             "The noise values are equal to the maximum intensity.")
-      .export_values();
+             "The noise values are equal to the maximum intensity.");
 
   // NOTE(tom): Unfortunately it is necessary to export this with defined types,
   //            as PyBind does not appear to support generics/templates.
