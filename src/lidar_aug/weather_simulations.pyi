@@ -1,37 +1,133 @@
 from enum import Enum
-from typing import Optional, overload
-from torch import Tensor
-from lidar_aug.transformations import DistributionRanges
-from point_cloud import IntensityRange
+import lidar_aug.point_cloud
+import lidar_aug.transformations
+import torch
+import typing
+
+__all__ = ['Distribution', 'FogParameter', 'fog', 'rain', 'snow']
+
+
+class Distribution(Enum):
+    """
+    Different options to determine which statistical distribution shouldbe used to sample the particles for some weather simulations.
+
+    Members:
+
+      EXPONENTIAL : Exponential distribution.
+
+      LOG_NORMAL : Log normal distribution.
+
+      GM : GM distribution.
+    """
+    EXPONENTIAL: typing.ClassVar[
+        Distribution]  # value = <Distribution.EXPONENTIAL: 0>
+    GM: typing.ClassVar[Distribution]  # value = <Distribution.GM: 2>
+    LOG_NORMAL: typing.ClassVar[
+        Distribution]  # value = <Distribution.LOG_NORMAL: 1>
+    __members__: typing.ClassVar[dict[
+        str,
+        Distribution]]  # value = {'EXPONENTIAL': <Distribution.EXPONENTIAL: 0>, 'LOG_NORMAL': <Distribution.LOG_NORMAL: 1>, 'GM': <Distribution.GM: 2>}
+
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+
+    def __getstate__(self) -> int:
+        ...
+
+    def __hash__(self) -> int:
+        ...
+
+    def __index__(self) -> int:
+        ...
+
+    def __init__(self, value: int) -> None:
+        ...
+
+    def __int__(self) -> int:
+        ...
+
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+
+    def __repr__(self) -> str:
+        ...
+
+    def __setstate__(self, state: int) -> None:
+        ...
+
+    def __str__(self) -> str:
+        ...
+
+    @property
+    def name(self) -> str:
+        ...
+
+    @property
+    def value(self) -> int:
+        ...
 
 
 class FogParameter(Enum):
     """
     Different parameters for the fog model/simulation.
 
-    DIST: Optimization of the distance distribution between the points.
-    CHAMFER: Optimization of the chamfer distance.
+    Members:
+
+      DIST : Optimization of the distance distribution between the points.
+
+      CHAMFER : Optimization of the chamfer distance.
     """
-    DIST: int
-    CHAMFER: int
+    CHAMFER: typing.ClassVar[FogParameter]  # value = <FogParameter.CHAMFER: 1>
+    DIST: typing.ClassVar[FogParameter]  # value = <FogParameter.DIST: 0>
+    __members__: typing.ClassVar[dict[
+        str,
+        FogParameter]]  # value = {'DIST': <FogParameter.DIST: 0>, 'CHAMFER': <FogParameter.CHAMFER: 1>}
+
+    def __eq__(self, other: typing.Any) -> bool:
+        ...
+
+    def __getstate__(self) -> int:
+        ...
+
+    def __hash__(self) -> int:
+        ...
+
+    def __index__(self) -> int:
+        ...
+
+    def __init__(self, value: int) -> None:
+        ...
+
+    def __int__(self) -> int:
+        ...
+
+    def __ne__(self, other: typing.Any) -> bool:
+        ...
+
+    def __repr__(self) -> str:
+        ...
+
+    def __setstate__(self, state: int) -> None:
+        ...
+
+    def __str__(self) -> str:
+        ...
+
+    @property
+    def name(self) -> str:
+        ...
+
+    @property
+    def value(self) -> int:
+        ...
 
 
-class Distribution(Enum):
+@typing.overload
+def fog(point_cloud: torch.Tensor, prob: float, metric: FogParameter,
+        sigma: float, mean: int) -> typing.Optional[list[torch.Tensor]]:
     """
-    Different options to determine which statistical distribution should
-    be used to sample the particles for some weather simulations.
-    """
-    EXPONENTIAL: int
-    LOG_NORMAL: int
-    GM: int
-
-
-@overload
-def fog(point_cloud: Tensor, prob: float, metric: FogParameter, sigma: float,
-        mean: int) -> Optional[list[Tensor]]:
-    """
-    Applies a fog simulation to a point cloud with a chance of `prob`%.
-    The point cloud has the shape (B, P, F).
+    Applies a fog simulation to a point cloud with a chance of `prob` %.
+    The point cloud has the shape `(B, N, F)` where `B` is the number of batches, `N` is the number of points and `F` is the number of features, which is 4; `(x, y, z, i)`.
 
     :param point_cloud: is the point cloud that the simulation is applied to.
     :param prob: is the probability with which the simulation is applied.
@@ -43,11 +139,17 @@ def fog(point_cloud: Tensor, prob: float, metric: FogParameter, sigma: float,
     ...
 
 
-@overload
-def fog(point_cloud: Tensor, metric: FogParameter, viewing_dist: float,
-        max_intensity: IntensityRange) -> Tensor:
+@typing.overload
+def fog(
+    point_cloud: torch.Tensor,
+    metric: FogParameter,
+    viewing_dist: float,
+    max_intensity: lidar_aug.point_cloud.IntensityRange = lidar_aug.
+    point_cloud.IntensityRange.MAX_INTENSITY_1
+) -> torch.Tensor:
     """
     Applies a fog simulation to a point cloud.
+    The point cloud has the shape `(N, F)` where `N` is the number of points and `F` is the number of features, which is 4; `(x, y, z, i)`.
 
     :param point_cloud: is the point cloud that the simulation is applied to.
     :param metric: is a parameter used to control the simulation.
@@ -58,12 +160,19 @@ def fog(point_cloud: Tensor, metric: FogParameter, viewing_dist: float,
     ...
 
 
-@overload
-def rain(point_cloud: Tensor, dims: DistributionRanges, num_drops: int,
-         precipitation: float, d: Distribution,
-         max_intensity: IntensityRange) -> Tensor:
+@typing.overload
+def rain(
+    point_cloud: torch.Tensor,
+    dims: lidar_aug.transformations.DistributionRanges,
+    num_drops: int,
+    precipitation: float,
+    d: Distribution,
+    max_intensity: lidar_aug.point_cloud.IntensityRange = lidar_aug.
+    point_cloud.IntensityRange.MAX_INTENSITY_1
+) -> torch.Tensor:
     """
     Applies a rain simulation to a point cloud.
+    The point cloud has the shape `(N, F)` where `N` is the number of points and `F` is the number of features, which is 4; `(x, y, z, i)`.
 
     :param point_cloud: is the point cloud that the simulation is applied to.
     :param dims: set the upper and lower bounds of the uniform distribution used to draw new points for the noise filter.
@@ -76,11 +185,13 @@ def rain(point_cloud: Tensor, dims: DistributionRanges, num_drops: int,
     ...
 
 
-@overload
-def rain(point_cloud: Tensor, noise_filter_path: str, num_drops_sigma: int,
-         precipitation_sigma: float, prob: float) -> Optional[Tensor]:
+@typing.overload
+def rain(point_cloud: torch.Tensor, noise_filter_path: str,
+         num_drops_sigma: int, precipitation_sigma: float,
+         prob: float) -> typing.Optional[torch.Tensor]:
     """
-    Applies a rain simulation to a point cloud with a chance of `prob`%.
+    Applies a rain simulation to a point cloud with a chance of `prob` %.
+    The point cloud has the shape `(N, F)` where `N` is the number of points and `F` is the number of features, which is 4; `(x, y, z, i)`.
 
     :param point_cloud: is the point cloud that the simulation is applied to.
     :param noise_filter_path: is the path to the directory containing the npz files with the noise filter data.
@@ -92,12 +203,19 @@ def rain(point_cloud: Tensor, noise_filter_path: str, num_drops_sigma: int,
     ...
 
 
-@overload
-def snow(point_cloud: Tensor, dims: DistributionRanges, num_drops: int,
-         precipitation: float, scale: int,
-         max_intensity: IntensityRange) -> Tensor:
+@typing.overload
+def snow(
+    point_cloud: torch.Tensor,
+    dims: lidar_aug.transformations.DistributionRanges,
+    num_drops: int,
+    precipitation: float,
+    scale: int,
+    max_intensity: lidar_aug.point_cloud.IntensityRange = lidar_aug.
+    point_cloud.IntensityRange.MAX_INTENSITY_1
+) -> torch.Tensor:
     """
     Applies a snow simulation to a point cloud.
+    The point cloud has the shape `(N, F)` where `N` is the number of points and `F` is the number of features, which is 4; `(x, y, z, i)`.
 
     :param point_cloud: is the point cloud that the simulation is applied to.
     :param dims: set the upper and lower bounds of the uniform distribution used to draw new points for the noise filter.
@@ -110,12 +228,13 @@ def snow(point_cloud: Tensor, dims: DistributionRanges, num_drops: int,
     ...
 
 
-@overload
-def snow(point_cloud: Tensor, noise_filter_path: str, num_drops_sigma: int,
-         precipitation_sigma: float, scale: int,
-         prob: float) -> Optional[Tensor]:
+@typing.overload
+def snow(point_cloud: torch.Tensor, noise_filter_path: str,
+         num_drops_sigma: int, precipitation_sigma: float, scale: int,
+         prob: float) -> typing.Optional[torch.Tensor]:
     """
-    Applies a snow simulation to a point cloud with a chance of `prob`%.
+    Applies a snow simulation to a point cloud with a chance of `prob` %.
+    The point cloud has the shape `(N, F)` where `N` is the number of points and `F` is the number of features, which is 4; `(x, y, z, i)`.
 
     :param point_cloud: is the point cloud that the simulation is applied to.
     :param noise_filter_path: is the path to the directory containing the npz files with the noise filter data.
