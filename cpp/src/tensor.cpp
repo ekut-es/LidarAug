@@ -22,9 +22,9 @@ change_sparse_representation(const torch::Tensor &input,
         size_t current_count = 0;
 
         for (tensor_size_t i = 0; i < num_tensors; i++) {
-          const auto batch_num = in[i][batch_idx_];
 
-          if (batch_num == num_batches) {
+          if (const auto batch_num = in[i][batch_idx_];
+              batch_num == num_batches) {
             current_count++;
           }
 
