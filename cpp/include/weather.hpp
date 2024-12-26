@@ -56,11 +56,6 @@ snow(torch::Tensor point_cloud,
 rain(torch::Tensor point_cloud, std::string_view noise_filter_path,
      uint32_t num_drops_sigma, float precipitation_sigma, float prob);
 
-[[nodiscard]] torch::Tensor
-snow(torch::Tensor point_cloud,
-     const cpp_utils::distribution_ranges<float> &dims, uint32_t num_drops,
-     float precipitation, int32_t scale, float max_intensity = 1);
-
 [[nodiscard]] std::optional<torch::Tensor>
 snow(torch::Tensor point_cloud, std::string_view noise_filter_path,
      uint32_t num_drops_sigma, float precipitation_sigma, int32_t scale,
