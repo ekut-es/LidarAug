@@ -482,7 +482,7 @@ void apply_transformation(torch::Tensor points,
   points.dot(transformation_matrix.permute({1, 0}));
 
   // write back intensity
-  points.index({Slice(), Slice(), POINT_CLOUD_I_IDX}) = intensity;
+  points.index_put_({Slice(), Slice(), POINT_CLOUD_I_IDX}, intensity);
 }
 
 #ifdef BUILD_MODULE
