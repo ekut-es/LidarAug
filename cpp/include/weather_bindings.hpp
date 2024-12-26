@@ -55,11 +55,11 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       arg("point_cloud"), arg("metric"), arg("viewing_dist"),
       arg("max_intensity") = point_cloud_data::intensity_range::MAX_INTENSITY_1,
       "Applies a fog simulation to a point cloud.\n"
+      "The point cloud has the shape `(N, F)` where `N` is the number of "
+      "points and `F` is the number of features, which is 4; `(x, y, z, i)`.\n"
       "\n"
       ":param point_cloud: is the point cloud that the simulation is applied "
       "to.\n"
-      "The point cloud has the shape `(N, F)` where `N` is the number of "
-      "points and `F` is the number of features, which is 4; `(x, y, z, i)`.\n"
       ":param metric: is a parameter used to control the simulation.\n"
       ":param viewing_dist:  is the viewing distance in the fog.\n"
       ":param max_intensity:  is the maximum intensity value of a point.\n"
