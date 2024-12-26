@@ -366,7 +366,9 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
 void random_point_noise(torch::Tensor points, const float sigma) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
-  auto noise = torch::normal(0, sigma, {dims.batch_size, dims.num_items, 3});
+  const auto noise =
+      torch::normal(0, sigma, {dims.batch_size, dims.num_items, 3});
+
   points.index({torch::indexing::Slice(), torch::indexing::Slice(),
                 torch::indexing::Slice(0, 3)}) += noise;
 }
@@ -374,8 +376,10 @@ void random_point_noise(torch::Tensor points, const float sigma) {
 void transform_along_ray(torch::Tensor points, const float sigma) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
-  auto noise = torch::normal(0, sigma, {dims.batch_size, dims.num_items, 1})
-                   .repeat({1, 1, 3});
+  const auto noise =
+      torch::normal(0, sigma, {dims.batch_size, dims.num_items, 1})
+          .repeat({1, 1, 3});
+
   points.index({torch::indexing::Slice(), torch::indexing::Slice(),
                 torch::indexing::Slice(0, 3)}) += noise;
 }
