@@ -69,8 +69,8 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def(
       "snow",
       pybind11::overload_cast<
-          torch::Tensor, cpp_utils::distribution_ranges<float>, uint32_t, float,
-          int32_t, point_cloud_data::intensity_range>(&snow),
+          torch::Tensor, const cpp_utils::distribution_ranges<float> &,
+          uint32_t, float, int32_t, point_cloud_data::intensity_range>(&snow),
       arg("point_cloud"), arg("dims"), arg("num_drops"), arg("precipitation"),
       arg("scale"),
       arg("max_intensity") = point_cloud_data::intensity_range::MAX_INTENSITY_1,
@@ -119,8 +119,9 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
   m.def(
       "rain",
       pybind11::overload_cast<
-          torch::Tensor, cpp_utils::distribution_ranges<float>, uint32_t, float,
-          distribution, point_cloud_data::intensity_range>(&rain),
+          torch::Tensor, const cpp_utils::distribution_ranges<float> &,
+          uint32_t, float, distribution, point_cloud_data::intensity_range>(
+          &rain),
       arg("point_cloud"), arg("dims"), arg("num_drops"), arg("precipitation"),
       arg("d"),
       arg("max_intensity") = point_cloud_data::intensity_range::MAX_INTENSITY_1,

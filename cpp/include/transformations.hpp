@@ -103,7 +103,7 @@ random_noise(const at::Tensor &points, float sigma,
  *
  * @returns a new tensor containing the new data
  */
-[[nodiscard]] torch::Tensor thin_out(at::Tensor points, float sigma);
+[[nodiscard]] torch::Tensor thin_out(const at::Tensor &points, float sigma);
 
 void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
 
