@@ -66,7 +66,7 @@ change_sparse_representation(const torch::Tensor &input,
       if (batch_num > batch.size()) {
         batch.emplace_back(tensor.clone(torch::get_contiguous_memory_format()));
         tensor_idx = 0;
-        tensor.zero_();
+        std::ignore = tensor.zero_();
       }
 
       tensor.index_put_({tensor_idx++}, in[i]);

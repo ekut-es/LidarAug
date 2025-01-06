@@ -103,7 +103,7 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, const float sigma,
       }
     }
 
-    point_indeces.zero_();
+    std::ignore = point_indeces.zero_();
   }
   scale_box_dimensions(labels, scale_factor);
 }

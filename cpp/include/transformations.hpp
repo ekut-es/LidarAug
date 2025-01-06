@@ -179,8 +179,8 @@ _delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
   const auto idx_names =
       torch::empty({not_deleted_names.size(0)}, names.options().dtype());
 
-  idx_labels.fill_(batch_idx);
-  idx_names.fill_(batch_idx);
+  std::ignore = idx_labels.fill_(batch_idx);
+  std::ignore = idx_names.fill_(batch_idx);
 
   // merge filtered tensors with index
   auto merged_labels =
