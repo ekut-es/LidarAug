@@ -351,6 +351,43 @@ TEST(Transformation, DeleteLabelsByMinPointsTest) {
   }
 }
 
+TEST(Transformation, ApplyTransformationTest) {
+
+  auto tensor = torch::tensor({{
+                                   {1.0, 1.0, 1.0, -1.0},
+                                   {-10.0, 1.0, 5.0, 0.5},
+                                   {20.0, -3.5, 19.0, -0.5},
+                               },
+                               {{-1.0, -2.0, -3.0, 0.4},
+                                {-4.0, -5.0, -6.0, 0.3},
+                                {-7.0, -8.0, -9.0, 0.2}}},
+                              F32);
+
+  const auto transformation_matrix = torch::tensor(
+      {
+          {2.0, 0.0, 0.0}, // Scale x by 2
+          {0.0, 3.0, 0.0}, // Scale y by 3
+          {0.0, 0.0, -4.0} // Scale z by -4
+      },
+      F32);
+
+  const auto expected = torch::tensor({{
+                                           {2.0, 3.0, -4.0, -1.0},
+                                           {-20.0, 3.0, -20.0, 0.5},
+                                           {40.0, -10.5, -76.0, -0.5},
+                                       },
+                                       {{-2.0, -6.0, 12.0, 0.4},
+                                        {-8.0, -15.0, 24.0, 0.3},
+                                        {-14.0, -24.0, 36.0, 0.2}}},
+                                      F32);
+
+  apply_transformation(tensor, transformation_matrix);
+
+  EXPECT_TRUE(tensor.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << tensor;
+}
+
 TEST(Tensor, ChangeSparseRepresentationTest) {
 
   // clang-format off
