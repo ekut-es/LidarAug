@@ -99,7 +99,7 @@ class NoiseType(Enum):
 def apply_transformation(points: torch.Tensor,
                          transformation_matrix: torch.Tensor) -> None:
     """
-    Applies a transformation matrix to an entire point cloud with the shape `(B, N, F)`, where `B` is the number of batches, `N` is the number of points and `F` is the number of features.
+    Applies a transformation matrix to an entire point cloud with the shape `(B, N, F)`, where `B` is the number of batches, `N` is the number of points and `F` has the size 4 and shape `[x, y, z, i]`.
 
     :param points:                is the point cloud that the transformation
                                   matrix is applied to.

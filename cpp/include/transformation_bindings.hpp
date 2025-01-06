@@ -322,7 +322,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
       arg("transformation_matrix"),
       "Applies a transformation matrix to an entire point cloud with the shape "
       "`(B, N, F)`, where `B` is the number of batches, `N` is the number of "
-      "points and `F` is the number of features.\n"
+      "points and `F` has the size 4 and shape `[x, y, z, i]`.\n"
       "\n"
       ":param points:                is the point cloud that the "
       "transformation\n"
