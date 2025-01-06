@@ -473,16 +473,15 @@ local_to_local_transform(const torch::Tensor &from_pose,
 void apply_transformation(torch::Tensor points,
                           const torch::Tensor &transformation_matrix) {
 
-  // save intensity values
-  const auto intensity =
-      torch::index_select(points, 2, torch::tensor({POINT_CLOUD_I_IDX}))
-          .flatten(0);
+  // Extract x, y, z coordinates
+  auto coords = points.index({Slice(), Slice(), Slice(0, 3)});
 
   // apply transformation
-  points.dot(transformation_matrix.permute({1, 0}));
+  const auto transformed_points =
+      coords.matmul(transformation_matrix.permute({1, 0}));
 
-  // write back intensity
-  points.index_put_({Slice(), Slice(), POINT_CLOUD_I_IDX}, intensity);
+  // Update x, y, z in place
+  points.index_put_({Slice(), Slice(), Slice(0, 3)}, transformed_points);
 }
 
 #ifdef BUILD_MODULE
