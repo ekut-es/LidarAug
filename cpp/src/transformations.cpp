@@ -3,7 +3,6 @@
 #include "../include/name.hpp"
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
-#include <ATen/ops/index_select.h>
 #include <algorithm>
 #include <cmath>
 #include <torch/csrc/autograd/generated/variable_factories.h>
