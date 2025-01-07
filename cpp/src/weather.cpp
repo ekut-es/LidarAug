@@ -21,16 +21,16 @@ using namespace torch_utils;
 calculate_factors(const fog_parameter metric, const float viewing_dist) {
   switch (metric) {
   case DIST: {
-    const float extinction_factor = 0.32 * exp(-0.022 * viewing_dist);
-    const float beta = (-0.00846 * viewing_dist) + 2.29;
-    const float delete_probability = -0.63 * exp(-0.02 * viewing_dist) + 1;
+    const float extinction_factor = 0.32f * exp(-0.022 * viewing_dist);
+    const float beta = (-0.00846f * viewing_dist) + 2.29;
+    const float delete_probability = -0.63f * exp(-0.02 * viewing_dist) + 1;
 
     return std::make_tuple(extinction_factor, beta, delete_probability);
   }
   case CHAMFER: {
-    const float extinction_factor = 0.23 * exp(-0.0082 * viewing_dist);
-    const float beta = (-0.006 * viewing_dist) + 2.31;
-    const float delete_probability = -0.7 * exp(-0.024 * viewing_dist) + 1;
+    const float extinction_factor = 0.23f * exp(-0.0082 * viewing_dist);
+    const float beta = (-0.006f * viewing_dist) + 2.31;
+    const float delete_probability = -0.7f * exp(-0.024 * viewing_dist) + 1;
 
     return std::make_tuple(extinction_factor, beta, delete_probability);
   }
