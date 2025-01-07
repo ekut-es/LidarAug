@@ -473,7 +473,7 @@ void apply_transformation(torch::Tensor points,
                           const torch::Tensor &transformation_matrix) {
 
   // Extract x, y, z coordinates
-  auto coords = points.index({Slice(), Slice(), Slice(0, 3)});
+  const auto coords = points.index({Slice(), Slice(), Slice(0, 3)});
 
   // apply transformation
   const auto transformed_points =
