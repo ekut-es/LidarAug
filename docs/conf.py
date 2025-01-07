@@ -23,7 +23,7 @@ lidar_aug.evaluation.ValuesView = MockClass
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'LidarAug'
-copyright = '2024, Tom Schammo, Sven Teufel'
+copyright = '2025, Tom Schammo, Sven Teufel'
 author = 'Tom Schammo, Sven Teufel'
 release = '0.0.1'
 
