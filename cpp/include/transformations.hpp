@@ -143,7 +143,7 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
  *          names (in that order), as well as the batch index.
  */
 [[nodiscard]] inline std::pair<torch::Tensor, torch::Tensor>
-_delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
+delete_labels_by_min_points_(const at::Tensor &points, const at::Tensor &labels,
                              const at::Tensor &names,
                              const tensor_size_t min_points,
                              const tensor_size_t batch_idx) {

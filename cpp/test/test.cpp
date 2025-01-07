@@ -270,7 +270,7 @@ TEST(Transformation, DeleteLabelsByMinPointsHelperTest) {
   constexpr std::uint64_t min_points = 2;
 
   const auto [result_labels, result_names] =
-      _delete_labels_by_min_points(points, labels, names, min_points, 0);
+      delete_labels_by_min_points_(points, labels, names, min_points, 0);
 
   const auto expected_points =
       torch::tensor({{10.4966, 10.1144, 10.2182, -8.4158},

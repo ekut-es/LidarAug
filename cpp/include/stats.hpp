@@ -32,7 +32,7 @@ template <typename T = double, bool Interpolate = true>
 class SnowIntensityDistribution {
 public:
   SnowIntensityDistribution(float min, float max, size_t resolution = 256)
-      : _min(min), _max(max), _d(0, 1) {
+      : min_(min), max_(max), _d(0, 1) {
     if (min >= max)
       throw std::runtime_error(
           "Invalid bounds (hint: min must be smaller than max)");
@@ -76,7 +76,7 @@ public:
   }
 
 private:
-  const float _min, _max;
+  const float min_, max_;
 
   struct Sample {
     T prob, value;

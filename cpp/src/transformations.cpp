@@ -348,7 +348,7 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
 
   for (tensor_size_t i = 0; i < batch_size; i++) {
 
-    auto [filtered_labels, filtered_names] = _delete_labels_by_min_points(
+    auto [filtered_labels, filtered_names] = delete_labels_by_min_points_(
         points[i], labels[i], names[i], min_points, i);
 
     labels_list.emplace_back(filtered_labels);
