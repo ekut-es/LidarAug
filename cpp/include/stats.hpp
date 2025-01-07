@@ -124,10 +124,10 @@ template <typename T, typename D>
 draw_values(D &dist, std::size_t number_of_values = 1,
             bool force = false) noexcept {
 
-  static_assert(std::is_base_of<std::uniform_int_distribution<T>, D>::value ||
-                std::is_base_of<std::uniform_real_distribution<T>, D>::value ||
-                std::is_base_of<std::normal_distribution<T>, D>::value ||
-                std::is_base_of<std::exponential_distribution<T>, D>::value ||
+  static_assert(std::is_base_of_v<std::uniform_int_distribution<T>, D> ||
+                std::is_base_of_v<std::uniform_real_distribution<T>, D> ||
+                std::is_base_of_v<std::normal_distribution<T>, D> ||
+                std::is_base_of_v<std::exponential_distribution<T>, D> ||
                 "'dist' does not satisfy the type constaints!");
 
   auto rng = get_rng();
@@ -164,10 +164,10 @@ template <typename T, c10::ScalarType type, typename D>
 [[nodiscard]] static inline torch::Tensor
 draw_values(D &dist, tensor_size_t number_of_values = 1) {
 
-  static_assert(std::is_base_of<std::uniform_int_distribution<T>, D>::value ||
-                std::is_base_of<std::uniform_real_distribution<T>, D>::value ||
-                std::is_base_of<std::normal_distribution<T>, D>::value ||
-                std::is_base_of<std::exponential_distribution<T>, D>::value ||
+  static_assert(std::is_base_of_v<std::uniform_int_distribution<T>, D> ||
+                std::is_base_of_v<std::uniform_real_distribution<T>, D> ||
+                std::is_base_of_v<std::normal_distribution<T>, D> ||
+                std::is_base_of_v<std::exponential_distribution<T>, D> ||
                 "'dist' does not satisfy the type constaints!");
 
   auto rng = get_rng();
