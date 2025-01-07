@@ -6,9 +6,9 @@
 #include "../include/utils.hpp"
 #include "../include/weather.hpp"
 
+#include <gtest/gtest.h>
 #include <cnpy/cnpy.hpp>
 #include <filesystem>
-#include <gtest/gtest.h>
 #include <torch/types.h>
 
 using namespace torch_utils;
