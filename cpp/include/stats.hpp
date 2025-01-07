@@ -20,7 +20,7 @@
 
 namespace constants {
 constexpr auto seed = 123u;
-}
+} // namespace constants
 
 #define HUNDRED_PERCENT 100
 
