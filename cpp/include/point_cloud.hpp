@@ -25,7 +25,7 @@ namespace point_cloud_data {
  * Intensity goes from [0; MAX_INTENSITY], where MAX_INTENSITY is either 1 or
  * 255.
  */
-enum struct intensity_range {
+enum struct intensity_range  : std::uint8_t {
   MAX_INTENSITY_1 = 1,
   MAX_INTENSITY_255 = 255,
 };

@@ -8,7 +8,7 @@
 #include "../include/utils.hpp"
 #include <torch/serialize/tensor.h>
 
-enum struct noise_type { UNIFORM, SALT_PEPPER, MIN, MAX };
+enum struct noise_type : std::uint8_t { UNIFORM, SALT_PEPPER, MIN, MAX };
 
 void translate(at::Tensor points, const at::Tensor &translation);
 void scale_points(at::Tensor points, float factor);
