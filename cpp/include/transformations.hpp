@@ -8,7 +8,7 @@
 #include "../include/utils.hpp"
 #include <torch/serialize/tensor.h>
 
-enum struct noise_type { UNIFORM, SALT_PEPPER, MIN, MAX };
+enum struct noise_type : std::uint8_t { UNIFORM, SALT_PEPPER, MIN, MAX };
 
 void translate(at::Tensor points, const at::Tensor &translation);
 void scale_points(at::Tensor points, float factor);
@@ -103,7 +103,7 @@ random_noise(const at::Tensor &points, float sigma,
  *
  * @returns a new tensor containing the new data
  */
-[[nodiscard]] torch::Tensor thin_out(at::Tensor points, float sigma);
+[[nodiscard]] torch::Tensor thin_out(const at::Tensor &points, float sigma);
 
 void rotate_random(at::Tensor points, at::Tensor labels, float sigma);
 
@@ -143,7 +143,7 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
  *          names (in that order), as well as the batch index.
  */
 [[nodiscard]] inline std::pair<torch::Tensor, torch::Tensor>
-_delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
+delete_labels_by_min_points_(const at::Tensor &points, const at::Tensor &labels,
                              const at::Tensor &names,
                              const tensor_size_t min_points,
                              const tensor_size_t batch_idx) {
@@ -179,8 +179,8 @@ _delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
   const auto idx_names =
       torch::empty({not_deleted_names.size(0)}, names.options().dtype());
 
-  idx_labels.fill_(batch_idx);
-  idx_names.fill_(batch_idx);
+  std::ignore = idx_labels.fill_(batch_idx);
+  std::ignore = idx_names.fill_(batch_idx);
 
   // merge filtered tensors with index
   auto merged_labels =

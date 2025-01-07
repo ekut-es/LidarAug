@@ -13,11 +13,9 @@
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
-#include <cmath>
 #include <numeric>
 #include <stdexcept>
 #include <torch/serialize/tensor.h>
-#include <type_traits>
 #include <vector>
 
 namespace rt {
@@ -25,7 +23,7 @@ namespace rt {
 template <typename T> struct vec3 {
   T x, y, z;
 
-  vec3<T>(torch::Tensor v)
+  vec3<T>(const torch::Tensor &v)
       : x(v[0].item<T>()), y(v[1].item<T>()), z(v[2].item<T>()){};
   vec3<T>(T _x, T _y, T _z) : x(_x), y(_y), z(_z){};
 
@@ -117,8 +115,8 @@ constexpr auto F64 = torch::kF64;
 constexpr auto I32 = torch::kI32;
 constexpr auto I64 = torch::kI64;
 
-[[nodiscard]] torch::Tensor rotate_yaw_t(torch::Tensor points,
-                                         torch::Tensor angle);
+[[nodiscard]] torch::Tensor rotate_yaw_t(const torch::Tensor &points,
+                                         const torch::Tensor &angle);
 
 /**
  * Converts bounding boxes tensor with shape (N, 7) to a different tensor with

@@ -6,9 +6,9 @@
 #include "../include/utils.hpp"
 #include "../include/weather.hpp"
 
+#include <gtest/gtest.h>
 #include <cnpy/cnpy.hpp>
 #include <filesystem>
-#include <gtest/gtest.h>
 #include <torch/types.h>
 
 using namespace torch_utils;
@@ -270,7 +270,7 @@ TEST(Transformation, DeleteLabelsByMinPointsHelperTest) {
   constexpr std::uint64_t min_points = 2;
 
   const auto [result_labels, result_names] =
-      _delete_labels_by_min_points(points, labels, names, min_points, 0);
+      delete_labels_by_min_points_(points, labels, names, min_points, 0);
 
   const auto expected_points =
       torch::tensor({{10.4966, 10.1144, 10.2182, -8.4158},
@@ -349,6 +349,43 @@ TEST(Transformation, DeleteLabelsByMinPointsTest) {
         << expected_names << "\nactual:\n"
         << result_names;
   }
+}
+
+TEST(Transformation, ApplyTransformationTest) {
+
+  auto tensor = torch::tensor({{
+                                   {1.0, 1.0, 1.0, -1.0},
+                                   {-10.0, 1.0, 5.0, 0.5},
+                                   {20.0, -3.5, 19.0, -0.5},
+                               },
+                               {{-1.0, -2.0, -3.0, 0.4},
+                                {-4.0, -5.0, -6.0, 0.3},
+                                {-7.0, -8.0, -9.0, 0.2}}},
+                              F32);
+
+  const auto transformation_matrix = torch::tensor(
+      {
+          {2.0, 0.0, 0.0}, // Scale x by 2
+          {0.0, 3.0, 0.0}, // Scale y by 3
+          {0.0, 0.0, -4.0} // Scale z by -4
+      },
+      F32);
+
+  const auto expected = torch::tensor({{
+                                           {2.0, 3.0, -4.0, -1.0},
+                                           {-20.0, 3.0, -20.0, 0.5},
+                                           {40.0, -10.5, -76.0, -0.5},
+                                       },
+                                       {{-2.0, -6.0, 12.0, 0.4},
+                                        {-8.0, -15.0, 24.0, 0.3},
+                                        {-14.0, -24.0, 36.0, 0.2}}},
+                                      F32);
+
+  apply_transformation(tensor, transformation_matrix);
+
+  EXPECT_TRUE(tensor.allclose(expected)) << "expected:\n"
+                                         << expected << "\nactual:\n"
+                                         << tensor;
 }
 
 TEST(Tensor, ChangeSparseRepresentationTest) {

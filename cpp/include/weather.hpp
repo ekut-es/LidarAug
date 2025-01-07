@@ -5,13 +5,12 @@
 #include "../include/point_cloud.hpp"
 #include "../include/raytracing.hpp"
 #include "../include/stats.hpp"
-#include <array>
 #include <cstdint>
 #include <optional>
 #include <string_view>
 #include <vector>
 
-typedef enum { DIST, CHAMFER } fog_parameter;
+typedef enum : std::uint8_t { DIST, CHAMFER } fog_parameter;
 
 [[nodiscard]] inline auto get_intensity(const simulation_type sim_t) {
 
@@ -40,25 +39,22 @@ fog(torch::Tensor point_cloud, fog_parameter metric, float viewing_dist,
         point_cloud_data::intensity_range::MAX_INTENSITY_1);
 
 [[nodiscard]] torch::Tensor
-rain(torch::Tensor point_cloud, cpp_utils::distribution_ranges<float> dims,
-     uint32_t num_drops, float precipitation, distribution d,
+rain(torch::Tensor point_cloud,
+     const cpp_utils::distribution_ranges<float> &dims, uint32_t num_drops,
+     float precipitation, distribution d,
      point_cloud_data::intensity_range max_intensity =
          point_cloud_data::intensity_range::MAX_INTENSITY_1);
 
 [[nodiscard]] torch::Tensor
-snow(torch::Tensor point_cloud, cpp_utils::distribution_ranges<float> dims,
-     uint32_t num_drops, float precipitation, int32_t scale,
+snow(torch::Tensor point_cloud,
+     const cpp_utils::distribution_ranges<float> &dims, uint32_t num_drops,
+     float precipitation, int32_t scale,
      point_cloud_data::intensity_range max_intensity =
          point_cloud_data::intensity_range::MAX_INTENSITY_1);
 
 [[nodiscard]] std::optional<torch::Tensor>
 rain(torch::Tensor point_cloud, std::string_view noise_filter_path,
      uint32_t num_drops_sigma, float precipitation_sigma, float prob);
-
-[[nodiscard]] torch::Tensor snow(torch::Tensor point_cloud,
-                                 cpp_utils::distribution_ranges<float> dims,
-                                 uint32_t num_drops, float precipitation,
-                                 int32_t scale, float max_intensity = 1);
 
 [[nodiscard]] std::optional<torch::Tensor>
 snow(torch::Tensor point_cloud, std::string_view noise_filter_path,

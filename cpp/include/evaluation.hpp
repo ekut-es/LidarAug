@@ -64,7 +64,7 @@ calculate_voc_average_precision(const std::vector<T> &recall,
   std::transform(precision.begin(), precision.end(), mean_precision.begin() + 1,
                  [](const T val) { return val; });
 
-  for (std::int64_t i = mean_precision.size() - 2; i >= 0; i--) {
+  for (std::int64_t i = mean_precision.size() - 2; i >= 0; --i) {
     mean_precision[i] = std::max(mean_precision[i], mean_precision[i + 1]);
   }
 

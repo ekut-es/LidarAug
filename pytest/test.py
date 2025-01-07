@@ -351,4 +351,4 @@ def test_fog_0():
 
     result = weather_simulations.fog(points, prob, metric, sigma, mean)
 
-    assert result == None
+    assert result is None

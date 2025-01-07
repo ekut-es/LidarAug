@@ -3,7 +3,6 @@
 #include "../include/name.hpp"
 #include "../include/stats.hpp"
 #include "../include/utils.hpp"
-#include <ATen/ops/index_select.h>
 #include <algorithm>
 #include <cmath>
 #include <torch/csrc/autograd/generated/variable_factories.h>
@@ -103,7 +102,7 @@ void scale_local(at::Tensor point_cloud, at::Tensor labels, const float sigma,
       }
     }
 
-    point_indeces.zero_();
+    std::ignore = point_indeces.zero_();
   }
   scale_box_dimensions(labels, scale_factor);
 }
@@ -308,7 +307,8 @@ void rotate_random(at::Tensor points, at::Tensor labels, const float sigma) {
   // NOTE(tom): coop boxes not implemented
 }
 
-[[nodiscard]] torch::Tensor thin_out(at::Tensor points, const float sigma) {
+[[nodiscard]] torch::Tensor thin_out(const at::Tensor &points,
+                                     const float sigma) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
   const auto percent = get_truncated_normal_value(0, sigma, 0, 1);
@@ -348,7 +348,7 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
 
   for (tensor_size_t i = 0; i < batch_size; i++) {
 
-    auto [filtered_labels, filtered_names] = _delete_labels_by_min_points(
+    auto [filtered_labels, filtered_names] = delete_labels_by_min_points_(
         points[i], labels[i], names[i], min_points, i);
 
     labels_list.emplace_back(filtered_labels);
@@ -366,7 +366,9 @@ delete_labels_by_min_points(const at::Tensor &points, const at::Tensor &labels,
 void random_point_noise(torch::Tensor points, const float sigma) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
-  auto noise = torch::normal(0, sigma, {dims.batch_size, dims.num_items, 3});
+  const auto noise =
+      torch::normal(0, sigma, {dims.batch_size, dims.num_items, 3});
+
   points.index({torch::indexing::Slice(), torch::indexing::Slice(),
                 torch::indexing::Slice(0, 3)}) += noise;
 }
@@ -374,8 +376,10 @@ void random_point_noise(torch::Tensor points, const float sigma) {
 void transform_along_ray(torch::Tensor points, const float sigma) {
   const dimensions dims = {points.size(0), points.size(1), points.size(2)};
 
-  auto noise = torch::normal(0, sigma, {dims.batch_size, dims.num_items, 1})
-                   .repeat({1, 1, 3});
+  const auto noise =
+      torch::normal(0, sigma, {dims.batch_size, dims.num_items, 1})
+          .repeat({1, 1, 3});
+
   points.index({torch::indexing::Slice(), torch::indexing::Slice(),
                 torch::indexing::Slice(0, 3)}) += noise;
 }
@@ -408,7 +412,7 @@ void intensity_shift(torch::Tensor points, const float sigma,
   for (tensor_size_t i = 0; i < dims.batch_size; i++) {
     for (tensor_size_t j = 0; j < dims.num_items; j++) {
 
-      const float current_intensity =
+      const auto current_intensity =
           points[i][j][POINT_CLOUD_I_IDX].item<float>();
       const float new_intensity = std::min(current_intensity + intensity_shift,
                                            static_cast<float>(max_intensity));
@@ -468,16 +472,15 @@ local_to_local_transform(const torch::Tensor &from_pose,
 void apply_transformation(torch::Tensor points,
                           const torch::Tensor &transformation_matrix) {
 
-  // save intensity values
-  const auto intensity =
-      torch::index_select(points, 2, torch::tensor({POINT_CLOUD_I_IDX}))
-          .flatten(0);
+  // Extract x, y, z coordinates
+  const auto coords = points.index({Slice(), Slice(), Slice(0, 3)});
 
   // apply transformation
-  points.dot(transformation_matrix.permute({1, 0}));
+  const auto transformed_points =
+      coords.matmul(transformation_matrix.permute({1, 0}));
 
-  // write back intensity
-  points.index({Slice(), Slice(), POINT_CLOUD_I_IDX}) = intensity;
+  // Update x, y, z in place
+  points.index_put_({Slice(), Slice(), Slice(0, 3)}, transformed_points);
 }
 
 #ifdef BUILD_MODULE
