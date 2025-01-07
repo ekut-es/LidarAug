@@ -10,7 +10,7 @@
 #include <string_view>
 #include <vector>
 
-typedef enum { DIST, CHAMFER } fog_parameter;
+typedef enum : std::uint8_t { DIST, CHAMFER } fog_parameter;
 
 [[nodiscard]] inline auto get_intensity(const simulation_type sim_t) {
 
