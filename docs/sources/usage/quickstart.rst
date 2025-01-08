@@ -35,6 +35,6 @@ To build the Docker image simply run ``make docker``.
 
 This will create a Docker image with the module and all the necessary dependencies.
 
-You can run it using ``docker run -it lidar_aug:1.0.0 bash``
+You can run it using ``docker run -it lidar_aug:latest bash``
 
 **NOTE:** For those using ARM run ``make docker-arm`` instead to build the docker image.
