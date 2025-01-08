@@ -7,3 +7,4 @@ build_files
 **/compile_commands.json
 .idea/
 docs/_build
+dist/
