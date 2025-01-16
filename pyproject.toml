@@ -16,6 +16,31 @@ include-package-data = true
 [project]
 name = "lidar_aug"
 version = "1.0.0"
+authors = [
+  {name = "Tom Schammo", email = "tom.schammo@uni-tuebingen.de"},
+  {name = "Sven Teufel", email = "sven.teufel@uni-tuebingen.de"},
+]
+description = "A toolbox for LiDAR point cloud data, providing point cloud transformations, point cloud augmentation, realistic weather simulation and 2D & 3D AP evaluation, with an easy-to-use Python API. This module supports several essential tasks for the development of LiDAR-based perception methods in automated driving."
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["augmentation", "machine learning", "LiDAR", "self driving", "weather simulation"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Visualization",
+  "Topic :: Scientific/Engineering :: Image Processing",
+
+  "License :: OSI Approved :: Apache Software License",
+
+  "Operating System :: POSIX :: Linux",
+
+  "Programming Language :: Python :: 3.11",
+]
 requires-python = "<3.12"
 dependencies = [
     "torch==2.2.0",
@@ -24,4 +49,9 @@ dependencies = [
     "open3d"
 ]
 
+[project.urls]
+Homepage = "https://lidaraug.readthedocs.io"
+Documentation = "https://lidaraug.readthedocs.io/en/release-v1.0.0/"
+Repository = "https://github.com/ekut-es/LidarAug/"
+Issues = "https://github.com/ekut-es/LidarAug/issues"
 # target-version = "py37"
