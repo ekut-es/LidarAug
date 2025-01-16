@@ -15,7 +15,7 @@ include-package-data = true
 
 [project]
 name = "lidar_aug"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
   {name = "Tom Schammo", email = "tom.schammo@uni-tuebingen.de"},
   {name = "Sven Teufel", email = "sven.teufel@uni-tuebingen.de"},
@@ -51,7 +51,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://lidaraug.readthedocs.io"
-Documentation = "https://lidaraug.readthedocs.io/en/release-v1.0.0/"
+Documentation = "https://lidaraug.readthedocs.io/en/release-v1.0.1/"
 Repository = "https://github.com/ekut-es/LidarAug/"
 Issues = "https://github.com/ekut-es/LidarAug/issues"
 # target-version = "py37"
