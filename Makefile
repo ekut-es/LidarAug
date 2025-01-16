@@ -46,10 +46,10 @@ install:
 	rm -rf ./build ./src/lidar_aug.egg-info && mkdir -p ./tmp && TMPDIR=./tmp python3.11 -m pip install -v . && rm -rf ./tmp
 
 docker:
-	docker build -t lidar_aug:1.0.1 .
+	docker build -t lidar_aug:latest .
 
 docker-arm:
-	docker build -t lidar_aug:1.0.1 --build-arg RUN_CTEST=false .
+	docker build -t lidar_aug:latest --build-arg RUN_CTEST=false .
 
 doc:
 	cd docs && make html
